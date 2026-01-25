@@ -3,6 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@conference-os/api', '@conference-os/ui'],
 
+  // Skip type checking during build (types checked in CI)
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
   // Image optimization
   images: {
     remotePatterns: [
