@@ -53,6 +53,9 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   * {
     @apply border-border;
   }
@@ -133,6 +136,22 @@
       linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
       linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
     background-size: 80px 80px;
+  }
+
+  .cursor-glow {
+    background: radial-gradient(
+      600px 600px at var(--cursor-x, 50%) var(--cursor-y, 20%),
+      rgba(59, 130, 246, 0.18),
+      transparent 65%
+    );
+  }
+
+  .cursor-glow-amber {
+    background: radial-gradient(
+      520px 520px at var(--cursor-x, 60%) var(--cursor-y, 30%),
+      rgba(245, 158, 11, 0.14),
+      transparent 65%
+    );
   }
 
   .glass-panel {
