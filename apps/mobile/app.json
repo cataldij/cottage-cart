@@ -19,6 +19,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.conferenceos.app",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "This app uses the camera to scan QR codes for check-in and badge scanning.",
         "NSMicrophoneUsageDescription": "This app uses the microphone for voice commands and live sessions.",
         "NSLocationWhenInUseUsageDescription": "This app uses your location for venue navigation and nearby attendee discovery.",
