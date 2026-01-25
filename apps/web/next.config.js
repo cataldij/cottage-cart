@@ -61,16 +61,7 @@ const nextConfig = {
     ]
   },
 
-  // Redirects
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/dashboard',
-        permanent: false,
-      },
-    ]
-  },
+  // No redirects - "/" shows the marketing homepage
 }
 
 module.exports = nextConfig
