@@ -135,8 +135,8 @@ async function getAnalyticsData(conferenceId?: string) {
   }))
 
   return {
-    conferences: conferences || [],
-    currentConference: conferences?.find((c) => c.id === targetConferenceId),
+    conferences: conferencesList || [],
+    currentConference: conferencesList?.find((c) => c.id === targetConferenceId),
     totalMembers: totalMembers || 0,
     checkedInMembers: checkedInMembers || 0,
     totalSessions: totalSessions || 0,
