@@ -24,6 +24,7 @@ import {
   Edit,
   Trash2,
   Search,
+  Filter,
 } from 'lucide-react'
 
 async function removeSpeakerAction(speakerId: string) {
@@ -40,7 +41,7 @@ async function removeSpeakerAction(speakerId: string) {
   await supabase.from('conference_members').delete().eq('user_id', speakerId)
 }
 
-async function getSpeakersData() {
+async function getSpeakersData(filters: { query?: string; featured?: string }) {
   const supabase = await createClient()
 
   const {
@@ -59,7 +60,7 @@ async function getSpeakersData() {
     .order('created_at', { ascending: false })
 
   if (!conferences || conferences.length === 0) {
-    return { speakers: [], conference: null }
+    return { speakers: [], allSpeakers: [], conference: null }
   }
 
   const conferenceId = conferences[0].id
@@ -148,14 +149,52 @@ async function getSpeakersData() {
     }
   })
 
+  const allSpeakers = Array.from(speakersMap.values())
+  const query = filters.query?.trim().toLowerCase()
+
+  const filteredSpeakers = allSpeakers.filter((speaker: any) => {
+    if (filters.featured === 'featured' && !speaker.isFeatured) {
+      return false
+    }
+    if (filters.featured === 'not-featured' && speaker.isFeatured) {
+      return false
+    }
+
+    if (!query) {
+      return true
+    }
+
+    const sessionTitles = speaker.sessions?.map((s: any) => s.title) || []
+    const haystack = [
+      speaker.name,
+      speaker.email,
+      speaker.company,
+      speaker.title,
+      ...sessionTitles,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+
+    return haystack.includes(query)
+  })
+
   return {
-    speakers: Array.from(speakersMap.values()),
+    speakers: filteredSpeakers,
+    allSpeakers,
     conference: conferences[0],
   }
 }
 
-export default async function SpeakersPage() {
-  const { speakers, conference } = await getSpeakersData()
+export default async function SpeakersPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string; featured?: string }
+}) {
+  const { speakers, allSpeakers, conference } = await getSpeakersData({
+    query: searchParams?.q,
+    featured: searchParams?.featured,
+  })
 
   if (!conference) {
     return (
@@ -187,8 +226,8 @@ export default async function SpeakersPage() {
     )
   }
 
-  const featuredSpeakers = speakers.filter((s) => s.isFeatured)
-  const totalSessions = speakers.reduce((sum, s) => sum + (s.sessions?.length || 0), 0)
+  const featuredSpeakers = allSpeakers.filter((s: any) => s.isFeatured)
+  const totalSessions = allSpeakers.reduce((sum: number, s: any) => sum + (s.sessions?.length || 0), 0)
 
   return (
     <div className="space-y-8">
@@ -215,7 +254,7 @@ export default async function SpeakersPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{speakers.length}</div>
+            <div className="text-2xl font-bold">{allSpeakers.length}</div>
           </CardContent>
         </Card>
 
@@ -246,26 +285,46 @@ export default async function SpeakersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {speakers.length > 0 ? (totalSessions / speakers.length).toFixed(1) : 0}
+              {allSpeakers.length > 0 ? (totalSessions / allSpeakers.length).toFixed(1) : 0}
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Search Bar */}
-      <div className="flex items-center gap-4">
+      <form className="flex flex-wrap items-center gap-3" method="get">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
+            name="q"
+            defaultValue={searchParams?.q || ''}
             placeholder="Search speakers..."
             className="w-full rounded-md border border-input bg-background py-2 pl-10 pr-4 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
-      </div>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <select
+            name="featured"
+            defaultValue={searchParams?.featured || 'all'}
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="all">All speakers</option>
+            <option value="featured">Featured only</option>
+            <option value="not-featured">Not featured</option>
+          </select>
+        </div>
+        <Button type="submit" variant="outline" size="sm">
+          Apply
+        </Button>
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/dashboard/speakers">Clear</Link>
+        </Button>
+      </form>
 
       {/* Speakers Grid */}
-      {speakers.length === 0 ? (
+      {allSpeakers.length === 0 ? (
         <Card>
           <CardContent className="flex min-h-[300px] flex-col items-center justify-center py-12">
             <Mic className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -281,9 +340,22 @@ export default async function SpeakersPage() {
             </Button>
           </CardContent>
         </Card>
+      ) : speakers.length === 0 ? (
+        <Card>
+          <CardContent className="flex min-h-[240px] flex-col items-center justify-center py-12">
+            <Mic className="mb-4 h-12 w-12 text-muted-foreground" />
+            <h3 className="mb-1 text-lg font-semibold">No matching speakers</h3>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Try adjusting the search or filters.
+            </p>
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/speakers">Clear filters</Link>
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {speakers.map((speaker) => (
+          {speakers.map((speaker: any) => (
             <Card key={speaker.id} className="overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">

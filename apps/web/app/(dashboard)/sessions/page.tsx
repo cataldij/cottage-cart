@@ -11,7 +11,16 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, Calendar, Clock, MapPin, Users, Edit, Trash2 } from 'lucide-react'
+import {
+  Plus,
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Edit,
+  Trash2,
+  LayoutGrid,
+} from 'lucide-react'
 
 async function deleteSessionAction(id: string) {
   'use server'
@@ -116,6 +125,12 @@ export default async function SessionsPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/sessions/agenda">
+              <LayoutGrid className="mr-2 h-4 w-4" />
+              Agenda Builder
+            </Link>
+          </Button>
           <Button variant="outline" asChild>
             <Link href="/dashboard/sessions/tracks">Tracks</Link>
           </Button>

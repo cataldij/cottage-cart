@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Building2, Plus, Trash2 } from 'lucide-react'
+import { Building2, Plus, Trash2, ArrowUpRight } from 'lucide-react'
 
 async function getSponsorsData() {
   const supabase = await createClient()
@@ -223,7 +223,12 @@ export default async function SponsorsPage() {
                   className="flex items-center justify-between rounded-lg border p-4"
                 >
                   <div>
-                    <p className="font-medium">{sponsor.name}</p>
+                    <Link
+                      href={`/dashboard/sponsors/${sponsor.id}`}
+                      className="font-medium hover:underline"
+                    >
+                      {sponsor.name}
+                    </Link>
                     <p className="text-xs text-muted-foreground">
                       {sponsor.tier} - Booth {sponsor.booth_number || 'TBD'}
                     </p>
@@ -231,11 +236,19 @@ export default async function SponsorsPage() {
                       {sponsor.leads?.[0]?.count || 0} leads
                     </p>
                   </div>
-                  <form action={deleteSponsorAction.bind(null, sponsor.id)}>
-                    <Button variant="ghost" size="icon" type="submit">
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/dashboard/sponsors/${sponsor.id}`}>
+                        View leads
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                      </Link>
                     </Button>
-                  </form>
+                    <form action={deleteSponsorAction.bind(null, sponsor.id)}>
+                      <Button variant="ghost" size="icon" type="submit">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </form>
+                  </div>
                 </div>
               ))}
             </div>
