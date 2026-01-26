@@ -1,4 +1,4 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -37,7 +37,11 @@ setInterval(() => {
 }, 60000) // Clean up every minute
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
+  let res = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  })
 
   // Apply rate limiting
   const ip = req.ip ?? req.headers.get('x-forwarded-for') ?? 'unknown'
@@ -45,13 +49,35 @@ export async function middleware(req: NextRequest) {
     return new NextResponse('Too Many Requests', { status: 429 })
   }
 
-  // Create Supabase client
-  const supabase = createMiddlewareClient({ req, res })
+  // Create Supabase client with cookie handlers
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
+          res = NextResponse.next({
+            request: {
+              headers: req.headers,
+            },
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            res.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
 
-  // Refresh session if expired
+  // Refresh session if expired - use getUser() for security
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
+  const session = user ? { user } : null
 
   // Protected routes
   const isAuthPage = req.nextUrl.pathname.startsWith('/login') ||
@@ -97,16 +123,15 @@ export async function middleware(req: NextRequest) {
   }
 
   // Add security headers
-  const response = NextResponse.next()
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set(
+  res.headers.set('X-Frame-Options', 'DENY')
+  res.headers.set('X-Content-Type-Options', 'nosniff')
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  res.headers.set(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=()'
   )
 
-  return response
+  return res
 }
 
 export const config = {
