@@ -47,19 +47,15 @@ export default function RegisterPage() {
     setIsLoading(true)
     try {
       await signUpBrowser(data.email, data.password, data.fullName)
-      toast({
-        title: 'Account created!',
-        description: 'Redirecting to dashboard...',
-      })
-      // Use hard redirect to ensure middleware picks up the new session
-      window.location.href = '/dashboard'
+      console.log('Signup success, redirecting...')
+      // Redirect immediately
+      window.location.replace('/dashboard')
     } catch (error: any) {
       toast({
         title: 'Error',
         description: error.message || 'Failed to create account',
         variant: 'destructive',
       })
-    } finally {
       setIsLoading(false)
     }
   }

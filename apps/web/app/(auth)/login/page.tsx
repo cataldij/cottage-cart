@@ -44,12 +44,9 @@ export default function LoginPage() {
     try {
       const result = await signInBrowser(data.email, data.password)
       console.log('Login success:', result)
-      toast({
-        title: 'Success',
-        description: 'Logged in! Redirecting...',
-      })
-      // Use hard redirect to ensure middleware picks up the new session
-      window.location.href = '/dashboard'
+      console.log('About to redirect to /dashboard...')
+      // Redirect immediately - don't wait for toast
+      window.location.replace('/dashboard')
     } catch (error: any) {
       console.error('Login error:', error)
       toast({
@@ -57,7 +54,6 @@ export default function LoginPage() {
         description: error.message || 'Failed to sign in',
         variant: 'destructive',
       })
-    } finally {
       setIsLoading(false)
     }
   }
