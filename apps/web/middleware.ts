@@ -2,13 +2,23 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Rate limiting store (in production, use Redis)
+// Rate limiting store (in production, use Redis or Upstash)
+// Note: In serverless, this resets on each cold start - consider using database-level rate limiting
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
 
 // Rate limiting function
 function rateLimit(identifier: string, limit: number = 100, windowMs: number = 60000): boolean {
   const now = Date.now()
   const record = rateLimitStore.get(identifier)
+
+  // Clean up expired records on-demand (serverless-friendly)
+  if (rateLimitStore.size > 1000) {
+    for (const [key, rec] of rateLimitStore.entries()) {
+      if (rec.resetAt < now) {
+        rateLimitStore.delete(key)
+      }
+    }
+  }
 
   if (!record || record.resetAt < now) {
     rateLimitStore.set(identifier, {
@@ -25,16 +35,6 @@ function rateLimit(identifier: string, limit: number = 100, windowMs: number = 6
   record.count++
   return true
 }
-
-// Clean up old rate limit records periodically
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, record] of rateLimitStore.entries()) {
-    if (record.resetAt < now) {
-      rateLimitStore.delete(key)
-    }
-  }
-}, 60000) // Clean up every minute
 
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next({
@@ -86,9 +86,7 @@ export async function middleware(req: NextRequest) {
   const isApiRoute = req.nextUrl.pathname.startsWith('/api')
 
   // Redirect to login if accessing protected routes without session
-  // TODO: Re-enable auth check for production
-  const bypassAuth = process.env.NODE_ENV === 'development'
-  if (isDashboardPage && !session && !bypassAuth) {
+  if (isDashboardPage && !session) {
     const redirectUrl = req.nextUrl.clone()
     redirectUrl.pathname = '/login'
     redirectUrl.searchParams.set('redirect', req.nextUrl.pathname)
@@ -122,14 +120,41 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Add security headers
+  // Add comprehensive security headers
   res.headers.set('X-Frame-Options', 'DENY')
   res.headers.set('X-Content-Type-Options', 'nosniff')
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  res.headers.set('X-XSS-Protection', '1; mode=block')
   res.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   )
+
+  // Strict Transport Security (HSTS) - only in production
+  if (process.env.NODE_ENV === 'production') {
+    res.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    )
+  }
+
+  // Content Security Policy
+  const cspHeader = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' blob: data: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live",
+    "frame-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests",
+  ].join('; ')
+
+  res.headers.set('Content-Security-Policy', cspHeader)
 
   return res
 }
