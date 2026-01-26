@@ -26,6 +26,32 @@ import {
   MoreHorizontal,
 } from 'lucide-react'
 
+async function checkInAttendeeAction(memberId: string) {
+  'use server'
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/login')
+  }
+
+  const { error } = await supabase
+    .from('conference_members')
+    .update({
+      checked_in: true,
+      checked_in_at: new Date().toISOString(),
+      checked_in_by: user.id,
+    })
+    .eq('id', memberId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  redirect('/dashboard/attendees')
+}
+
 async function getAttendeesData() {
   const supabase = await createClient()
 
@@ -303,7 +329,7 @@ export default async function AttendeesPage() {
                         {attendee.ticket_type ? (
                           <span className="text-sm">{attendee.ticket_type}</span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">—</span>
+                          <span className="text-sm text-muted-foreground">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -331,10 +357,12 @@ export default async function AttendeesPage() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
                           {!attendee.checked_in && (
-                            <Button variant="outline" size="sm">
-                              <CheckCircle className="mr-1 h-3 w-3" />
-                              Check In
-                            </Button>
+                            <form action={checkInAttendeeAction.bind(null, attendee.id)}>
+                              <Button variant="outline" size="sm" type="submit">
+                                <CheckCircle className="mr-1 h-3 w-3" />
+                                Check In
+                              </Button>
+                            </form>
                           )}
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />

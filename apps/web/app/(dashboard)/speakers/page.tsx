@@ -26,6 +26,20 @@ import {
   Search,
 } from 'lucide-react'
 
+async function removeSpeakerAction(speakerId: string) {
+  'use server'
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/login')
+  }
+
+  await supabase.from('speaker_profiles').delete().eq('user_id', speakerId)
+  await supabase.from('conference_members').delete().eq('user_id', speakerId)
+}
+
 async function getSpeakersData() {
   const supabase = await createClient()
 
@@ -324,7 +338,7 @@ export default async function SpeakersPage() {
                               key={session.id}
                               className="text-xs text-muted-foreground truncate"
                             >
-                              • {session.title}
+                              - {session.title}
                             </p>
                           ))}
                           {speaker.sessions.length > 2 && (
@@ -388,10 +402,12 @@ export default async function SpeakersPage() {
                       Edit
                     </Link>
                   </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="mr-1 h-3 w-3 text-destructive" />
-                    Remove
-                  </Button>
+                  <form action={removeSpeakerAction.bind(null, speaker.id)}>
+                    <Button variant="ghost" size="sm" type="submit">
+                      <Trash2 className="mr-1 h-3 w-3 text-destructive" />
+                      Remove
+                    </Button>
+                  </form>
                 </div>
               </CardContent>
             </Card>

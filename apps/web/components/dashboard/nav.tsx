@@ -53,8 +53,8 @@ const navigation = [
     icon: MessageSquare,
   },
   {
-    name: 'Announcements',
-    href: '/dashboard/announcements',
+    name: 'Notifications',
+    href: '/dashboard/notifications',
     icon: Bell,
   },
   {

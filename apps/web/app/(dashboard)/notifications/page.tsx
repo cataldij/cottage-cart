@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -10,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { getSupabaseBrowser } from '@/lib/supabase-browser'
 import {
   Bell,
   Send,
@@ -30,94 +30,212 @@ interface NotificationHistory {
   sentAt: Date
   recipientCount: number
   status: 'sent' | 'failed' | 'pending'
+  priority: 'low' | 'normal' | 'high' | 'urgent'
 }
 
-// Mock data - replace with API calls
-const mockHistory: NotificationHistory[] = [
-  {
-    id: '1',
-    title: 'Keynote Starting Soon',
-    message: 'The opening keynote with Sarah Chen begins in 15 minutes in the Grand Ballroom.',
-    targetRole: null,
-    sentAt: new Date('2024-06-15T09:45:00'),
-    recipientCount: 342,
-    status: 'sent',
-  },
-  {
-    id: '2',
-    title: 'Schedule Update',
-    message: 'The workshop "Advanced AI Techniques" has moved to Room 204.',
-    targetRole: null,
-    sentAt: new Date('2024-06-15T11:30:00'),
-    recipientCount: 342,
-    status: 'sent',
-  },
-  {
-    id: '3',
-    title: 'Speaker Reminder',
-    message: 'Please arrive at your session room 15 minutes early for A/V setup.',
-    targetRole: 'speaker',
-    sentAt: new Date('2024-06-15T08:00:00'),
-    recipientCount: 24,
-    status: 'sent',
-  },
-]
+type RoleCounts = {
+  all: number
+  speaker: number
+  sponsor: number
+  staff: number
+  pushEnabled: number
+}
 
 export default function NotificationsPage() {
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [targetRole, setTargetRole] = useState<string | null>(null)
   const [priority, setPriority] = useState<'low' | 'normal' | 'high' | 'urgent'>('normal')
+  const [sendPush, setSendPush] = useState(true)
   const [isSending, setIsSending] = useState(false)
-  const [history, setHistory] = useState<NotificationHistory[]>(mockHistory)
+  const [conferenceId, setConferenceId] = useState<string | null>(null)
+  const [roleCounts, setRoleCounts] = useState<RoleCounts>({
+    all: 0,
+    speaker: 0,
+    sponsor: 0,
+    staff: 0,
+    pushEnabled: 0,
+  })
+  const [announcements, setAnnouncements] = useState<any[]>([])
+
+  useEffect(() => {
+    const loadConference = async () => {
+      const supabase = getSupabaseBrowser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: conferences } = await supabase
+        .from('conferences')
+        .select('id')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (conferences && conferences.length > 0) {
+        setConferenceId(conferences[0].id)
+      }
+    }
+
+    loadConference()
+  }, [])
+
+  useEffect(() => {
+    if (!conferenceId) return
+
+    const loadCounts = async () => {
+      const supabase = getSupabaseBrowser()
+      const { data: members } = await supabase
+        .from('conference_members')
+        .select('role, user:profiles(push_enabled)')
+        .eq('conference_id', conferenceId)
+
+      const counts = members?.reduce<RoleCounts>(
+        (acc, member) => {
+          if (member.role === 'speaker') acc.speaker += 1
+          if (member.role === 'sponsor') acc.sponsor += 1
+          if (member.role === 'staff') acc.staff += 1
+          if (member.user?.push_enabled) acc.pushEnabled += 1
+          acc.all += 1
+          return acc
+        },
+        { all: 0, speaker: 0, sponsor: 0, staff: 0, pushEnabled: 0 }
+      )
+
+      setRoleCounts(counts || { all: 0, speaker: 0, sponsor: 0, staff: 0, pushEnabled: 0 })
+    }
+
+    const loadHistory = async () => {
+      const supabase = getSupabaseBrowser()
+      const { data } = await supabase
+        .from('announcements')
+        .select('*')
+        .eq('conference_id', conferenceId)
+        .order('created_at', { ascending: false })
+
+      setAnnouncements(data || [])
+    }
+
+    loadCounts()
+    loadHistory()
+  }, [conferenceId])
+
+  const history: NotificationHistory[] = useMemo(() => {
+    return announcements.map((item) => ({
+      id: item.id,
+      title: item.title,
+      message: item.message,
+      targetRole: item.target_role,
+      sentAt: new Date(item.created_at),
+      recipientCount: item.target_role
+        ? (roleCounts as any)[item.target_role] || 0
+        : roleCounts.all,
+      status: 'sent' as const,
+      priority: (item.priority || 'normal') as NotificationHistory['priority'],
+    }))
+  }, [announcements, roleCounts])
+
+  const roleOptions = useMemo(
+    () => [
+      { value: null, label: 'All Attendees', icon: Users, count: roleCounts.all },
+      { value: 'speaker', label: 'Speakers Only', icon: Mic, count: roleCounts.speaker },
+      { value: 'sponsor', label: 'Sponsors Only', icon: Building2, count: roleCounts.sponsor },
+      { value: 'staff', label: 'Staff Only', icon: Users, count: roleCounts.staff },
+    ],
+    [roleCounts]
+  )
 
   const handleSend = async () => {
     if (!title.trim() || !message.trim()) {
       alert('Please enter both title and message')
       return
     }
-
-    setIsSending(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    const newNotification: NotificationHistory = {
-      id: `${Date.now()}`,
-      title,
-      message,
-      targetRole,
-      sentAt: new Date(),
-      recipientCount: targetRole ? 24 : 342,
-      status: 'sent',
+    if (!conferenceId) {
+      alert('No conference selected')
+      return
     }
 
-    setHistory([newNotification, ...history])
+    setIsSending(true)
+    const supabase = getSupabaseBrowser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    const { data: announcement, error } = await supabase
+      .from('announcements')
+      .insert({
+        conference_id: conferenceId,
+        title: title.trim(),
+        message: message.trim(),
+        priority,
+        target_role: targetRole,
+        send_push: sendPush,
+        created_by: user?.id,
+      })
+      .select()
+      .single()
+
+    if (error || !announcement) {
+      setIsSending(false)
+      alert(error?.message || 'Failed to send notification')
+      return
+    }
+
+    let status: NotificationHistory['status'] = 'sent'
+    if (sendPush) {
+      try {
+        let userIds: string[] | undefined
+        if (targetRole) {
+          const { data: members } = await supabase
+            .from('conference_members')
+            .select('user_id')
+            .eq('conference_id', conferenceId)
+            .eq('role', targetRole)
+          userIds = members?.map((m) => m.user_id) || []
+        }
+
+        await supabase.functions.invoke('send-push-notification', {
+          body: {
+            userIds: userIds && userIds.length > 0 ? userIds : undefined,
+            conferenceId: !targetRole ? conferenceId : undefined,
+            title: title.trim(),
+            body: message.trim(),
+            data: {
+              priority,
+              announcementId: announcement.id,
+            },
+          },
+        })
+      } catch (err) {
+        status = 'failed'
+      }
+    }
+
+    const recipientCount = targetRole
+      ? (roleCounts as any)[targetRole] || 0
+      : roleCounts.all
+
+    setAnnouncements((prev) => [announcement, ...prev])
+
     setTitle('')
     setMessage('')
     setTargetRole(null)
     setPriority('normal')
+    setSendPush(true)
     setIsSending(false)
   }
-
-  const roleOptions = [
-    { value: null, label: 'All Attendees', icon: Users, count: 342 },
-    { value: 'speaker', label: 'Speakers Only', icon: Mic, count: 24 },
-    { value: 'sponsor', label: 'Sponsors Only', icon: Building2, count: 15 },
-    { value: 'staff', label: 'Staff Only', icon: Users, count: 8 },
-  ]
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Notifications</h1>
         <p className="text-muted-foreground">
-          Send push notifications and announcements to attendees
+          Send announcements and push notifications to attendees.
         </p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* Compose Notification */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -125,11 +243,10 @@ export default function NotificationsPage() {
               Send Notification
             </CardTitle>
             <CardDescription>
-              Compose and send a push notification to attendees
+              Compose an announcement for attendees and staff.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Target Audience */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Target Audience</label>
               <div className="grid grid-cols-2 gap-2">
@@ -153,7 +270,6 @@ export default function NotificationsPage() {
               </div>
             </div>
 
-            {/* Priority */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Priority</label>
               <div className="flex gap-2">
@@ -177,7 +293,15 @@ export default function NotificationsPage() {
               </div>
             </div>
 
-            {/* Title */}
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                checked={sendPush}
+                onChange={(e) => setSendPush(e.target.checked)}
+              />
+              Send push notification
+            </label>
+
             <div className="space-y-2">
               <label htmlFor="title" className="text-sm font-medium">
                 Title
@@ -187,14 +311,13 @@ export default function NotificationsPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., Keynote Starting Soon"
+                placeholder="e.g., Keynote starting soon"
                 className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 maxLength={50}
               />
               <p className="text-xs text-muted-foreground">{title.length}/50 characters</p>
             </div>
 
-            {/* Message */}
             <div className="space-y-2">
               <label htmlFor="message" className="text-sm font-medium">
                 Message
@@ -211,7 +334,6 @@ export default function NotificationsPage() {
               <p className="text-xs text-muted-foreground">{message.length}/200 characters</p>
             </div>
 
-            {/* Preview */}
             {(title || message) && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Preview</label>
@@ -231,7 +353,6 @@ export default function NotificationsPage() {
               </div>
             )}
 
-            {/* Send Button */}
             <Button
               onClick={handleSend}
               disabled={!title.trim() || !message.trim() || isSending}
@@ -245,24 +366,24 @@ export default function NotificationsPage() {
               ) : (
                 <>
                   <Send className="mr-2 h-4 w-4" />
-                  Send to {roleOptions.find((r) => r.value === targetRole)?.count || 342}{' '}
-                  {targetRole ? roleOptions.find((r) => r.value === targetRole)?.label.toLowerCase() : 'attendees'}
+                  Send to{' '}
+                  {roleOptions.find((r) => r.value === targetRole)?.count || roleCounts.all}{' '}
+                  {targetRole
+                    ? roleOptions.find((r) => r.value === targetRole)?.label.toLowerCase()
+                    : 'attendees'}
                 </>
               )}
             </Button>
           </CardContent>
         </Card>
 
-        {/* Notification History */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5" />
               Recent Notifications
             </CardTitle>
-            <CardDescription>
-              History of sent notifications
-            </CardDescription>
+            <CardDescription>History of sent announcements.</CardDescription>
           </CardHeader>
           <CardContent>
             {history.length === 0 ? (
@@ -270,7 +391,7 @@ export default function NotificationsPage() {
                 <Bell className="mb-4 h-12 w-12 text-muted-foreground" />
                 <h3 className="mb-1 text-lg font-semibold">No notifications sent</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your sent notifications will appear here
+                  Your sent notifications will appear here.
                 </p>
               </div>
             ) : (
@@ -310,6 +431,9 @@ export default function NotificationsPage() {
                           <span>{notification.recipientCount} recipients</span>
                         </div>
                       </div>
+                      <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium capitalize text-muted-foreground">
+                        {notification.priority}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -319,7 +443,6 @@ export default function NotificationsPage() {
         </Card>
       </div>
 
-      {/* Quick Stats */}
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -328,7 +451,7 @@ export default function NotificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{history.length}</div>
-            <p className="text-xs text-muted-foreground">notifications today</p>
+            <p className="text-xs text-muted-foreground">announcements</p>
           </CardContent>
         </Card>
 
@@ -370,7 +493,12 @@ export default function NotificationsPage() {
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89%</div>
+            <div className="text-2xl font-bold">
+              {roleCounts.all > 0
+                ? Math.round((roleCounts.pushEnabled / roleCounts.all) * 100)
+                : 0}
+              %
+            </div>
             <p className="text-xs text-muted-foreground">of attendees</p>
           </CardContent>
         </Card>

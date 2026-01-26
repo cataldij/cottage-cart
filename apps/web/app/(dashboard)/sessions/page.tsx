@@ -13,6 +13,24 @@ import {
 import { Button } from '@/components/ui/button'
 import { Plus, Calendar, Clock, MapPin, Users, Edit, Trash2 } from 'lucide-react'
 
+async function deleteSessionAction(id: string) {
+  'use server'
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const { error } = await supabase.from('sessions').delete().eq('id', id)
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
 async function getSessionsData() {
   const supabase = await createClient()
 
@@ -97,12 +115,20 @@ export default async function SessionsPage() {
             Manage sessions for {conference.name}
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/sessions/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Session
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/sessions/tracks">Tracks</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/sessions/rooms">Rooms</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/sessions/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Session
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -305,9 +331,11 @@ export default async function SessionsPage() {
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <form action={deleteSessionAction.bind(null, session.id)}>
+                        <Button variant="ghost" size="icon" type="submit">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </form>
                     </div>
                   </div>
                 )
