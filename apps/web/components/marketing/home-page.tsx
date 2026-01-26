@@ -8,55 +8,53 @@ import { ImageReveal } from '@/components/marketing/image-reveal'
 import {
   ArrowRight,
   ArrowUpRight,
-  Award,
-  CheckCircle2,
   Compass,
   Gem,
-  Layers,
   Play,
   ShieldCheck,
   Sparkles,
-  Star,
   Zap,
 } from 'lucide-react'
 
 const stats = [
-  { label: 'Conferences shipped', value: '420+' },
-  { label: 'Attendees orchestrated', value: '1.8M' },
-  { label: 'Average NPS', value: '74' },
-  { label: 'Countries', value: '38' },
+  { label: 'Data tables live', value: '25+' },
+  { label: 'Edge functions', value: '5' },
+  { label: 'Languages supported', value: '12+' },
+  { label: 'Realtime messaging', value: 'Live' },
 ]
 
 const partners = [
-  'Northwind Live',
-  'Summitworks',
-  'Aurora Forum',
-  'Atlas Collective',
-  'Studio Meridian',
-  'Kinetic Labs',
+  'Agenda Builder',
+  'Ticketing + Check-in',
+  'Networking',
+  'Messaging',
+  'Sponsor Tools',
+  'Analytics',
+  'Push Notifications',
+  'Venue Maps',
 ]
 
 const showcases = [
   {
-    name: 'Signal Summit',
-    location: 'New York',
-    detail: 'Hybrid keynote with 42 sessions',
+    name: 'Agenda Builder',
+    location: 'Scheduling & tracks',
+    detail: 'Create sessions, speakers, rooms, and tracks.',
     tone: 'from-sky-500/80 to-indigo-500/80',
     image:
       'https://images.pexels.com/photos/29708277/pexels-photo-29708277.jpeg?cs=srgb&dl=pexels-bertellifotografia-29708277.jpg&fm=jpg',
   },
   {
-    name: 'Nova Product Week',
-    location: 'Berlin',
-    detail: 'Sponsor experience redesign',
+    name: 'Check-in Ops',
+    location: 'Registration + QR',
+    detail: 'Ticket tiers, QR badges, and onsite check-in.',
     tone: 'from-amber-400/80 to-rose-500/80',
     image:
       'https://images.pexels.com/photos/29708259/pexels-photo-29708259.jpeg?cs=srgb&dl=pexels-bertellifotografia-29708259.jpg&fm=jpg',
   },
   {
-    name: 'Atlas Builders Live',
-    location: 'San Francisco',
-    detail: '150 speakers across 12 stages',
+    name: 'Sponsor Hub',
+    location: 'Expo + leads',
+    detail: 'Sponsor profiles, booths, and lead capture.',
     tone: 'from-emerald-400/80 to-teal-500/80',
     image:
       'https://images.pexels.com/photos/27945914/pexels-photo-27945914.jpeg?cs=srgb&dl=pexels-diva-plavalaguna-27945914.jpg&fm=jpg',
@@ -65,23 +63,23 @@ const showcases = [
 
 const capabilities = [
   {
-    title: 'Real-time control',
-    copy: 'Operate check-ins, content, and comms from a single command layer.',
+    title: 'Conference setup + branding',
+    copy: 'Create events with custom logos, banners, and color systems.',
     icon: Zap,
   },
   {
-    title: 'Elevated sponsor value',
-    copy: 'Premium booth flows and measurable engagement for partners.',
+    title: 'Agenda + speaker management',
+    copy: 'Build tracks, rooms, sessions, and speaker lineups in one place.',
     icon: Gem,
   },
   {
-    title: 'Delightful attendee journeys',
-    copy: 'Personalized agendas, networking, and smart notifications.',
+    title: 'Ticketing + check-in ops',
+    copy: 'Stripe-backed ticketing, QR badges, and real-time check-in.',
     icon: Compass,
   },
   {
-    title: 'Enterprise-grade security',
-    copy: 'Role-based access and compliance-ready data handling.',
+    title: 'Realtime comms + analytics',
+    copy: 'Announcements, push notifications, and live engagement metrics.',
     icon: ShieldCheck,
   },
 ]
@@ -101,19 +99,27 @@ const steps = [
   },
 ]
 
-const testimonials = [
-  {
-    quote:
-      'Conference OS felt like a creative studio and ops command center in one. We doubled retention.',
-    name: 'Maya Patel',
-    role: 'VP Experiences, Signal Labs',
-  },
-  {
-    quote:
-      'Our sponsors finally had a premium digital booth and a real story to tell.',
-    name: 'Javier Moreno',
-    role: 'Director of Growth, Atlas',
-  },
+const liveNow = [
+  'Conference creation and branding',
+  'Agenda builder with tracks, rooms, and sessions',
+  'Speaker and attendee management',
+  'Ticket tiers, QR badges, and check-in',
+  'Networking and direct messaging',
+  'Announcements with push notifications',
+  'Analytics dashboard with realtime charts',
+  'Venue maps + proximity networking',
+  'Sponsor booths and lead capture',
+  'AI recommendations + session summaries',
+  'Live translation and text-to-speech announcements',
+]
+
+const comingNext = [
+  'Live streaming + session replay (API ready)',
+  'Real-time transcription + captions (Whisper)',
+  'AR wayfinding for indoor navigation',
+  'Meeting scheduler for 1:1s',
+  'Session feedback and ratings',
+  'Calendar sync (Google + Apple)',
 ]
 
 const heroBackdrop =
@@ -183,17 +189,17 @@ export default function HomePage() {
             </div>
           </div>
           <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
-            <a href="#work" className="transition hover:text-slate-900">
-              Work
+            <a href="#modules" className="transition hover:text-slate-900">
+              Modules
             </a>
             <a href="#capabilities" className="transition hover:text-slate-900">
               Capabilities
             </a>
-            <a href="#insights" className="transition hover:text-slate-900">
-              Insights
+            <a href="#live" className="transition hover:text-slate-900">
+              Live now
             </a>
-            <a href="#team" className="transition hover:text-slate-900">
-              Team
+            <a href="#launch" className="transition hover:text-slate-900">
+              Launch
             </a>
           </nav>
           <div className="flex items-center gap-3">
@@ -229,14 +235,13 @@ export default function HomePage() {
               </div>
               <div className="space-y-4">
                 <h1 className="font-display text-4xl font-semibold leading-[1.05] text-slate-900 md:text-6xl">
-                  Open with a{' '}
-                  <span className="text-gradient">wow</span>. Deliver with
-                  precision.
+                  The operating system for{' '}
+                  <span className="text-gradient">conference leaders</span>.
                 </h1>
                 <p className="text-base text-slate-600 md:text-lg">
-                  Conference OS blends creative storytelling, live operations,
-                  and AI intelligence into a single system. Everything you need
-                  to move from first sketch to showtime.
+                  Conference OS runs the full organizer workflow - from
+                  conference setup and ticketing to live engagement, analytics,
+                  and attendee networking. Built for modern event teams.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -379,7 +384,7 @@ export default function HomePage() {
       </div>
 
       <motion.section
-        id="work"
+        id="modules"
         className="mx-auto w-full max-w-6xl px-6 py-20 lg:px-8"
         variants={stagger}
         initial="hidden"
@@ -389,14 +394,14 @@ export default function HomePage() {
         <motion.div className="flex flex-wrap items-end justify-between gap-6" variants={fadeUp}>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-              Featured work
+              Modules live today
             </p>
             <h2 className="font-display mt-3 text-3xl text-slate-900 md:text-4xl">
-              Conferences crafted with intention.
+              Built for organizers. Ready for launch.
             </h2>
           </div>
           <Button variant="outline" className="rounded-full border-white/70 bg-white/80">
-            View all case studies
+            View all modules
             <ArrowUpRight className="h-4 w-4" />
           </Button>
         </motion.div>
@@ -426,7 +431,7 @@ export default function HomePage() {
                   </h3>
                   <p className="mt-2 text-sm text-white/80">{item.detail}</p>
                   <div className="mt-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-                    View case
+                    View module
                     <ArrowUpRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -559,7 +564,7 @@ export default function HomePage() {
       </motion.section>
 
       <motion.section
-        id="insights"
+        id="live"
         className="mx-auto w-full max-w-6xl px-6 py-20 lg:px-8"
         variants={stagger}
         initial="hidden"
@@ -567,28 +572,23 @@ export default function HomePage() {
         viewport={{ once: true, amount: 0.2 }}
       >
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <motion.div className="space-y-6" variants={fadeUp}>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                Client feedback
-              </p>
-              <h2 className="font-display mt-3 text-3xl text-slate-900 md:text-4xl">
-                Trusted by teams pushing the category forward.
-              </h2>
+          <motion.div className="glass-panel rounded-3xl p-6" variants={fadeUp}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  Live today
+                </p>
+                <h3 className="font-display mt-2 text-xl text-slate-900">
+                  Organizer platform features
+                </h3>
+              </div>
+              <Sparkles className="h-6 w-6 text-slate-500" />
             </div>
-            <div className="grid gap-6">
-              {testimonials.map((item) => (
-                <div key={item.name} className="glass-panel rounded-3xl p-6">
-                  <div className="flex items-center gap-2 text-amber-400">
-                    {[...Array(5)].map((_, idx) => (
-                      <Star key={idx} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm text-slate-600">{item.quote}</p>
-                  <p className="mt-4 text-sm font-semibold text-slate-900">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-slate-500">{item.role}</p>
+            <div className="mt-6 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+              {liveNow.map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-emerald-500" />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
@@ -597,45 +597,28 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                  Accolades
+                  Coming next
                 </p>
                 <h3 className="font-display mt-2 text-xl text-slate-900">
-                  Awards + press
+                  Roadmap in progress
                 </h3>
               </div>
-              <Award className="h-6 w-6 text-slate-500" />
+              <Compass className="h-6 w-6 text-slate-500" />
             </div>
-            <div className="mt-6 space-y-4 text-sm text-slate-600">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-1 h-4 w-4 text-emerald-500" />
-                Event Tech 50 - Best Organizer Platform
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-1 h-4 w-4 text-emerald-500" />
-                Fast Company - Design Systems for Live Events
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-1 h-4 w-4 text-emerald-500" />
-                Product Hunt - Top Launch of the Month
-              </div>
-            </div>
-            <div className="mt-8 rounded-2xl border border-white/70 bg-white/80 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                  Social proof
-                </p>
-                <Layers className="h-5 w-5 text-slate-500" />
-              </div>
-              <p className="mt-3 text-sm text-slate-600">
-                120,000+ organizers follow our updates.
-              </p>
+            <div className="mt-6 space-y-3 text-sm text-slate-600">
+              {comingNext.map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-slate-400" />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
       </motion.section>
 
       <motion.section
-        id="team"
+        id="launch"
         className="mx-auto w-full max-w-6xl px-6 pb-24 pt-10 lg:px-8"
         variants={stagger}
         initial="hidden"
