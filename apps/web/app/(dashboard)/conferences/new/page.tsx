@@ -63,6 +63,8 @@ async function createConferenceAction(formData: FormData) {
     created_by: user.id,
   }
 
+  console.log('Creating conference with payload:', JSON.stringify(payload, null, 2))
+
   const { data, error } = await supabase
     .from('conferences')
     .insert(payload)
@@ -70,8 +72,11 @@ async function createConferenceAction(formData: FormData) {
     .single()
 
   if (error) {
-    throw new Error(error.message)
+    console.error('Conference insert error:', error)
+    throw new Error(`Failed to create conference: ${error.message} (code: ${error.code})`)
   }
+
+  console.log('Conference created with ID:', data.id)
 
   // Add the creator as an organizer in conference_members
   const { error: memberError } = await supabase
@@ -83,12 +88,14 @@ async function createConferenceAction(formData: FormData) {
     })
 
   if (memberError) {
+    console.error('Member insert error:', memberError)
     // If adding member fails, try to clean up the conference
     await supabase.from('conferences').delete().eq('id', data.id)
-    throw new Error(memberError.message)
+    throw new Error(`Failed to add organizer: ${memberError.message} (code: ${memberError.code})`)
   }
 
-  redirect(`/dashboard/conferences/${data.id}`)
+  console.log('User added as organizer, redirecting to conference page')
+  redirect(`/conferences/${data.id}`)
 }
 
 export default function NewConferencePage() {
