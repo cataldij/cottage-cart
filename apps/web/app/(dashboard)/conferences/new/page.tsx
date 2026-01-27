@@ -73,6 +73,21 @@ async function createConferenceAction(formData: FormData) {
     throw new Error(error.message)
   }
 
+  // Add the creator as an organizer in conference_members
+  const { error: memberError } = await supabase
+    .from('conference_members')
+    .insert({
+      conference_id: data.id,
+      user_id: user.id,
+      role: 'organizer',
+    })
+
+  if (memberError) {
+    // If adding member fails, try to clean up the conference
+    await supabase.from('conferences').delete().eq('id', data.id)
+    throw new Error(memberError.message)
+  }
+
   redirect(`/dashboard/conferences/${data.id}`)
 }
 
