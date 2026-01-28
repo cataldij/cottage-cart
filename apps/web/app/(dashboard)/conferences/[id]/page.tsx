@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Calendar, Users, MapPin, Trash2 } from 'lucide-react'
+import { Calendar, Users, MapPin, Trash2, Palette, Eye, ExternalLink } from 'lucide-react'
 
 async function getConference(id: string) {
   const supabase = await createClient()
@@ -113,14 +113,20 @@ export default async function ConferenceDetailPage({
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
+            <Link href={`/c/${conference.slug}`} target="_blank">
+              <Eye className="mr-2 h-4 w-4" />
+              Preview
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/dashboard/conferences/${conference.id}/settings`}>
+              <Palette className="mr-2 h-4 w-4" />
+              Customize
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
             <Link href="/dashboard/conferences">Back</Link>
           </Button>
-          <form action={deleteConferenceAction.bind(null, conference.id)}>
-            <Button variant="destructive" type="submit">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </Button>
-          </form>
         </div>
       </div>
 
