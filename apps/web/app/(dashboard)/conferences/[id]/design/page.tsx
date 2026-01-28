@@ -154,11 +154,7 @@ export default function DesignStudioPage({
           conferenceId={params.id}
           initialTokens={initialTokens}
         >
-          <DesignEditor
-            conferenceId={params.id}
-            pageSections={pageSections}
-            onPageSectionsChange={handlePageSectionsChange}
-          />
+          <DesignEditor conferenceId={params.id} />
         </DesignSystemProvider>
       </div>
     </div>
