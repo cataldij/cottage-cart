@@ -182,12 +182,14 @@ interface DesignSystemProviderProps {
   conferenceId: string | null;
   initialTokens?: DesignTokens;
   children: React.ReactNode;
+  demoMode?: boolean;
 }
 
 export function DesignSystemProvider({
   conferenceId,
   initialTokens,
   children,
+  demoMode = false,
 }: DesignSystemProviderProps) {
   const [tokens, setTokensState] = useState<DesignTokens>(initialTokens || DEFAULT_TOKENS);
   const [savedTokens, setSavedTokens] = useState<DesignTokens>(initialTokens || DEFAULT_TOKENS);
@@ -204,9 +206,9 @@ export function DesignSystemProvider({
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Load tokens when conferenceId changes
+  // Load tokens when conferenceId changes (skip in demo mode)
   useEffect(() => {
-    if (!conferenceId) return;
+    if (!conferenceId || demoMode) return;
 
     async function loadTokens() {
       setIsLoading(true);
@@ -232,7 +234,7 @@ export function DesignSystemProvider({
     }
 
     loadTokens();
-  }, [conferenceId, supabase]);
+  }, [conferenceId, supabase, demoMode]);
 
   // Inject CSS variables into document
   useEffect(() => {
@@ -326,8 +328,12 @@ export function DesignSystemProvider({
     }
   }, [setTokens]);
 
-  // Save tokens to database
+  // Save tokens to database (shows alert in demo mode)
   const saveTokens = useCallback(async (): Promise<boolean> => {
+    if (demoMode) {
+      alert('Saving is disabled in demo mode. Sign up to save your designs!');
+      return false;
+    }
     if (!conferenceId) return false;
 
     setIsSaving(true);
@@ -370,7 +376,7 @@ export function DesignSystemProvider({
     } finally {
       setIsSaving(false);
     }
-  }, [conferenceId, tokens, supabase]);
+  }, [conferenceId, tokens, supabase, demoMode]);
 
   // Undo/Redo
   const undo = useCallback(() => {
@@ -387,8 +393,12 @@ export function DesignSystemProvider({
     }
   }, [history, historyIndex]);
 
-  // Apply a preset
+  // Apply a preset (shows alert in demo mode)
   const applyPreset = useCallback(async (presetSlug: string): Promise<boolean> => {
+    if (demoMode) {
+      alert('Presets are disabled in demo mode. Sign up to use design presets!');
+      return false;
+    }
     try {
       const { data: preset, error } = await supabase
         .from('design_presets')
@@ -407,7 +417,7 @@ export function DesignSystemProvider({
       console.error('Error applying preset:', error);
       return false;
     }
-  }, [setTokens, supabase]);
+  }, [setTokens, supabase, demoMode]);
 
   // CSS helpers
   const getCSSVariables = useCallback((): Record<string, string> => {
