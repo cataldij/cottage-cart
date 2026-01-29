@@ -837,6 +837,11 @@ export function DesignEditor({ conferenceId }: DesignEditorProps) {
     setTokens,
     updateColor,
     updateFont,
+    generateFromPrompt,
+    saveTokens,
+    undo,
+    redo,
+  } = useDesignSystem();
 
   // Dynamically load Google Fonts when typography changes
   useEffect(() => {
@@ -859,11 +864,6 @@ export function DesignEditor({ conferenceId }: DesignEditorProps) {
       document.head.appendChild(link);
     });
   }, [tokens.typography?.fontFamily]);
-    generateFromPrompt,
-    saveTokens,
-    undo,
-    redo,
-  } = useDesignSystem();
 
   const [activeTab, setActiveTab] = useState('ai');
   const [deviceSize, setDeviceSize] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
