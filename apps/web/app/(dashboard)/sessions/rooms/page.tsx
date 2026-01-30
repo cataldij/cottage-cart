@@ -58,7 +58,7 @@ async function createRoomAction(formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const payload = {
@@ -75,7 +75,7 @@ async function createRoomAction(formData: FormData) {
   const { error } = await supabase.from('rooms').insert(payload)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/sessions/rooms')
+  redirect('/sessions/rooms')
 }
 
 async function deleteRoomAction(id: string) {
@@ -89,7 +89,7 @@ async function deleteRoomAction(id: string) {
   const { error } = await supabase.from('rooms').delete().eq('id', id)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/sessions/rooms')
+  redirect('/sessions/rooms')
 }
 
 export default async function RoomsPage() {

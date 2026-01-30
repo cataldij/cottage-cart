@@ -54,7 +54,7 @@ async function createSponsorAction(formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const payload = {
@@ -70,7 +70,7 @@ async function createSponsorAction(formData: FormData) {
   const { error } = await supabase.from('sponsors').insert(payload)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/sponsors')
+  redirect('/sponsors')
 }
 
 async function deleteSponsorAction(id: string) {
@@ -84,7 +84,7 @@ async function deleteSponsorAction(id: string) {
   const { error } = await supabase.from('sponsors').delete().eq('id', id)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/sponsors')
+  redirect('/sponsors')
 }
 
 export default async function SponsorsPage() {

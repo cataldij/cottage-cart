@@ -26,7 +26,7 @@ async function getSpeakerData(speakerId: string) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const conferenceId = conferences[0].id
@@ -38,7 +38,7 @@ async function getSpeakerData(speakerId: string) {
     .single()
 
   if (!profile) {
-    redirect('/dashboard/speakers')
+    redirect('/speakers')
   }
 
   const { data: speakerProfile } = await supabase
@@ -88,7 +88,7 @@ async function updateSpeakerAction(speakerId: string, formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const conferenceId = conferences[0].id
@@ -120,7 +120,7 @@ async function updateSpeakerAction(speakerId: string, formData: FormData) {
       .insert(selected.map((sessionId) => ({ session_id: sessionId, speaker_id: speakerId })))
   }
 
-  redirect('/dashboard/speakers')
+  redirect('/speakers')
 }
 
 async function removeSpeakerAction(speakerId: string) {
@@ -133,7 +133,7 @@ async function removeSpeakerAction(speakerId: string) {
 
   await supabase.from('speaker_profiles').delete().eq('user_id', speakerId)
   await supabase.from('conference_members').delete().eq('user_id', speakerId)
-  redirect('/dashboard/speakers')
+  redirect('/speakers')
 }
 
 export default async function EditSpeakerPage({

@@ -47,7 +47,7 @@ async function inviteAttendeeAction(formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const conferenceId = conferences[0].id
@@ -82,7 +82,7 @@ async function inviteAttendeeAction(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/attendees')
+  redirect('/attendees')
 }
 
 export default async function InviteAttendeePage() {

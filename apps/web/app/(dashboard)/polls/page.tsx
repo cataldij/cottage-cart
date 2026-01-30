@@ -30,7 +30,7 @@ async function createPollAction(formData: FormData) {
     .filter(Boolean)
 
   if (!sessionId || !question || options.length === 0) {
-    redirect('/dashboard/polls')
+    redirect('/polls')
   }
 
   const payload = {
@@ -44,7 +44,7 @@ async function createPollAction(formData: FormData) {
   const { error } = await supabase.from('polls').insert(payload)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/polls')
+  redirect('/polls')
 }
 
 async function updatePollStatusAction(formData: FormData) {
@@ -68,7 +68,7 @@ async function updatePollStatusAction(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/polls')
+  redirect('/polls')
 }
 
 async function updatePollResultsAction(formData: FormData) {
@@ -89,7 +89,7 @@ async function updatePollResultsAction(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/polls')
+  redirect('/polls')
 }
 
 async function getPollsData() {

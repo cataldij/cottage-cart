@@ -49,7 +49,7 @@ async function checkInAttendeeAction(memberId: string) {
     throw new Error(error.message)
   }
 
-  redirect('/dashboard/attendees')
+  redirect('/attendees')
 }
 
 async function getAttendeesData(filters: {

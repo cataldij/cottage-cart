@@ -62,7 +62,7 @@ async function createTrackAction(formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const payload = {
@@ -76,7 +76,7 @@ async function createTrackAction(formData: FormData) {
   const { error } = await supabase.from('tracks').insert(payload)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/sessions/tracks')
+  redirect('/sessions/tracks')
 }
 
 async function deleteTrackAction(id: string) {
@@ -90,7 +90,7 @@ async function deleteTrackAction(id: string) {
   const { error } = await supabase.from('tracks').delete().eq('id', id)
   if (error) throw new Error(error.message)
 
-  redirect('/dashboard/sessions/tracks')
+  redirect('/sessions/tracks')
 }
 
 export default async function TracksPage() {

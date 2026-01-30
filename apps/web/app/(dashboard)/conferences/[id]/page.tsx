@@ -28,7 +28,7 @@ async function getConference(id: string) {
     .single()
 
   if (!conference) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   return { conference, userId: user.id }
@@ -94,7 +94,7 @@ async function deleteConferenceAction(id: string) {
     throw new Error(error.message)
   }
 
-  redirect('/dashboard/conferences')
+  redirect('/conferences')
 }
 
 export default async function ConferenceDetailPage({
@@ -119,13 +119,13 @@ export default async function ConferenceDetailPage({
             </Link>
           </Button>
           <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-            <Link href={`/dashboard/conferences/${conference.id}/design`}>
+            <Link href={`/conferences/${conference.id}/design`}>
               <Sparkles className="mr-2 h-4 w-4" />
               Design Studio
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href={`/dashboard/conferences/${conference.id}/settings`}>
+            <Link href={`/conferences/${conference.id}/settings`}>
               <Palette className="mr-2 h-4 w-4" />
               Settings
             </Link>

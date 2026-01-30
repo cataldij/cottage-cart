@@ -28,7 +28,7 @@ async function getSessionData(id: string) {
     .single()
 
   if (!session) {
-    redirect('/dashboard/sessions')
+    redirect('/sessions')
   }
 
   const { data: tracks } = await supabase
@@ -82,7 +82,7 @@ async function updateSessionAction(id: string, formData: FormData) {
     throw new Error(error.message)
   }
 
-  redirect('/dashboard/sessions')
+  redirect('/sessions')
 }
 
 async function deleteSessionAction(id: string) {
@@ -103,7 +103,7 @@ async function deleteSessionAction(id: string) {
     throw new Error(error.message)
   }
 
-  redirect('/dashboard/sessions')
+  redirect('/sessions')
 }
 
 export default async function EditSessionPage({

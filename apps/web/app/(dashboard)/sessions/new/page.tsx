@@ -67,7 +67,7 @@ async function createSessionAction(formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const conferenceId = conferences[0].id
@@ -97,7 +97,7 @@ async function createSessionAction(formData: FormData) {
     throw new Error(error.message)
   }
 
-  redirect('/dashboard/sessions')
+  redirect('/sessions')
 }
 
 export default async function NewSessionPage() {

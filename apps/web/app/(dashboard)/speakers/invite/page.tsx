@@ -50,7 +50,7 @@ async function inviteSpeakerAction(formData: FormData) {
     .limit(1)
 
   if (!conferences || conferences.length === 0) {
-    redirect('/dashboard/conferences')
+    redirect('/conferences')
   }
 
   const conferenceId = conferences[0].id
@@ -91,7 +91,7 @@ async function inviteSpeakerAction(formData: FormData) {
       bio,
     })
 
-  redirect('/dashboard/speakers')
+  redirect('/speakers')
 }
 
 export default async function InviteSpeakerPage() {
