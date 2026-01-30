@@ -28,6 +28,7 @@ export default function DesignStudioPage() {
         const { data } = await supabase
           .from('conferences')
           .select('id, name')
+          .eq('created_by', user.id)
           .order('created_at', { ascending: false })
 
         if (data && data.length > 0) {

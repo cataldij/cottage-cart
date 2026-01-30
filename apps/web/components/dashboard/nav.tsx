@@ -26,57 +26,57 @@ const navigation = [
   },
   {
     name: 'Conferences',
-    href: '/dashboard/conferences',
+    href: '/conferences',
     icon: Calendar,
   },
   {
     name: 'Attendees',
-    href: '/dashboard/attendees',
+    href: '/attendees',
     icon: Users,
   },
   {
     name: 'Speakers',
-    href: '/dashboard/speakers',
+    href: '/speakers',
     icon: UserCog,
   },
   {
     name: 'Sponsors',
-    href: '/dashboard/sponsors',
+    href: '/sponsors',
     icon: Building2,
   },
   {
     name: 'Tickets',
-    href: '/dashboard/tickets',
+    href: '/tickets',
     icon: Ticket,
   },
   {
     name: 'Messages',
-    href: '/dashboard/messages',
+    href: '/messages',
     icon: MessageSquare,
   },
   {
     name: 'Notifications',
-    href: '/dashboard/notifications',
+    href: '/notifications',
     icon: Bell,
   },
   {
     name: 'Live Polls',
-    href: '/dashboard/polls',
+    href: '/polls',
     icon: ListChecks,
   },
   {
     name: 'Badges',
-    href: '/dashboard/badges',
+    href: '/badges',
     icon: BadgeCheck,
   },
   {
     name: 'Analytics',
-    href: '/dashboard/analytics',
+    href: '/analytics',
     icon: BarChart3,
   },
   {
     name: 'Settings',
-    href: '/dashboard/settings',
+    href: '/settings',
     icon: Settings,
   },
 ]

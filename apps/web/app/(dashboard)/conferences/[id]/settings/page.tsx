@@ -181,7 +181,7 @@ export default function ConferenceSettingsPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href={`/dashboard/conferences/${params.id}`}>
+            <Link href={`/conferences/${params.id}`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>

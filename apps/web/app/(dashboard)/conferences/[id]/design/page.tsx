@@ -119,7 +119,7 @@ export default function DesignStudioPage({
       <div className="flex items-center justify-between border-b px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href={`/dashboard/conferences/${params.id}`}>
+            <Link href={`/conferences/${params.id}`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -141,7 +141,7 @@ export default function DesignStudioPage({
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href={`/dashboard/conferences/${params.id}/settings`}>
+            <Link href={`/conferences/${params.id}/settings`}>
               Classic Settings
             </Link>
           </Button>

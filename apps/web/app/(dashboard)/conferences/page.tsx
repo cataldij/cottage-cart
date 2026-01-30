@@ -273,7 +273,7 @@ function ConferenceCard({
             </div>
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <Link href={`/dashboard/conferences/${conference.id}`}>
+                <Link href={`/conferences/${conference.id}`}>
                   <Settings className="mr-1 h-3 w-3" />
                   Manage
                 </Link>
