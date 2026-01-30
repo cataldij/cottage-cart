@@ -16,9 +16,8 @@ import {
   Bell,
   ListChecks,
   BadgeCheck,
-  Palette,
-  Rocket,
   Eye,
+  Plus,
 } from 'lucide-react'
 
 interface NavItem {
@@ -26,6 +25,11 @@ interface NavItem {
   href: string
   icon: React.ComponentType<{ className?: string }>
   highlight?: boolean
+}
+
+interface NavSection {
+  title: string
+  items: NavItem[]
 }
 
 interface AppNavProps {
@@ -43,82 +47,102 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
   // For non-demo mode with empty basePath, use /dashboard as the overview page
   const overviewHref = basePath ? basePath : (isDemo ? '/' : '/dashboard')
 
-  const navigation: NavItem[] = [
+  const sections: NavSection[] = [
     {
-      name: 'Overview',
-      href: overviewHref,
-      icon: LayoutDashboard,
+      title: 'Main',
+      items: [
+        {
+          name: 'Overview',
+          href: overviewHref,
+          icon: LayoutDashboard,
+        },
+        {
+          name: 'Conferences',
+          href: `${basePath}/conferences`,
+          icon: Calendar,
+          highlight: true,
+        },
+        {
+          name: 'Preview',
+          href: `${basePath}/preview`,
+          icon: Eye,
+        },
+      ],
     },
     {
-      name: 'App Builder',
-      href: `${basePath}/builder`,
-      icon: Rocket,
-      highlight: true,
+      title: 'Content',
+      items: [
+        {
+          name: 'Sessions',
+          href: `${basePath}/sessions/agenda`,
+          icon: Calendar,
+        },
+        {
+          name: 'Speakers',
+          href: `${basePath}/speakers`,
+          icon: UserCog,
+        },
+        {
+          name: 'Sponsors',
+          href: `${basePath}/sponsors`,
+          icon: Building2,
+        },
+      ],
     },
     {
-      name: 'Design Studio',
-      href: `${basePath}/design`,
-      icon: Palette,
+      title: 'Attendees',
+      items: [
+        {
+          name: 'Attendees',
+          href: `${basePath}/attendees`,
+          icon: Users,
+        },
+        {
+          name: 'Tickets',
+          href: `${basePath}/tickets`,
+          icon: Ticket,
+        },
+        {
+          name: 'Check-in',
+          href: `${basePath}/check-in`,
+          icon: BadgeCheck,
+        },
+      ],
     },
     {
-      name: 'Preview',
-      href: `${basePath}/preview`,
-      icon: Eye,
+      title: 'Engagement',
+      items: [
+        {
+          name: 'Messages',
+          href: `${basePath}/messages`,
+          icon: MessageSquare,
+        },
+        {
+          name: 'Notifications',
+          href: `${basePath}/notifications`,
+          icon: Bell,
+        },
+        {
+          name: 'Live Polls',
+          href: `${basePath}/polls`,
+          icon: ListChecks,
+        },
+      ],
     },
     {
-      name: 'Conferences',
-      href: `${basePath}/conferences`,
-      icon: Calendar,
-    },
-    {
-      name: 'Attendees',
-      href: `${basePath}/attendees`,
-      icon: Users,
-    },
-    {
-      name: 'Speakers',
-      href: `${basePath}/speakers`,
-      icon: UserCog,
-    },
-    {
-      name: 'Sponsors',
-      href: `${basePath}/sponsors`,
-      icon: Building2,
-    },
-    {
-      name: 'Tickets',
-      href: `${basePath}/tickets`,
-      icon: Ticket,
-    },
-    {
-      name: 'Messages',
-      href: `${basePath}/messages`,
-      icon: MessageSquare,
-    },
-    {
-      name: 'Notifications',
-      href: `${basePath}/notifications`,
-      icon: Bell,
-    },
-    {
-      name: 'Live Polls',
-      href: `${basePath}/polls`,
-      icon: ListChecks,
-    },
-    {
-      name: 'Badges',
-      href: `${basePath}/badges`,
-      icon: BadgeCheck,
-    },
-    {
-      name: 'Analytics',
-      href: `${basePath}/analytics`,
-      icon: BarChart3,
-    },
-    {
-      name: 'Settings',
-      href: `${basePath}/settings`,
-      icon: Settings,
+      title: 'Insights',
+      items: [
+        {
+          name: 'Analytics',
+          href: `${basePath}/analytics`,
+          icon: BarChart3,
+        },
+        {
+          name: 'Settings',
+          href: `${basePath}/settings`,
+          icon: Settings,
+        },
+      ],
     },
   ]
 
@@ -148,36 +172,48 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="relative flex-1 space-y-1 overflow-y-auto p-4 scrollbar-thin">
-        <div className="px-2 pb-2 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Workspace
-        </div>
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+      {/* Quick Action: Create Conference */}
+      <div className="relative px-4 pt-4">
+        <Link
+          href={`${basePath}/conferences/new`}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-blue-700 hover:to-violet-700 hover:shadow-lg"
+        >
+          <Plus className="h-4 w-4" />
+          New Conference
+        </Link>
+      </div>
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
-                isActive
-                  ? 'bg-slate-900 text-white shadow-soft'
-                  : 'text-slate-600 hover:bg-white/80 hover:text-slate-900',
-                item.highlight && !isActive && 'text-primary'
-              )}
-            >
-              <item.icon className="h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
-              {item.name}
-              {item.highlight && !isActive && (
-                <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-                  New
-                </span>
-              )}
-            </Link>
-          )
-        })}
+      {/* Navigation */}
+      <nav className="relative flex-1 space-y-6 overflow-y-auto p-4 scrollbar-thin">
+        {sections.map((section) => (
+          <div key={section.title}>
+            <div className="px-2 pb-2 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              {section.title}
+            </div>
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
+                      isActive
+                        ? 'bg-slate-900 text-white shadow-soft'
+                        : 'text-slate-600 hover:bg-white/80 hover:text-slate-900',
+                      item.highlight && !isActive && 'text-primary'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* User section */}
