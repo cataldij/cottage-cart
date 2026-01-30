@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Sparkles, Palette } from 'lucide-react'
 import { DesignStudioClient } from './client'
 
+// Force dynamic rendering to prevent caching
+export const dynamic = 'force-dynamic'
+
 interface Conference {
   id: string
   name: string
@@ -21,11 +24,19 @@ async function getConferences(): Promise<Conference[]> {
     redirect('/login')
   }
 
-  const { data } = await supabase
+  console.log('[Design Studio] Fetching conferences for user:', user.id)
+
+  const { data, error } = await supabase
     .from('conferences')
     .select('id, name, slug')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('[Design Studio] Error fetching conferences:', error)
+  }
+
+  console.log('[Design Studio] Found conferences:', data?.length || 0)
 
   return data || []
 }
