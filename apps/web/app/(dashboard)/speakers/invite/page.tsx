@@ -103,7 +103,7 @@ export default async function InviteSpeakerPage() {
         <h1 className="text-3xl font-bold">Invite Speaker</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -119,7 +119,7 @@ export default async function InviteSpeakerPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/speakers">Back to Speakers</Link>
+          <Link href="/speakers">Back to Speakers</Link>
         </Button>
       </div>
 
@@ -169,7 +169,7 @@ export default async function InviteSpeakerPage() {
             </div>
             <div className="md:col-span-2 flex justify-end gap-3">
               <Button variant="outline" asChild>
-                <Link href="/dashboard/speakers">Cancel</Link>
+                <Link href="/speakers">Cancel</Link>
               </Button>
               <Button type="submit">Invite Speaker</Button>
             </div>

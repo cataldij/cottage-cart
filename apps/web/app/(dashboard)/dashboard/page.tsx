@@ -211,14 +211,14 @@ export default async function DashboardPage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild className="rounded-full bg-slate-900 px-5 text-white shadow-soft hover:bg-slate-800">
-                <Link href="/dashboard/conferences/new">Create conference</Link>
+                <Link href="/conferences/new">Create conference</Link>
               </Button>
               <Button
                 variant="outline"
                 asChild
                 className="rounded-full border-white/70 bg-white/80 px-5 text-slate-700 shadow-soft hover:bg-white"
               >
-                <Link href="/dashboard/attendees/invite">Invite team</Link>
+                <Link href="/attendees/invite">Invite team</Link>
               </Button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -471,7 +471,7 @@ export default async function DashboardPage() {
               <TrendingUp className="h-5 w-5 text-slate-500" />
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Link href="/dashboard/conferences/new" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
+              <Link href="/conferences/new" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
                   <Calendar className="h-5 w-5" />
                 </div>
@@ -482,7 +482,7 @@ export default async function DashboardPage() {
                   Build the next event in minutes.
                 </p>
               </Link>
-              <Link href="/dashboard/sponsors" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
+              <Link href="/sponsors" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white">
                   <Building2 className="h-5 w-5" />
                 </div>
@@ -493,7 +493,7 @@ export default async function DashboardPage() {
                   Launch a premium booth experience.
                 </p>
               </Link>
-              <Link href="/dashboard/analytics" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
+              <Link href="/analytics" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
                   <TrendingUp className="h-5 w-5" />
                 </div>
@@ -504,7 +504,7 @@ export default async function DashboardPage() {
                   Track engagement in real time.
                 </p>
               </Link>
-              <Link href="/dashboard/check-in" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
+              <Link href="/check-in" className="group flex flex-col gap-2 rounded-2xl border border-white/70 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-soft">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-white">
                   <Zap className="h-5 w-5" />
                 </div>

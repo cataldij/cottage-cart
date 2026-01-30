@@ -147,7 +147,7 @@ export default async function PollsPage() {
         <h1 className="text-3xl font-bold tracking-tight">Live Polls</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -212,7 +212,7 @@ export default async function PollsPage() {
                 Add sessions before creating polls.
               </p>
               <Button asChild>
-                <Link href="/dashboard/sessions/new">Create Session</Link>
+                <Link href="/sessions/new">Create Session</Link>
               </Button>
             </div>
           ) : (

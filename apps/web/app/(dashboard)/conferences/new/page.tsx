@@ -103,14 +103,14 @@ export default function NewConferencePage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/conferences">Back to Conferences</Link>
+          <Link href="/conferences">Back to Conferences</Link>
         </Button>
       </div>
 
       <AIConferenceForm action={createConferenceAction}>
         <div className="flex justify-end gap-3">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/conferences">Cancel</Link>
+            <Link href="/conferences">Cancel</Link>
           </Button>
           <Button type="submit">Create Conference</Button>
         </div>

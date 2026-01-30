@@ -108,7 +108,7 @@ export default async function BadgesPage({
         <h1 className="text-3xl font-bold tracking-tight">Badge Printing</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -198,7 +198,7 @@ export default async function BadgesPage({
           Apply
         </Button>
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard/badges">Clear</Link>
+          <Link href="/badges">Clear</Link>
         </Button>
       </form>
 

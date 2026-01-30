@@ -111,7 +111,7 @@ export default async function NewSessionPage() {
           <p className="text-muted-foreground">Create a conference first.</p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -127,7 +127,7 @@ export default async function NewSessionPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/sessions">Back to Sessions</Link>
+          <Link href="/sessions">Back to Sessions</Link>
         </Button>
       </div>
 
@@ -284,7 +284,7 @@ export default async function NewSessionPage() {
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions">Cancel</Link>
+            <Link href="/sessions">Cancel</Link>
           </Button>
           <Button type="submit">Create Session</Button>
         </div>

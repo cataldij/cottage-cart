@@ -59,7 +59,7 @@ export default async function AgendaPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -76,10 +76,10 @@ export default async function AgendaPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions">Back to Sessions</Link>
+            <Link href="/sessions">Back to Sessions</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions/rooms">Manage Rooms</Link>
+            <Link href="/sessions/rooms">Manage Rooms</Link>
           </Button>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default async function AgendaPage() {
             Add rooms to start arranging your agenda.
           </p>
           <Button className="mt-4" asChild>
-            <Link href="/dashboard/sessions/rooms">Create Rooms</Link>
+            <Link href="/sessions/rooms">Create Rooms</Link>
           </Button>
         </div>
       ) : (

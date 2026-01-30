@@ -61,7 +61,7 @@ export default async function SettingsPage() {
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )

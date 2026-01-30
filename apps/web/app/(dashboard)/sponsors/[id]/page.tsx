@@ -69,7 +69,7 @@ export default async function SponsorDetailPage({
         <h1 className="text-3xl font-bold">Sponsor Detail</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -83,7 +83,7 @@ export default async function SponsorDetailPage({
           This sponsor is not associated with {conference.name}.
         </p>
         <Button asChild>
-          <Link href="/dashboard/sponsors">Back to Sponsors</Link>
+          <Link href="/sponsors">Back to Sponsors</Link>
         </Button>
       </div>
     )
@@ -107,7 +107,7 @@ export default async function SponsorDetailPage({
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sponsors">Back to Sponsors</Link>
+            <Link href="/sponsors">Back to Sponsors</Link>
           </Button>
           <Button asChild>
             <a href={`/dashboard/sponsors/${sponsor.id}/export`}>Export CSV</a>

@@ -104,7 +104,7 @@ export default async function SessionsPage() {
               Create a conference to start adding sessions
             </p>
             <Button asChild>
-              <Link href="/dashboard/conferences">
+              <Link href="/conferences">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Conference
               </Link>
@@ -126,19 +126,19 @@ export default async function SessionsPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions/agenda">
+            <Link href="/sessions/agenda">
               <LayoutGrid className="mr-2 h-4 w-4" />
               Agenda Builder
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions/tracks">Tracks</Link>
+            <Link href="/sessions/tracks">Tracks</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions/rooms">Rooms</Link>
+            <Link href="/sessions/rooms">Rooms</Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard/sessions/new">
+            <Link href="/sessions/new">
               <Plus className="mr-2 h-4 w-4" />
               New Session
             </Link>
@@ -224,7 +224,7 @@ export default async function SessionsPage() {
                 Start building your conference agenda
               </p>
               <Button asChild>
-                <Link href="/dashboard/sessions/new">
+                <Link href="/sessions/new">
                   <Plus className="mr-2 h-4 w-4" />
                   Create First Session
                 </Link>

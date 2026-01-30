@@ -131,7 +131,7 @@ export default async function ConferenceDetailPage({
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/dashboard/conferences">Back</Link>
+            <Link href="/conferences">Back</Link>
           </Button>
         </div>
       </div>
@@ -328,7 +328,7 @@ export default async function ConferenceDetailPage({
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/conferences">Cancel</Link>
+            <Link href="/conferences">Cancel</Link>
           </Button>
           <Button type="submit">Save changes</Button>
         </div>

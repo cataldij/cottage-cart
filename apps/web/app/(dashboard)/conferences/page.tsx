@@ -79,7 +79,7 @@ export default async function ConferencesPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">
+          <Link href="/conferences/new">
             <Plus className="mr-2 h-4 w-4" />
             New Conference
           </Link>
@@ -141,7 +141,7 @@ export default async function ConferencesPage() {
               Create your first conference to start building your event
             </p>
             <Button asChild>
-              <Link href="/dashboard/conferences/new">
+              <Link href="/conferences/new">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Conference
               </Link>

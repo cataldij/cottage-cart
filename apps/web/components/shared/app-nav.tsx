@@ -40,10 +40,13 @@ interface AppNavProps {
 export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
   const pathname = usePathname()
 
+  // For non-demo mode with empty basePath, use /dashboard as the overview page
+  const overviewHref = basePath ? basePath : (isDemo ? '/' : '/dashboard')
+
   const navigation: NavItem[] = [
     {
       name: 'Overview',
-      href: basePath || '/',
+      href: overviewHref,
       icon: LayoutDashboard,
     },
     {
@@ -132,7 +135,7 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
 
       {/* Logo */}
       <div className="relative flex h-20 items-center border-b border-white/70 px-6">
-        <Link href={basePath || '/'} className="flex items-center gap-3">
+        <Link href={overviewHref} className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-amber-400 to-teal-400 text-white shadow-soft">
             <span className="text-lg font-bold">C</span>
           </div>

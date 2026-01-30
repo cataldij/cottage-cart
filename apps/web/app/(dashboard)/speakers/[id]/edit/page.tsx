@@ -153,7 +153,7 @@ export default async function EditSpeakerPage({
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/speakers">Back</Link>
+            <Link href="/speakers">Back</Link>
           </Button>
           <form action={removeSpeakerAction.bind(null, profile.id)}>
             <Button variant="destructive" type="submit">
@@ -257,7 +257,7 @@ export default async function EditSpeakerPage({
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/speakers">Cancel</Link>
+            <Link href="/speakers">Cancel</Link>
           </Button>
           <Button type="submit">Save changes</Button>
         </div>

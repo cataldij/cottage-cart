@@ -96,7 +96,7 @@ export default async function SponsorsPage() {
         <h1 className="text-3xl font-bold">Sponsors</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )

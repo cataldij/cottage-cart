@@ -102,7 +102,7 @@ export default async function TracksPage() {
         <h1 className="text-3xl font-bold">Tracks</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -118,7 +118,7 @@ export default async function TracksPage() {
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/sessions">Back to Sessions</Link>
+          <Link href="/sessions">Back to Sessions</Link>
         </Button>
       </div>
 

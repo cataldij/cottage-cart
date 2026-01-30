@@ -72,7 +72,7 @@ export default async function MessagesPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )

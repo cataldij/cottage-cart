@@ -122,7 +122,7 @@ export default async function EditSessionPage({
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions">Back</Link>
+            <Link href="/sessions">Back</Link>
           </Button>
           <form action={deleteSessionAction.bind(null, session.id)}>
             <Button variant="destructive" type="submit">
@@ -296,7 +296,7 @@ export default async function EditSessionPage({
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" asChild>
-            <Link href="/dashboard/sessions">Cancel</Link>
+            <Link href="/sessions">Cancel</Link>
           </Button>
           <Button type="submit">Save changes</Button>
         </div>

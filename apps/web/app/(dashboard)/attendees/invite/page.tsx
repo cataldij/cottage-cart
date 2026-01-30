@@ -94,7 +94,7 @@ export default async function InviteAttendeePage() {
         <h1 className="text-3xl font-bold">Add Attendee</h1>
         <p className="text-muted-foreground">Create a conference first.</p>
         <Button asChild>
-          <Link href="/dashboard/conferences/new">Create Conference</Link>
+          <Link href="/conferences/new">Create Conference</Link>
         </Button>
       </div>
     )
@@ -108,7 +108,7 @@ export default async function InviteAttendeePage() {
           <p className="text-muted-foreground">Invite someone to {conference.name}</p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/dashboard/attendees">Back to Attendees</Link>
+          <Link href="/attendees">Back to Attendees</Link>
         </Button>
       </div>
 
@@ -162,7 +162,7 @@ export default async function InviteAttendeePage() {
             </label>
             <div className="md:col-span-2 flex justify-end gap-3">
               <Button variant="outline" asChild>
-                <Link href="/dashboard/attendees">Cancel</Link>
+                <Link href="/attendees">Cancel</Link>
               </Button>
               <Button type="submit">Add Attendee</Button>
             </div>

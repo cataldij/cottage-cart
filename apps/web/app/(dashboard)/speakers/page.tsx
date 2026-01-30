@@ -215,7 +215,7 @@ export default async function SpeakersPage({
               Create a conference to start adding speakers
             </p>
             <Button asChild>
-              <Link href="/dashboard/conferences">
+              <Link href="/conferences">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Conference
               </Link>
@@ -239,7 +239,7 @@ export default async function SpeakersPage({
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/speakers/invite">
+          <Link href="/speakers/invite">
             <Plus className="mr-2 h-4 w-4" />
             Invite Speaker
           </Link>
@@ -319,7 +319,7 @@ export default async function SpeakersPage({
           Apply
         </Button>
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard/speakers">Clear</Link>
+          <Link href="/speakers">Clear</Link>
         </Button>
       </form>
 
@@ -333,7 +333,7 @@ export default async function SpeakersPage({
               Invite speakers to present at your conference
             </p>
             <Button asChild>
-              <Link href="/dashboard/speakers/invite">
+              <Link href="/speakers/invite">
                 <Plus className="mr-2 h-4 w-4" />
                 Invite First Speaker
               </Link>
@@ -349,7 +349,7 @@ export default async function SpeakersPage({
               Try adjusting the search or filters.
             </p>
             <Button variant="outline" asChild>
-              <Link href="/dashboard/speakers">Clear filters</Link>
+              <Link href="/speakers">Clear filters</Link>
             </Button>
           </CardContent>
         </Card>

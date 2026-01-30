@@ -185,7 +185,7 @@ export default async function AttendeesPage({
               Create a conference to see attendees
             </p>
             <Button asChild>
-              <Link href="/dashboard/conferences">
+              <Link href="/conferences">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Conference
               </Link>
@@ -211,7 +211,7 @@ export default async function AttendeesPage({
             Export CSV
           </Button>
           <Button asChild>
-            <Link href="/dashboard/attendees/invite">
+            <Link href="/attendees/invite">
               <Plus className="mr-2 h-4 w-4" />
               Add Attendee
             </Link>
@@ -305,7 +305,7 @@ export default async function AttendeesPage({
           Apply
         </Button>
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard/attendees">Clear</Link>
+          <Link href="/attendees">Clear</Link>
         </Button>
       </form>
 
