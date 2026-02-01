@@ -10,11 +10,32 @@ interface DesktopWebsitePreviewProps {
   venueName?: string
   primaryColor: string
   secondaryColor?: string
+  accentColor?: string
+  backgroundColor?: string
+  textColor?: string
+  navBackgroundColor?: string
+  navTextColor?: string
+  buttonColor?: string
+  buttonTextColor?: string
   bannerUrl?: string | null
   logoUrl?: string | null
+  fontHeading?: string
+  fontBody?: string
+  heroHeight?: 'small' | 'medium' | 'large' | 'full'
+  heroOverlayOpacity?: number
   sessions?: Array<{ id: string; title: string; room?: string }>
   speakers?: Array<{ id: string; name: string; title?: string; avatarUrl?: string }>
   sponsors?: Array<{ id: string; name: string; logoUrl?: string; tier: string }>
+}
+
+// Map hero height to pixel values
+function getHeroMinHeight(height?: string): number {
+  switch (height) {
+    case 'small': return 280
+    case 'large': return 520
+    case 'full': return 600
+    default: return 400
+  }
 }
 
 /**
@@ -29,13 +50,26 @@ export function DesktopWebsitePreview({
   venueName,
   primaryColor,
   secondaryColor,
+  accentColor,
+  backgroundColor = '#ffffff',
+  textColor = '#1f2937',
+  navBackgroundColor = '#ffffff',
+  navTextColor = '#374151',
+  buttonColor,
+  buttonTextColor = '#ffffff',
   bannerUrl,
   logoUrl,
+  fontHeading = 'Inter',
+  fontBody = 'Inter',
+  heroHeight = 'medium',
+  heroOverlayOpacity = 0.3,
   sessions = [],
   speakers = [],
   sponsors = [],
 }: DesktopWebsitePreviewProps) {
   const gradientHero = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor || adjustColor(primaryColor, -20)} 100%)`
+  const effectiveButtonColor = buttonColor || primaryColor
+  const heroMinHeight = getHeroMinHeight(heroHeight)
 
   // Mock data for realistic preview
   const mockSessions = sessions.length > 0 ? sessions : [
@@ -68,14 +102,15 @@ export function DesktopWebsitePreview({
   }
 
   return (
-    <div className="min-h-full bg-white">
+    <div className="min-h-full" style={{ backgroundColor, fontFamily: `"${fontBody}", sans-serif` }}>
       {/* Navigation Bar */}
       <nav
         className="sticky top-0 z-50 flex items-center justify-between px-8 py-4"
         style={{
-          backgroundColor: 'rgba(255,255,255,0.95)',
+          backgroundColor: `${navBackgroundColor}f2`,
           backdropFilter: 'blur(8px)',
           borderBottom: '1px solid #e5e7eb',
+          color: navTextColor,
         }}
       >
         <div className="flex items-center gap-3">
@@ -83,13 +118,13 @@ export function DesktopWebsitePreview({
             <img src={logoUrl} alt={eventName} className="h-10 w-auto" />
           ) : (
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-white text-lg font-bold"
-              style={{ backgroundColor: primaryColor }}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold"
+              style={{ backgroundColor: primaryColor, color: buttonTextColor }}
             >
               {eventName.charAt(0)}
             </div>
           )}
-          <span className="text-lg font-semibold text-gray-900">{eventName}</span>
+          <span className="text-lg font-semibold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>{eventName}</span>
         </div>
 
         <div className="flex items-center gap-8">
@@ -97,14 +132,15 @@ export function DesktopWebsitePreview({
             <a
               key={item}
               href="#"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: navTextColor }}
             >
               {item}
             </a>
           ))}
           <button
-            className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-105"
-            style={{ backgroundColor: primaryColor }}
+            className="rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:scale-105"
+            style={{ backgroundColor: effectiveButtonColor, color: buttonTextColor }}
           >
             Register Now
           </button>
@@ -115,17 +151,34 @@ export function DesktopWebsitePreview({
       <section
         className="relative overflow-hidden"
         style={{
-          background: gradientHero,
-          minHeight: 400,
+          background: bannerUrl ? undefined : gradientHero,
+          minHeight: heroMinHeight,
         }}
       >
-        {/* Background pattern */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
+        {/* Banner image if provided */}
+        {bannerUrl && (
+          <>
+            <img
+              src={bannerUrl}
+              alt={eventName}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: `rgba(0, 0, 0, ${heroOverlayOpacity})` }}
+            />
+          </>
+        )}
+
+        {/* Background pattern for gradient hero */}
+        {!bannerUrl && (
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          />
+        )}
 
         <div className="relative max-w-6xl mx-auto px-8 py-20 text-center">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium text-white mb-6">
@@ -133,7 +186,7 @@ export function DesktopWebsitePreview({
             {formatDate(startDate)} {endDate && `- ${formatDate(endDate)}`}
           </div>
 
-          <h1 className="text-5xl font-bold text-white mb-4 leading-tight">
+          <h1 className="text-5xl font-bold text-white mb-4 leading-tight" style={{ fontFamily: `"${fontHeading}", sans-serif` }}>
             {eventName}
           </h1>
 
@@ -145,8 +198,8 @@ export function DesktopWebsitePreview({
 
           <div className="flex items-center justify-center gap-4">
             <button
-              className="flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold shadow-lg transition-transform hover:scale-105"
-              style={{ color: primaryColor }}
+              className="flex items-center gap-2 rounded-full px-8 py-4 text-base font-semibold shadow-lg transition-transform hover:scale-105"
+              style={{ backgroundColor: accentColor || '#ffffff', color: accentColor ? buttonTextColor : effectiveButtonColor }}
             >
               Get Your Ticket
               <ArrowRight className="h-4 w-4" />
@@ -168,8 +221,8 @@ export function DesktopWebsitePreview({
 
       {/* Stats Bar */}
       <section
-        className="border-b border-gray-100"
-        style={{ backgroundColor: '#fafafa' }}
+        className="border-b"
+        style={{ backgroundColor: `${backgroundColor}f8`, borderColor: `${textColor}15` }}
       >
         <div className="max-w-6xl mx-auto px-8 py-8 grid grid-cols-4 gap-8">
           {[
@@ -180,8 +233,8 @@ export function DesktopWebsitePreview({
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <stat.icon className="h-6 w-6 mx-auto mb-2" style={{ color: primaryColor }} />
-              <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-              <div className="text-sm text-gray-500">{stat.label}</div>
+              <div className="text-3xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>{stat.value}</div>
+              <div className="text-sm" style={{ color: `${textColor}80` }}>{stat.label}</div>
             </div>
           ))}
         </div>
@@ -191,8 +244,8 @@ export function DesktopWebsitePreview({
       <section className="max-w-6xl mx-auto px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Featured Sessions</h2>
-            <p className="text-gray-500">Explore our curated selection of talks and workshops</p>
+            <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Featured Sessions</h2>
+            <p style={{ color: `${textColor}99` }}>Explore our curated selection of talks and workshops</p>
           </div>
           <a
             href="#"
@@ -208,7 +261,8 @@ export function DesktopWebsitePreview({
           {mockSessions.slice(0, 3).map((session, index) => (
             <div
               key={session.id}
-              className="group rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:shadow-lg hover:border-gray-200"
+              className="group rounded-2xl border p-6 transition-all hover:shadow-lg"
+              style={{ backgroundColor, borderColor: `${textColor}15` }}
             >
               <div
                 className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium mb-4"
@@ -219,10 +273,10 @@ export function DesktopWebsitePreview({
               >
                 {index === 0 ? 'Keynote' : index === 2 ? 'Workshop' : 'Talk'}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-700">
+              <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>
                 {session.title}
               </h3>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm" style={{ color: `${textColor}80` }}>
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
                   45 min
@@ -238,12 +292,12 @@ export function DesktopWebsitePreview({
       </section>
 
       {/* Speakers Section */}
-      <section style={{ backgroundColor: '#fafafa' }}>
+      <section style={{ backgroundColor: `${backgroundColor}f0` }}>
         <div className="max-w-6xl mx-auto px-8 py-16">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Featured Speakers</h2>
-              <p className="text-gray-500">Learn from industry leaders and innovators</p>
+              <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Featured Speakers</h2>
+              <p style={{ color: `${textColor}99` }}>Learn from industry leaders and innovators</p>
             </div>
             <a
               href="#"
@@ -274,9 +328,9 @@ export function DesktopWebsitePreview({
                     </div>
                   )}
                 </div>
-                <h3 className="font-semibold text-gray-900">{speaker.name}</h3>
+                <h3 className="font-semibold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>{speaker.name}</h3>
                 {speaker.title && (
-                  <p className="text-sm text-gray-500">{speaker.title}</p>
+                  <p className="text-sm" style={{ color: `${textColor}80` }}>{speaker.title}</p>
                 )}
               </div>
             ))}
@@ -290,35 +344,38 @@ export function DesktopWebsitePreview({
         style={{ background: gradientHero }}
       >
         <div className="max-w-4xl mx-auto px-8 py-20 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-white mb-4" style={{ fontFamily: `"${fontHeading}", sans-serif` }}>
             Ready to Join Us?
           </h2>
           <p className="text-lg text-white/80 mb-8">
             Don't miss out on this incredible experience. Register today and be part of something amazing.
           </p>
-          <button className="rounded-full bg-white px-8 py-4 text-base font-semibold shadow-lg transition-transform hover:scale-105" style={{ color: primaryColor }}>
+          <button
+            className="rounded-full px-8 py-4 text-base font-semibold shadow-lg transition-transform hover:scale-105"
+            style={{ backgroundColor: accentColor || '#ffffff', color: accentColor ? buttonTextColor : effectiveButtonColor }}
+          >
             Register Now - Starting at $199
           </button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 bg-gray-50">
+      <footer className="border-t" style={{ backgroundColor: `${backgroundColor}f8`, borderColor: `${textColor}20` }}>
         <div className="max-w-6xl mx-auto px-8 py-12">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-white text-sm font-bold"
-                style={{ backgroundColor: primaryColor }}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold"
+                style={{ backgroundColor: primaryColor, color: buttonTextColor }}
               >
                 {eventName.charAt(0)}
               </div>
-              <span className="font-semibold text-gray-900">{eventName}</span>
+              <span className="font-semibold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>{eventName}</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <a href="#" className="hover:text-gray-900">Privacy</a>
-              <a href="#" className="hover:text-gray-900">Terms</a>
-              <a href="#" className="hover:text-gray-900">Contact</a>
+            <div className="flex items-center gap-6 text-sm" style={{ color: `${textColor}99` }}>
+              <a href="#" className="hover:opacity-80">Privacy</a>
+              <a href="#" className="hover:opacity-80">Terms</a>
+              <a href="#" className="hover:opacity-80">Contact</a>
             </div>
           </div>
         </div>

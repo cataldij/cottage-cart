@@ -8,6 +8,7 @@ export function EditorPreview() {
   const { conference, modules } = state
 
   // Map context data to AppPreview config format
+  // All design settings are passed so preview updates in real-time
   const config = {
     eventName: conference.name || 'Your Conference',
     tagline: conference.tagline || undefined,
@@ -17,7 +18,35 @@ export function EditorPreview() {
     bannerUrl: conference.bannerUrl,
     logoUrl: conference.logoUrl,
     colors: {
-      primary: conference.primaryColor,
+      primary: conference.primaryColor || '#2563eb',
+      secondary: conference.secondaryColor || '#8b5cf6',
+      accent: conference.accentColor || '#f59e0b',
+      background: conference.backgroundColor || '#ffffff',
+      text: conference.textColor || '#1f2937',
+      heading: conference.headingColor || '#111827',
+      navBackground: conference.navBackgroundColor || '#ffffff',
+      navText: conference.navTextColor || '#374151',
+      button: conference.buttonColor || conference.primaryColor || '#2563eb',
+      buttonText: conference.buttonTextColor || '#ffffff',
+    },
+    fonts: {
+      heading: conference.fontHeading || 'Inter',
+      body: conference.fontBody || 'Inter',
+    },
+    hero: {
+      height: conference.heroHeight || 'medium',
+      style: conference.heroStyle || 'gradient',
+      backgroundUrl: conference.heroBackgroundUrl,
+      videoUrl: conference.heroVideoUrl,
+      overlayOpacity: conference.heroOverlayOpacity ?? 0.3,
+    },
+    background: {
+      pattern: conference.backgroundPattern || 'none',
+      patternColor: conference.backgroundPatternColor || '#00000010',
+      gradientStart: conference.backgroundGradientStart,
+      gradientEnd: conference.backgroundGradientEnd,
+      imageUrl: conference.backgroundImageUrl,
+      imageOverlay: conference.backgroundImageOverlay ?? 0.5,
     },
     modules: modules.map(m => ({
       id: m.id,

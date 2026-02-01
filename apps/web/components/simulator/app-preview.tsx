@@ -28,11 +28,36 @@ interface PreviewConfig {
   colors: {
     primary: string
     secondary?: string
+    accent?: string
     background?: string
-    surface?: string
     text?: string
+    heading?: string
+    navBackground?: string
+    navText?: string
+    button?: string
+    buttonText?: string
+    surface?: string
     textMuted?: string
     border?: string
+  }
+  fonts?: {
+    heading?: string
+    body?: string
+  }
+  hero?: {
+    height?: 'small' | 'medium' | 'large' | 'full'
+    style?: 'image' | 'video' | 'gradient'
+    backgroundUrl?: string | null
+    videoUrl?: string | null
+    overlayOpacity?: number
+  }
+  background?: {
+    pattern?: 'none' | 'dots' | 'grid' | 'diagonal' | 'zigzag'
+    patternColor?: string
+    gradientStart?: string
+    gradientEnd?: string
+    imageUrl?: string | null
+    imageOverlay?: number
   }
   fontFamily?: string
   gradientHero?: string
@@ -143,8 +168,19 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
                 venueName={config.venueName}
                 primaryColor={config.colors.primary}
                 secondaryColor={config.colors.secondary}
+                accentColor={config.colors.accent}
+                backgroundColor={config.colors.background}
+                textColor={config.colors.text}
+                navBackgroundColor={config.colors.navBackground}
+                navTextColor={config.colors.navText}
+                buttonColor={config.colors.button}
+                buttonTextColor={config.colors.buttonText}
                 bannerUrl={config.bannerUrl}
                 logoUrl={config.logoUrl}
+                fontHeading={config.fonts?.heading}
+                fontBody={config.fonts?.body}
+                heroHeight={config.hero?.height}
+                heroOverlayOpacity={config.hero?.overlayOpacity}
               />
             </DesktopBrowser>
           )}
