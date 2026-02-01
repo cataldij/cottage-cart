@@ -17,6 +17,7 @@ export function EditorPreview() {
     venueName: conference.venueName || undefined,
     bannerUrl: conference.bannerUrl,
     logoUrl: conference.logoUrl,
+    registrationButtonText: conference.registrationButtonText || 'Register Now',
     colors: {
       primary: conference.primaryColor || '#2563eb',
       secondary: conference.secondaryColor || '#8b5cf6',

@@ -17,12 +17,25 @@ interface DesktopWebsitePreviewProps {
   navTextColor?: string
   buttonColor?: string
   buttonTextColor?: string
+  registrationButtonText?: string
   bannerUrl?: string | null
   logoUrl?: string | null
   fontHeading?: string
   fontBody?: string
+  // Hero settings
+  heroStyle?: 'image' | 'video' | 'gradient'
   heroHeight?: 'small' | 'medium' | 'large' | 'full'
+  heroBackgroundUrl?: string | null
+  heroVideoUrl?: string | null
   heroOverlayOpacity?: number
+  // Background settings
+  backgroundPattern?: 'none' | 'dots' | 'grid' | 'diagonal' | 'zigzag'
+  backgroundPatternColor?: string
+  backgroundGradientStart?: string
+  backgroundGradientEnd?: string
+  backgroundImageUrl?: string | null
+  backgroundImageOverlay?: number
+  // Content
   sessions?: Array<{ id: string; title: string; room?: string }>
   speakers?: Array<{ id: string; name: string; title?: string; avatarUrl?: string }>
   sponsors?: Array<{ id: string; name: string; logoUrl?: string; tier: string }>
@@ -42,6 +55,24 @@ function getHeroMinHeight(height?: string): number {
  * Professional desktop conference website preview
  * Looks like a real deployed conference landing page
  */
+// Generate background pattern CSS
+function getPatternCSS(pattern?: string, color?: string): string | undefined {
+  if (!pattern || pattern === 'none') return undefined
+  const c = color || 'rgba(0,0,0,0.05)'
+  switch (pattern) {
+    case 'dots':
+      return `radial-gradient(circle at 1px 1px, ${c} 1px, transparent 0)`
+    case 'grid':
+      return `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`
+    case 'diagonal':
+      return `repeating-linear-gradient(45deg, ${c}, ${c} 1px, transparent 1px, transparent 10px)`
+    case 'zigzag':
+      return `linear-gradient(135deg, ${c} 25%, transparent 25%), linear-gradient(225deg, ${c} 25%, transparent 25%), linear-gradient(45deg, ${c} 25%, transparent 25%), linear-gradient(315deg, ${c} 25%, transparent 25%)`
+    default:
+      return undefined
+  }
+}
+
 export function DesktopWebsitePreview({
   eventName,
   tagline,
@@ -57,12 +88,25 @@ export function DesktopWebsitePreview({
   navTextColor = '#374151',
   buttonColor,
   buttonTextColor = '#ffffff',
+  registrationButtonText = 'Register Now',
   bannerUrl,
   logoUrl,
   fontHeading = 'Inter',
   fontBody = 'Inter',
+  // Hero settings
+  heroStyle = 'gradient',
   heroHeight = 'medium',
+  heroBackgroundUrl,
+  heroVideoUrl,
   heroOverlayOpacity = 0.3,
+  // Background settings
+  backgroundPattern = 'none',
+  backgroundPatternColor,
+  backgroundGradientStart,
+  backgroundGradientEnd,
+  backgroundImageUrl,
+  backgroundImageOverlay = 0.5,
+  // Content
   sessions = [],
   speakers = [],
   sponsors = [],
@@ -70,6 +114,22 @@ export function DesktopWebsitePreview({
   const gradientHero = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor || adjustColor(primaryColor, -20)} 100%)`
   const effectiveButtonColor = buttonColor || primaryColor
   const heroMinHeight = getHeroMinHeight(heroHeight)
+
+  // Use heroBackgroundUrl if set, otherwise fall back to bannerUrl
+  const effectiveHeroImage = heroBackgroundUrl || bannerUrl
+
+  // Determine what to show in hero based on style
+  const showHeroImage = heroStyle === 'image' && effectiveHeroImage
+  const showHeroVideo = heroStyle === 'video' && heroVideoUrl
+  const showHeroGradient = heroStyle === 'gradient' || (!showHeroImage && !showHeroVideo)
+
+  // Background pattern CSS
+  const patternCSS = getPatternCSS(backgroundPattern, backgroundPatternColor)
+
+  // Background gradient for page
+  const pageBackgroundGradient = backgroundGradientStart && backgroundGradientEnd
+    ? `linear-gradient(180deg, ${backgroundGradientStart}, ${backgroundGradientEnd})`
+    : undefined
 
   // Mock data for realistic preview
   const mockSessions = sessions.length > 0 ? sessions : [
@@ -102,10 +162,41 @@ export function DesktopWebsitePreview({
   }
 
   return (
-    <div className="min-h-full" style={{ backgroundColor, fontFamily: `"${fontBody}", sans-serif` }}>
+    <div
+      className="min-h-full relative"
+      style={{
+        backgroundColor,
+        fontFamily: `"${fontBody}", sans-serif`,
+        background: pageBackgroundGradient || backgroundColor,
+      }}
+    >
+      {/* Background pattern overlay */}
+      {patternCSS && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: patternCSS,
+            backgroundSize: backgroundPattern === 'zigzag' ? '20px 20px' : '20px 20px',
+          }}
+        />
+      )}
+
+      {/* Background image overlay */}
+      {backgroundImageUrl && (
+        <>
+          <div
+            className="absolute inset-0 pointer-events-none bg-cover bg-center"
+            style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ backgroundColor: `rgba(255, 255, 255, ${backgroundImageOverlay})` }}
+          />
+        </>
+      )}
       {/* Navigation Bar */}
       <nav
-        className="sticky top-0 z-50 flex items-center justify-between px-8 py-4"
+        className="relative sticky top-0 z-50 flex items-center justify-between px-8 py-4"
         style={{
           backgroundColor: `${navBackgroundColor}f2`,
           backdropFilter: 'blur(8px)',
@@ -142,7 +233,7 @@ export function DesktopWebsitePreview({
             className="rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:scale-105"
             style={{ backgroundColor: effectiveButtonColor, color: buttonTextColor }}
           >
-            Register Now
+            {registrationButtonText}
           </button>
         </div>
       </nav>
@@ -151,15 +242,15 @@ export function DesktopWebsitePreview({
       <section
         className="relative overflow-hidden"
         style={{
-          background: bannerUrl ? undefined : gradientHero,
+          background: showHeroGradient ? gradientHero : undefined,
           minHeight: heroMinHeight,
         }}
       >
-        {/* Banner image if provided */}
-        {bannerUrl && (
+        {/* Hero image */}
+        {showHeroImage && (
           <>
             <img
-              src={bannerUrl}
+              src={effectiveHeroImage}
               alt={eventName}
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -170,8 +261,26 @@ export function DesktopWebsitePreview({
           </>
         )}
 
+        {/* Hero video */}
+        {showHeroVideo && (
+          <>
+            <video
+              src={heroVideoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: `rgba(0, 0, 0, ${heroOverlayOpacity})` }}
+            />
+          </>
+        )}
+
         {/* Background pattern for gradient hero */}
-        {!bannerUrl && (
+        {showHeroGradient && (
           <div
             className="absolute inset-0 opacity-10"
             style={{

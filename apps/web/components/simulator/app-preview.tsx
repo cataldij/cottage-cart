@@ -104,6 +104,7 @@ interface PreviewConfig {
   venueName?: string
   bannerUrl?: string | null
   logoUrl?: string | null
+  registrationButtonText?: string
   colors: {
     primary: string
     secondary?: string
@@ -257,12 +258,24 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
                 navTextColor={config.colors.navText}
                 buttonColor={config.colors.button}
                 buttonTextColor={config.colors.buttonText}
+                registrationButtonText={config.registrationButtonText}
                 bannerUrl={config.bannerUrl}
                 logoUrl={config.logoUrl}
                 fontHeading={config.fonts?.heading}
                 fontBody={config.fonts?.body}
+                // Hero settings
+                heroStyle={config.hero?.style}
                 heroHeight={config.hero?.height}
+                heroBackgroundUrl={config.hero?.backgroundUrl}
+                heroVideoUrl={config.hero?.videoUrl}
                 heroOverlayOpacity={config.hero?.overlayOpacity}
+                // Background settings
+                backgroundPattern={config.background?.pattern}
+                backgroundPatternColor={config.background?.patternColor}
+                backgroundGradientStart={config.background?.gradientStart}
+                backgroundGradientEnd={config.background?.gradientEnd}
+                backgroundImageUrl={config.background?.imageUrl}
+                backgroundImageOverlay={config.background?.imageOverlay}
               />
             </DesktopBrowser>
           )}
