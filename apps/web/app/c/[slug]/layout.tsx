@@ -42,6 +42,35 @@ const PATTERN_CSS: Record<string, { css: string; size: string }> = {
   },
 }
 
+// Generate Google Fonts URL for selected fonts
+function getGoogleFontsUrl(headingFont?: string, bodyFont?: string): string | null {
+  const fonts: string[] = []
+
+  // Map font names to Google Fonts format
+  const fontMap: Record<string, string> = {
+    'Inter': 'Inter:wght@400;500;600;700',
+    'Sora': 'Sora:wght@400;500;600;700',
+    'Poppins': 'Poppins:wght@400;500;600;700',
+    'Montserrat': 'Montserrat:wght@400;500;600;700',
+    'Raleway': 'Raleway:wght@400;500;600;700',
+    'Playfair Display': 'Playfair+Display:wght@400;500;600;700',
+    'Merriweather': 'Merriweather:wght@400;700',
+    'Space Grotesk': 'Space+Grotesk:wght@400;500;600;700',
+    'JetBrains Mono': 'JetBrains+Mono:wght@400;500;600;700',
+  }
+
+  if (headingFont && fontMap[headingFont]) {
+    fonts.push(fontMap[headingFont])
+  }
+  if (bodyFont && bodyFont !== headingFont && fontMap[bodyFont]) {
+    fonts.push(fontMap[bodyFont])
+  }
+
+  if (fonts.length === 0) return null
+
+  return `https://fonts.googleapis.com/css2?${fonts.map(f => `family=${f}`).join('&')}&display=swap`
+}
+
 // Generate CSS variables from conference settings
 function generateThemeCSS(conference: any) {
   const patternColor = conference.background_pattern_color || '#00000010'
@@ -152,8 +181,16 @@ export default async function PublicConferenceLayout({
   // Get background styles
   const backgroundStyles = getBackgroundStyles(conference)
 
+  // Get Google Fonts URL
+  const googleFontsUrl = getGoogleFontsUrl(conference.font_heading, conference.font_body)
+
   return (
     <>
+      {/* Load Google Fonts */}
+      {googleFontsUrl && (
+        <link rel="stylesheet" href={googleFontsUrl} />
+      )}
+
       {/* Inject theme CSS */}
       <style dangerouslySetInnerHTML={{ __html: generateThemeCSS(conference) }} />
 

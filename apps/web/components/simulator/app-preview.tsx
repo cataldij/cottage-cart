@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Smartphone, Monitor, RotateCcw } from 'lucide-react'
 import { ios } from '@conference-os/attendee-ui'
 import { IphoneSimulator } from './iphone-simulator'
@@ -8,6 +8,49 @@ import { DesktopBrowser } from './desktop-browser'
 import { DesktopWebsitePreview } from './desktop-website-preview'
 import { AttendeeAppShell, DEFAULT_TABS } from './attendee-app-shell'
 import { AttendeeAppHome } from './attendee-app-home'
+
+// Google Fonts loader
+const FONT_MAP: Record<string, string> = {
+  'Inter': 'Inter:wght@400;500;600;700',
+  'Sora': 'Sora:wght@400;500;600;700',
+  'Poppins': 'Poppins:wght@400;500;600;700',
+  'Montserrat': 'Montserrat:wght@400;500;600;700',
+  'Raleway': 'Raleway:wght@400;500;600;700',
+  'Playfair Display': 'Playfair+Display:wght@400;500;600;700',
+  'Merriweather': 'Merriweather:wght@400;700',
+  'Space Grotesk': 'Space+Grotesk:wght@400;500;600;700',
+  'JetBrains Mono': 'JetBrains+Mono:wght@400;500;600;700',
+}
+
+function useGoogleFonts(headingFont?: string, bodyFont?: string) {
+  useEffect(() => {
+    const fonts: string[] = []
+
+    if (headingFont && FONT_MAP[headingFont]) {
+      fonts.push(FONT_MAP[headingFont])
+    }
+    if (bodyFont && bodyFont !== headingFont && FONT_MAP[bodyFont]) {
+      fonts.push(FONT_MAP[bodyFont])
+    }
+
+    if (fonts.length === 0) return
+
+    const linkId = 'google-fonts-preview'
+    let link = document.getElementById(linkId) as HTMLLinkElement | null
+
+    const url = `https://fonts.googleapis.com/css2?${fonts.map(f => `family=${f}`).join('&')}&display=swap`
+
+    if (link) {
+      link.href = url
+    } else {
+      link = document.createElement('link')
+      link.id = linkId
+      link.rel = 'stylesheet'
+      link.href = url
+      document.head.appendChild(link)
+    }
+  }, [headingFont, bodyFont])
+}
 
 interface NavigationModule {
   id: string
@@ -75,6 +118,9 @@ type TabId = 'home' | 'agenda' | 'speakers' | 'map' | 'profile'
 export function AppPreview({ config, className = '' }: AppPreviewProps) {
   const [device, setDevice] = useState<DeviceType>('iphone')
   const [activeTab, setActiveTab] = useState<TabId>('home')
+
+  // Load Google Fonts for preview
+  useGoogleFonts(config.fonts?.heading, config.fonts?.body)
 
   const scale = 0.7
 
