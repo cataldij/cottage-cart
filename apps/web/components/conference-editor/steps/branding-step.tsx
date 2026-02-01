@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useConferenceEditor } from '@/contexts/conference-editor-context'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,6 +18,9 @@ import {
   Grid3X3,
   Video,
   Layers,
+  Upload,
+  X,
+  Link,
 } from 'lucide-react'
 
 const COLOR_PRESETS = [
@@ -102,6 +105,184 @@ const HERO_STYLES = [
   { value: 'image', label: 'Image', icon: ImageIcon },
   { value: 'video', label: 'Video', icon: Video },
 ]
+
+// Media Upload Component with drag-and-drop
+interface MediaUploadProps {
+  value: string | null
+  onChange: (url: string | null) => void
+  accept: string
+  label: string
+  placeholder: string
+}
+
+function MediaUpload({ value, onChange, accept, label, placeholder }: MediaUploadProps) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [showUrlInput, setShowUrlInput] = useState(false)
+  const [urlValue, setUrlValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = useCallback(async (file: File) => {
+    setIsUploading(true)
+    try {
+      // Convert to base64 for immediate preview
+      // In production, you'd upload to Supabase Storage or similar
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        onChange(reader.result as string)
+        setIsUploading(false)
+      }
+      reader.onerror = () => {
+        setIsUploading(false)
+        alert('Failed to read file')
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      setIsUploading(false)
+      alert('Failed to upload file')
+    }
+  }, [onChange])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFile(file)
+  }, [handleFile])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleFile(file)
+  }, [handleFile])
+
+  const handleUrlSubmit = useCallback(() => {
+    if (urlValue.trim()) {
+      onChange(urlValue.trim())
+      setShowUrlInput(false)
+      setUrlValue('')
+    }
+  }, [urlValue, onChange])
+
+  const handleRemove = useCallback(() => {
+    onChange(null)
+    if (inputRef.current) inputRef.current.value = ''
+  }, [onChange])
+
+  if (value) {
+    // Preview mode
+    const isVideo = accept.includes('video') || value.includes('video') || value.endsWith('.mp4') || value.endsWith('.webm')
+    return (
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <div className="relative rounded-xl overflow-hidden border border-slate-200">
+          {isVideo ? (
+            <video
+              src={value}
+              className="w-full h-40 object-cover"
+              muted
+              loop
+              autoPlay
+              playsInline
+            />
+          ) : (
+            <img
+              src={value}
+              alt="Preview"
+              className="w-full h-40 object-cover"
+            />
+          )}
+          <button
+            onClick={handleRemove}
+            className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="text-xs text-slate-500 truncate">{value.startsWith('data:') ? 'Uploaded file' : value}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        onChange={handleInputChange}
+        className="hidden"
+      />
+
+      {showUrlInput ? (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Input
+              value={urlValue}
+              onChange={(e) => setUrlValue(e.target.value)}
+              placeholder={placeholder}
+              className="flex-1"
+              onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
+            />
+            <Button size="sm" onClick={handleUrlSubmit}>Add</Button>
+            <Button size="sm" variant="ghost" onClick={() => setShowUrlInput(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => inputRef.current?.click()}
+          className={`
+            flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed cursor-pointer transition-all
+            ${isDragging
+              ? 'border-violet-500 bg-violet-50'
+              : 'border-slate-300 hover:border-violet-400 hover:bg-violet-50/50'
+            }
+            ${isUploading ? 'opacity-50 pointer-events-none' : ''}
+          `}
+        >
+          {isUploading ? (
+            <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
+          ) : (
+            <Upload className={`h-8 w-8 ${isDragging ? 'text-violet-500' : 'text-slate-400'}`} />
+          )}
+          <div className="text-center">
+            <p className={`text-sm font-medium ${isDragging ? 'text-violet-600' : 'text-slate-600'}`}>
+              {isUploading ? 'Uploading...' : 'Click to upload or drag and drop'}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              {accept.includes('video') ? 'MP4, WebM up to 50MB' : 'PNG, JPG, WebP up to 10MB'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!showUrlInput && (
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowUrlInput(true) }}
+          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-violet-600 transition-colors"
+        >
+          <Link className="h-3 w-3" />
+          Or enter a URL instead
+        </button>
+      )}
+    </div>
+  )
+}
 
 export function BrandingStep() {
   const { state, updateConference } = useConferenceEditor()
@@ -386,27 +567,25 @@ export function BrandingStep() {
             </div>
           </div>
 
-          {/* Hero Image/Video URL */}
+          {/* Hero Image/Video Upload */}
           {conference.heroStyle === 'image' && (
-            <div className="space-y-2">
-              <Label>Hero Image URL</Label>
-              <Input
-                value={conference.heroBackgroundUrl || ''}
-                onChange={(e) => updateConference({ heroBackgroundUrl: e.target.value || null })}
-                placeholder="https://example.com/hero-image.jpg"
-              />
-            </div>
+            <MediaUpload
+              value={conference.heroBackgroundUrl}
+              onChange={(url) => updateConference({ heroBackgroundUrl: url })}
+              accept="image/*"
+              label="Hero Image"
+              placeholder="https://example.com/hero-image.jpg"
+            />
           )}
 
           {conference.heroStyle === 'video' && (
-            <div className="space-y-2">
-              <Label>Hero Video URL</Label>
-              <Input
-                value={conference.heroVideoUrl || ''}
-                onChange={(e) => updateConference({ heroVideoUrl: e.target.value || null })}
-                placeholder="https://example.com/hero-video.mp4"
-              />
-            </div>
+            <MediaUpload
+              value={conference.heroVideoUrl}
+              onChange={(url) => updateConference({ heroVideoUrl: url })}
+              accept="video/*"
+              label="Hero Video"
+              placeholder="https://example.com/hero-video.mp4"
+            />
           )}
 
           {/* Overlay Opacity */}
@@ -512,14 +691,13 @@ export function BrandingStep() {
           </div>
 
           {/* Background Image */}
-          <div className="space-y-2">
-            <Label>Background Image URL</Label>
-            <Input
-              value={conference.backgroundImageUrl || ''}
-              onChange={(e) => updateConference({ backgroundImageUrl: e.target.value || null })}
-              placeholder="https://example.com/background.jpg"
-            />
-          </div>
+          <MediaUpload
+            value={conference.backgroundImageUrl}
+            onChange={(url) => updateConference({ backgroundImageUrl: url })}
+            accept="image/*"
+            label="Background Image"
+            placeholder="https://example.com/background.jpg"
+          />
 
           {conference.backgroundImageUrl && (
             <div className="space-y-3">
