@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 export function BuilderContent() {
-  const { currentStep, nextStep, prevStep, canGoNext, canGoPrev } = useBuilder()
+  const { currentStep, nextStep, prevStep, canGoNext, canGoPrev, generateEventCode } = useBuilder()
 
   return (
     <div className="flex h-full flex-col">
@@ -39,7 +39,7 @@ export function BuilderContent() {
             <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
-          <Button onClick={() => {}} className="gap-2 bg-green-600 hover:bg-green-700">
+          <Button onClick={generateEventCode} className="gap-2 bg-green-600 hover:bg-green-700">
             Publish App
             <ArrowRight className="h-4 w-4" />
           </Button>

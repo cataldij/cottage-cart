@@ -45,7 +45,7 @@ export function BuilderStepper() {
           {STEPS.map((step, index) => {
             const isComplete = currentStep > step.id
             const isCurrent = currentStep === step.id
-            const isClickable = isComplete || isCurrent
+            const isClickable = true
 
             return (
               <li key={step.name} className="relative z-10 flex flex-col items-center">
