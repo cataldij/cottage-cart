@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Calendar, MapPin, Clock, Users, ChevronRight, Play, ArrowRight } from 'lucide-react'
 
 interface DesktopWebsitePreviewProps {
@@ -148,6 +149,15 @@ export function DesktopWebsitePreview({
     { id: '4', name: 'David Kim', title: 'Founder, AI Ventures', avatarUrl: null },
   ]
 
+  const mockSponsors = sponsors.length > 0 ? sponsors : [
+    { id: '1', name: 'Aurora', tier: 'Platinum' },
+    { id: '2', name: 'Northwind', tier: 'Gold' },
+    { id: '3', name: 'SummitWorks', tier: 'Silver' },
+    { id: '4', name: 'Atlas Collective', tier: 'Gold' },
+  ]
+
+  const [activeSection, setActiveSection] = useState<'schedule' | 'speakers' | 'sponsors' | 'venue'>('schedule')
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return 'TBD'
     try {
@@ -219,15 +229,25 @@ export function DesktopWebsitePreview({
         </div>
 
         <div className="flex items-center gap-8">
-          {['Schedule', 'Speakers', 'Sponsors', 'Venue'].map((item) => (
-            <a
-              key={item}
-              href="#"
+          {([
+            { id: 'schedule', label: 'Schedule' },
+            { id: 'speakers', label: 'Speakers' },
+            { id: 'sponsors', label: 'Sponsors' },
+            { id: 'venue', label: 'Venue' },
+          ] as const).map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveSection(item.id)}
               className="text-sm font-medium transition-colors hover:opacity-80"
-              style={{ color: navTextColor }}
+              style={{
+                color: navTextColor,
+                borderBottom: activeSection === item.id ? `2px solid ${primaryColor}` : '2px solid transparent',
+                paddingBottom: 4,
+              }}
             >
-              {item}
-            </a>
+              {item.label}
+            </button>
           ))}
           <button
             className="rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:scale-105"
@@ -350,6 +370,7 @@ export function DesktopWebsitePreview({
       </section>
 
       {/* Featured Sessions */}
+      {activeSection === 'schedule' && (
       <section className="max-w-6xl mx-auto px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -399,8 +420,10 @@ export function DesktopWebsitePreview({
           ))}
         </div>
       </section>
+      )}
 
       {/* Speakers Section */}
+      {activeSection === 'speakers' && (
       <section style={{ backgroundColor: `${backgroundColor}f0` }}>
         <div className="max-w-6xl mx-auto px-8 py-16">
           <div className="flex items-center justify-between mb-8">
@@ -446,6 +469,75 @@ export function DesktopWebsitePreview({
           </div>
         </div>
       </section>
+      )}
+
+      {/* Sponsors Section */}
+      {activeSection === 'sponsors' && (
+      <section className="max-w-6xl mx-auto px-8 py-16">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Sponsors</h2>
+            <p style={{ color: `${textColor}99` }}>Our partners powering the event</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-4 gap-6">
+          {mockSponsors.map((sponsor) => (
+            <div
+              key={sponsor.id}
+              className="rounded-2xl border p-5 text-center"
+              style={{ backgroundColor, borderColor: `${textColor}15` }}
+            >
+              <div
+                className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold"
+                style={{ backgroundColor: `${primaryColor}15`, color: primaryColor }}
+              >
+                {sponsor.name.charAt(0)}
+              </div>
+              <div className="font-semibold" style={{ color: textColor }}>{sponsor.name}</div>
+              <div className="text-xs uppercase tracking-wide" style={{ color: `${textColor}80` }}>
+                {sponsor.tier}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      )}
+
+      {/* Venue Section */}
+      {activeSection === 'venue' && (
+      <section className="max-w-6xl mx-auto px-8 py-16">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Venue</h2>
+            <p style={{ color: `${textColor}99` }}>Find your way around the event</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-8">
+          <div
+            className="rounded-2xl border"
+            style={{ backgroundColor, borderColor: `${textColor}15` }}
+          >
+            <div
+              className="h-64 w-full rounded-2xl"
+              style={{ background: `linear-gradient(135deg, ${primaryColor}20, ${accentColor || primaryColor}35)` }}
+            />
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" style={{ color: primaryColor }} />
+              <span style={{ color: textColor, fontWeight: 600 }}>{venueName || 'Moscone Center'}</span>
+            </div>
+            <div style={{ color: `${textColor}80` }}>
+              747 Howard St, San Francisco, CA
+            </div>
+            <div className="rounded-xl border p-4" style={{ backgroundColor, borderColor: `${textColor}15` }}>
+              <div className="text-sm font-semibold" style={{ color: textColor }}>Directions</div>
+              <div className="text-sm" style={{ color: `${textColor}80` }}>Use main entrance on Howard St. Doors open at 8:00 AM.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* CTA Section */}
       <section

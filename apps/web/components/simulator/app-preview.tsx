@@ -8,6 +8,12 @@ import { DesktopBrowser } from './desktop-browser'
 import { DesktopWebsitePreview } from './desktop-website-preview'
 import { AttendeeAppShell, DEFAULT_TABS } from './attendee-app-shell'
 import { AttendeeAppHome } from './attendee-app-home'
+import {
+  AgendaScreen,
+  SpeakersScreen,
+  MapScreen,
+  ProfileScreen,
+} from './attendee-app-screens'
 
 // Google Fonts loader - comprehensive font map
 const FONT_MAP: Record<string, string> = {
@@ -166,6 +172,66 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
 
   const scale = 0.7
 
+  const handleModuleTap = (moduleId: string) => {
+    const moduleToTab: Record<string, TabId> = {
+      agenda: 'agenda',
+      schedule: 'agenda',
+      speakers: 'speakers',
+      map: 'map',
+      profile: 'profile',
+    }
+    const target = moduleToTab[moduleId]
+    if (target) setActiveTab(target)
+  }
+
+  const renderActiveAppScreen = () => {
+    const sharedProps = {
+      primaryColor: config.colors.primary,
+      secondaryColor: config.colors.secondary,
+      accentColor: config.colors.accent,
+      backgroundColor: config.colors.background,
+      surfaceColor: config.colors.surface,
+      textColor: config.colors.text,
+      textMutedColor: config.colors.textMuted,
+      borderColor: config.colors.border,
+      fontHeading: config.fonts?.heading,
+      fontBody: config.fonts?.body,
+      cardStyle: config.cardStyle,
+      scale,
+    }
+
+    if (activeTab === 'agenda') return <AgendaScreen {...sharedProps} />
+    if (activeTab === 'speakers') return <SpeakersScreen {...sharedProps} />
+    if (activeTab === 'map') return <MapScreen {...sharedProps} />
+    if (activeTab === 'profile') return <ProfileScreen {...sharedProps} />
+
+    return (
+      <AttendeeAppHome
+        eventName={config.eventName}
+        tagline={config.tagline}
+        startDate={config.startDate}
+        endDate={config.endDate}
+        venueName={config.venueName}
+        bannerUrl={config.bannerUrl}
+        logoUrl={config.logoUrl}
+        primaryColor={config.colors.primary}
+        secondaryColor={config.colors.secondary}
+        accentColor={config.colors.accent}
+        backgroundColor={config.colors.background}
+        surfaceColor={config.colors.surface}
+        textColor={config.colors.text}
+        textMutedColor={config.colors.textMuted}
+        borderColor={config.colors.border}
+        fontHeading={config.fonts?.heading}
+        fontBody={config.fonts?.body}
+        cardStyle={config.cardStyle}
+        modules={config.modules}
+        onModuleTap={handleModuleTap}
+        scale={scale}
+      />
+    )
+  }
+
   return (
     <div className={`flex h-full flex-col ${className}`}>
       {/* Header */}
@@ -228,29 +294,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
                 primaryColor={config.colors.primary}
                 scale={scale}
               >
-              <AttendeeAppHome
-                eventName={config.eventName}
-                tagline={config.tagline}
-                startDate={config.startDate}
-                endDate={config.endDate}
-                venueName={config.venueName}
-                bannerUrl={config.bannerUrl}
-                logoUrl={config.logoUrl}
-                primaryColor={config.colors.primary}
-                secondaryColor={config.colors.secondary}
-                accentColor={config.colors.accent}
-                backgroundColor={config.colors.background}
-                surfaceColor={config.colors.surface}
-                textColor={config.colors.text}
-                textMutedColor={config.colors.textMuted}
-                borderColor={config.colors.border}
-                fontHeading={config.fonts?.heading}
-                fontBody={config.fonts?.body}
-                cardStyle={config.cardStyle}
-                modules={config.modules}
-                onModuleTap={(moduleId) => console.log('Module tapped:', moduleId)}
-                scale={scale}
-              />
+              {renderActiveAppScreen()}
               </AttendeeAppShell>
             </IphoneSimulator>
           ) : (
