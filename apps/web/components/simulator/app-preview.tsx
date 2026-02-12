@@ -135,6 +135,7 @@ interface PreviewConfig {
     border?: 'none' | 'primary' | 'secondary' | 'accent'
     iconStyle?: 'solid' | 'outline' | 'pill'
   }
+  iconTheme?: 'solid' | 'outline' | 'duotone' | 'glass'
   hero?: {
     height?: 'small' | 'medium' | 'large' | 'full'
     style?: 'image' | 'video' | 'gradient'
@@ -197,6 +198,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
       fontHeading: config.fonts?.heading,
       fontBody: config.fonts?.body,
       cardStyle: config.cardStyle,
+      iconTheme: config.iconTheme,
       scale,
     }
 
@@ -225,6 +227,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
         fontHeading={config.fonts?.heading}
         fontBody={config.fonts?.body}
         cardStyle={config.cardStyle}
+        iconTheme={config.iconTheme}
         modules={config.modules}
         onModuleTap={handleModuleTap}
         scale={scale}

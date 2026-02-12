@@ -9,10 +9,40 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 export function BuilderContent() {
-  const { currentStep, nextStep, prevStep, canGoNext, canGoPrev, generateEventCode } = useBuilder()
+  const {
+    currentStep,
+    nextStep,
+    prevStep,
+    canGoNext,
+    canGoPrev,
+    generateEventCode,
+    previewEnabled,
+    setPreviewEnabled,
+    saveDraft,
+  } = useBuilder()
 
   return (
     <div className="flex h-full flex-col">
+      <div className="mb-4 flex items-center justify-between rounded-2xl border bg-white/80 px-4 py-3">
+        <div>
+          <p className="text-sm font-semibold text-slate-900">Preview changes</p>
+          <p className="text-xs text-slate-500">
+            Toggle live preview without saving.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={previewEnabled ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setPreviewEnabled(!previewEnabled)}
+          >
+            {previewEnabled ? 'Preview On' : 'Preview Off'}
+          </Button>
+          <Button size="sm" onClick={saveDraft}>
+            Save Changes
+          </Button>
+        </div>
+      </div>
       {/* Step Content */}
       <div className="flex-1 overflow-y-auto rounded-2xl border bg-white/80 p-6 backdrop-blur-xl">
         {currentStep === 0 && <OverviewStep />}

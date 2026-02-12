@@ -4,8 +4,9 @@ import { useBuilder } from '@/contexts/builder-context'
 import { AppPreview } from '@/components/simulator/app-preview'
 
 export function BuilderPreview() {
-  const { state } = useBuilder()
-  const { overview, design, navigation } = state
+  const { state, savedState, previewEnabled } = useBuilder()
+  const activeState = previewEnabled ? state : savedState
+  const { overview, design, navigation, web } = activeState
   const { tokens, gradients } = design
 
   // Build the config object for the preview
@@ -26,6 +27,8 @@ export function BuilderPreview() {
       text: tokens?.colors?.text || '#0f172a',
       textMuted: tokens?.colors?.textMuted || '#64748b',
       border: tokens?.colors?.border || '#e2e8f0',
+      navBackground: web.navBackgroundColor,
+      navText: web.navTextColor,
     },
     fonts: {
       heading: tokens?.typography?.fontFamily?.heading,
@@ -34,6 +37,22 @@ export function BuilderPreview() {
     gradientHero: gradients?.hero,
     modules: navigation,
     cardStyle: design.cardStyle,
+    iconTheme: design.iconTheme,
+    hero: {
+      style: web.heroStyle,
+      height: web.heroHeight,
+      backgroundUrl: web.heroBackgroundUrl,
+      videoUrl: web.heroVideoUrl,
+      overlayOpacity: web.heroOverlayOpacity,
+    },
+    background: {
+      pattern: web.backgroundPattern as any,
+      patternColor: web.backgroundPatternColor || undefined,
+      gradientStart: web.backgroundGradientStart || undefined,
+      gradientEnd: web.backgroundGradientEnd || undefined,
+      imageUrl: web.backgroundImageUrl || undefined,
+      imageOverlay: web.backgroundImageOverlay,
+    },
   }
 
   return (

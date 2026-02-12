@@ -88,3 +88,4 @@ __tests__/
 *.map
 
 .vercel
+.env*.local

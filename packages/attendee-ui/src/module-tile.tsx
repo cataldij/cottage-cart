@@ -84,6 +84,7 @@ interface ModuleTileProps {
   onPress?: () => void
   size?: 'sm' | 'md' | 'lg'
   showDescription?: boolean
+  iconStyle?: 'solid' | 'outline' | 'duotone' | 'glass'
   className?: string
   style?: React.CSSProperties
 }
@@ -93,6 +94,7 @@ export function ModuleTile({
   onPress,
   size = 'md',
   showDescription = false,
+  iconStyle = 'solid',
   style,
 }: ModuleTileProps) {
   const config = typeof module === 'string' ? moduleConfigs[module] : module
@@ -139,6 +141,21 @@ export function ModuleTile({
 
   const sizeConfig = sizes[size]
 
+  const baseBackground = `linear-gradient(135deg, ${config.gradient[0]}, ${config.gradient[1]})`
+  const background = iconStyle === 'solid'
+    ? baseBackground
+    : iconStyle === 'duotone'
+      ? `linear-gradient(135deg, ${config.gradient[0]}30, ${config.gradient[1]}30)`
+      : iconStyle === 'glass'
+        ? 'rgba(255, 255, 255, 0.18)'
+        : '#ffffff'
+
+  const border = iconStyle === 'outline' || iconStyle === 'glass'
+    ? `1px solid ${primaryColor}33`
+    : 'none'
+
+  const iconColor = iconStyle === 'solid' ? '#ffffff' : primaryColor
+
   return (
     <motion.button
       onClick={onPress}
@@ -150,11 +167,12 @@ export function ModuleTile({
         gap: sizeConfig.gap,
         width: sizeConfig.width,
         padding: sizeConfig.padding,
-        background: `linear-gradient(135deg, ${config.gradient[0]}, ${config.gradient[1]})`,
+        background,
         borderRadius: sizeConfig.borderRadius,
-        border: 'none',
+        border,
         cursor: 'pointer',
-        boxShadow: ios.shadow.md,
+        boxShadow: iconStyle === 'solid' ? ios.shadow.md : ios.shadow.sm,
+        backdropFilter: iconStyle === 'glass' ? 'blur(10px)' : undefined,
         WebkitTapHighlightColor: 'transparent',
         ...style,
       }}
@@ -162,15 +180,15 @@ export function ModuleTile({
       whileTap={{ scale: 0.95 }}
       transition={ios.animation.spring.snappy}
     >
-      <Icon size={sizeConfig.iconSize} color="#FFFFFF" strokeWidth={2} />
+      <Icon size={sizeConfig.iconSize} color={iconColor} strokeWidth={2} />
       <IOSText
         variant="caption1"
-        color="#FFFFFF"
+        color={iconColor}
         weight={600}
         align="center"
         style={{
           fontSize: sizeConfig.fontSize,
-          textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+          textShadow: iconStyle === 'solid' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
         }}
       >
         {config.label}
@@ -234,6 +252,7 @@ interface CompactModuleTileProps {
   module: ModuleConfig | string
   onPress?: () => void
   scale?: number
+  iconStyle?: 'solid' | 'outline' | 'duotone' | 'glass'
   style?: React.CSSProperties
 }
 
@@ -241,6 +260,7 @@ export function CompactModuleTile({
   module,
   onPress,
   scale = 0.7,
+  iconStyle = 'solid',
   style,
 }: CompactModuleTileProps) {
   const config = typeof module === 'string' ? moduleConfigs[module] : module
@@ -252,6 +272,21 @@ export function CompactModuleTile({
   const baseSize = 72
   const baseIconSize = 24
   const baseFontSize = 10
+
+  const baseBackground = `linear-gradient(135deg, ${config.gradient[0]}, ${config.gradient[1]})`
+  const background = iconStyle === 'solid'
+    ? baseBackground
+    : iconStyle === 'duotone'
+      ? `linear-gradient(135deg, ${config.gradient[0]}30, ${config.gradient[1]}30)`
+      : iconStyle === 'glass'
+        ? 'rgba(255, 255, 255, 0.18)'
+        : '#ffffff'
+
+  const border = iconStyle === 'outline' || iconStyle === 'glass'
+    ? `1px solid ${ios.colors.systemBlue}33`
+    : 'none'
+
+  const iconColor = iconStyle === 'solid' ? '#ffffff' : ios.colors.systemBlue
 
   return (
     <motion.button
@@ -265,26 +300,29 @@ export function CompactModuleTile({
         width: baseSize * scale,
         height: baseSize * scale,
         padding: 8 * scale,
-        background: `linear-gradient(135deg, ${config.gradient[0]}, ${config.gradient[1]})`,
+        background,
         borderRadius: ios.radius.md * scale,
-        border: 'none',
+        border,
         cursor: 'pointer',
-        boxShadow: `0 ${2 * scale}px ${6 * scale}px rgba(0,0,0,0.1)`,
+        boxShadow: iconStyle === 'solid'
+          ? `0 ${2 * scale}px ${6 * scale}px rgba(0,0,0,0.1)`
+          : `0 ${1 * scale}px ${4 * scale}px rgba(0,0,0,0.08)`,
+        backdropFilter: iconStyle === 'glass' ? 'blur(10px)' : undefined,
         WebkitTapHighlightColor: 'transparent',
         ...style,
       }}
       whileTap={{ scale: 0.95 }}
       transition={ios.animation.spring.snappy}
     >
-      <Icon size={baseIconSize * scale} color="#FFFFFF" strokeWidth={2} />
+      <Icon size={baseIconSize * scale} color={iconColor} strokeWidth={2} />
       <span
         style={{
           fontSize: baseFontSize * scale,
           fontWeight: 600,
-          color: '#FFFFFF',
+          color: iconColor,
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
-          textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+          textShadow: iconStyle === 'solid' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
         }}
       >
         {config.label}
@@ -300,6 +338,7 @@ interface CompactModuleGridProps {
   columns?: 2 | 3
   scale?: number
   gap?: number
+  iconStyle?: 'solid' | 'outline' | 'duotone' | 'glass'
   style?: React.CSSProperties
 }
 
@@ -309,6 +348,7 @@ export function CompactModuleGrid({
   columns = 3,
   scale = 0.7,
   gap = 8,
+  iconStyle = 'solid',
   style,
 }: CompactModuleGridProps) {
   const themeContext = useConferenceThemeOptional()
@@ -336,6 +376,7 @@ export function CompactModuleGrid({
           module={moduleId}
           scale={scale}
           onPress={() => onModulePress?.(moduleId)}
+          iconStyle={iconStyle}
         />
       ))}
     </div>

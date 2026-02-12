@@ -38,6 +38,7 @@ interface AttendeeAppHomeProps {
     border?: 'none' | 'primary' | 'secondary' | 'accent'
     iconStyle?: 'solid' | 'outline' | 'pill'
   }
+  iconTheme?: 'solid' | 'outline' | 'duotone' | 'glass'
   modules: NavigationModule[]
   onModuleTap?: (moduleId: string) => void
   scale?: number
@@ -70,6 +71,7 @@ export function AttendeeAppHome({
     border: 'primary',
     iconStyle: 'solid',
   },
+  iconTheme = 'solid',
   modules,
   onModuleTap,
   scale = 0.7,
@@ -165,6 +167,7 @@ export function AttendeeAppHome({
             columns={3}
             scale={scale * 0.85}
             gap={8}
+            iconStyle={iconTheme}
           />
 
           {/* Quick Stats */}

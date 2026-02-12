@@ -8,6 +8,7 @@ import { DEMO_CONFERENCE, DEMO_DESIGN_TOKENS, DEMO_GRADIENTS } from '@/lib/demo-
 // =============================================
 
 interface ConferenceOverview {
+  id?: string
   name: string
   tagline: string
   description: string
@@ -64,6 +65,7 @@ interface BuilderState {
       border: 'none' | 'primary' | 'secondary' | 'accent'
       iconStyle: 'solid' | 'outline' | 'pill'
     }
+    iconTheme: 'solid' | 'outline' | 'duotone' | 'glass'
   }
   navigation: NavigationModule[]
   publish: {
@@ -71,10 +73,29 @@ interface BuilderState {
     attendeeUrl: string
     isPublished: boolean
   }
+  web: {
+    navBackgroundColor: string
+    navTextColor: string
+    heroStyle: 'image' | 'video' | 'gradient'
+    heroHeight: 'small' | 'medium' | 'large' | 'full'
+    heroBackgroundUrl: string | null
+    heroVideoUrl: string | null
+    heroOverlayOpacity: number
+    backgroundPattern: string | null
+    backgroundPatternColor: string | null
+    backgroundGradientStart: string | null
+    backgroundGradientEnd: string | null
+    backgroundImageUrl: string | null
+    backgroundImageOverlay: number
+  }
 }
 
 interface BuilderContextValue {
   state: BuilderState
+  savedState: BuilderState
+  previewEnabled: boolean
+  setPreviewEnabled: (enabled: boolean) => void
+  saveDraft: () => Promise<void>
   // Step navigation
   currentStep: number
   setStep: (step: number) => void
@@ -88,6 +109,8 @@ interface BuilderContextValue {
   updateDesignTokens: (tokens: DesignTokens) => void
   updateGradients: (gradients: BuilderState['design']['gradients']) => void
   updateCardStyle: (cardStyle: BuilderState['design']['cardStyle']) => void
+  updateIconTheme: (iconTheme: BuilderState['design']['iconTheme']) => void
+  updateWebSettings: (updates: Partial<BuilderState['web']>) => void
   // Navigation
   toggleModule: (moduleId: string) => void
   reorderModules: (modules: NavigationModule[]) => void
@@ -114,6 +137,7 @@ const DEFAULT_MODULES: NavigationModule[] = [
 const DEFAULT_STATE: BuilderState = {
   step: 0,
   overview: {
+    id: DEMO_CONFERENCE.id,
     name: DEMO_CONFERENCE.name,
     tagline: DEMO_CONFERENCE.tagline || '',
     description: DEMO_CONFERENCE.description || '',
@@ -133,12 +157,28 @@ const DEFAULT_STATE: BuilderState = {
       border: 'primary',
       iconStyle: 'solid',
     },
+    iconTheme: 'solid',
   },
   navigation: DEFAULT_MODULES,
   publish: {
     eventCode: '',
     attendeeUrl: '',
     isPublished: false,
+  },
+  web: {
+    navBackgroundColor: '#ffffff',
+    navTextColor: '#374151',
+    heroStyle: 'gradient',
+    heroHeight: 'medium',
+    heroBackgroundUrl: null,
+    heroVideoUrl: null,
+    heroOverlayOpacity: 0.3,
+    backgroundPattern: null,
+    backgroundPatternColor: '#00000010',
+    backgroundGradientStart: null,
+    backgroundGradientEnd: null,
+    backgroundImageUrl: null,
+    backgroundImageOverlay: 0.5,
   },
 }
 
@@ -150,6 +190,8 @@ const BuilderContext = createContext<BuilderContextValue | null>(null)
 
 export function BuilderProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<BuilderState>(DEFAULT_STATE)
+  const [savedState, setSavedState] = useState<BuilderState>(DEFAULT_STATE)
+  const [previewEnabled, setPreviewEnabled] = useState(false)
 
   const setStep = useCallback((step: number) => {
     setState(prev => ({ ...prev, step: Math.max(0, Math.min(3, step)) }))
@@ -188,6 +230,20 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     setState(prev => ({
       ...prev,
       design: { ...prev.design, cardStyle },
+    }))
+  }, [])
+
+  const updateIconTheme = useCallback((iconTheme: BuilderState['design']['iconTheme']) => {
+    setState(prev => ({
+      ...prev,
+      design: { ...prev.design, iconTheme },
+    }))
+  }, [])
+
+  const updateWebSettings = useCallback((updates: Partial<BuilderState['web']>) => {
+    setState(prev => ({
+      ...prev,
+      web: { ...prev.web, ...updates },
     }))
   }, [])
 
@@ -231,8 +287,10 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
         gradients: data.design?.gradients || prev.design.gradients,
         cardStyle: data.design?.cardStyle || prev.design.cardStyle,
         darkMode: data.design?.darkMode ?? prev.design.darkMode,
+        iconTheme: data.design?.iconTheme || prev.design.iconTheme,
       },
       navigation: data.navigation || prev.navigation,
+      web: { ...prev.web, ...(data.web || {}) },
     }))
   }, [])
 
@@ -267,8 +325,9 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
           },
         }
 
-        hydrateFromServer({
+        const hydrated: Partial<BuilderState> = {
           overview: {
+            id: conference?.id,
             name: conference?.name || '',
             tagline: conference?.tagline || '',
             description: conference?.description || '',
@@ -281,8 +340,27 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
           },
           design: {
             tokens: baseTokens,
+            iconTheme: (tokens?.app?.iconTheme as BuilderState['design']['iconTheme']) || 'solid',
           },
-        })
+          web: {
+            navBackgroundColor: conference?.nav_background_color || '#ffffff',
+            navTextColor: conference?.nav_text_color || '#374151',
+            heroStyle: conference?.hero_style || 'gradient',
+            heroHeight: conference?.hero_height || 'medium',
+            heroBackgroundUrl: conference?.hero_background_url || null,
+            heroVideoUrl: conference?.hero_video_url || null,
+            heroOverlayOpacity: conference?.hero_overlay_opacity ?? 0.3,
+            backgroundPattern: conference?.background_pattern || null,
+            backgroundPatternColor: conference?.background_pattern_color || '#00000010',
+            backgroundGradientStart: conference?.background_gradient_start || null,
+            backgroundGradientEnd: conference?.background_gradient_end || null,
+            backgroundImageUrl: conference?.background_image_url || null,
+            backgroundImageOverlay: conference?.background_image_overlay ?? 0.5,
+          },
+        }
+
+        hydrateFromServer(hydrated)
+        setSavedState(prev => ({ ...prev, ...hydrated } as BuilderState))
       } catch (error) {
         console.error('Failed to load builder state:', error)
       }
@@ -295,8 +373,21 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const saveDraft = useCallback(async () => {
+    await fetch('/api/builder/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+    })
+    setSavedState(state)
+  }, [state])
+
   const value: BuilderContextValue = {
     state,
+    savedState,
+    previewEnabled,
+    setPreviewEnabled,
+    saveDraft,
     currentStep: state.step,
     setStep,
     nextStep,
@@ -307,6 +398,8 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     updateDesignTokens,
     updateGradients,
     updateCardStyle,
+    updateIconTheme,
+    updateWebSettings,
     toggleModule,
     reorderModules,
     generateEventCode,

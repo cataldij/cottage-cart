@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { BackgroundPicker } from '@/components/conference/background-picker'
 import {
   Palette,
   Type,
@@ -17,6 +18,7 @@ import {
   Zap,
   Sliders,
   Users,
+  Image,
 } from 'lucide-react'
 
 const EXAMPLE_PROMPTS = [
@@ -43,8 +45,8 @@ const FONTS = [
 ]
 
 export function BrandingStep() {
-  const { state, updateDesignTokens, updateGradients, updateCardStyle } = useBuilder()
-  const { design } = state
+  const { state, updateDesignTokens, updateGradients, updateCardStyle, updateIconTheme, updateWebSettings } = useBuilder()
+  const { design, overview, web } = state
 
   const [prompt, setPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -142,6 +144,10 @@ export function BrandingStep() {
           <TabsTrigger value="typography" className="flex-1 gap-1.5">
             <Type className="h-4 w-4" />
             Typography
+          </TabsTrigger>
+          <TabsTrigger value="background" className="flex-1 gap-1.5">
+            <Image className="h-4 w-4" />
+            Background
           </TabsTrigger>
         </TabsList>
 
@@ -301,6 +307,21 @@ export function BrandingStep() {
                 </select>
               </div>
             </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Module Icon Theme</label>
+                <select
+                  value={design.iconTheme}
+                  onChange={(e) => updateIconTheme(e.target.value as any)}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                >
+                  <option value="solid">Solid</option>
+                  <option value="outline">Outline</option>
+                  <option value="duotone">Duotone</option>
+                  <option value="glass">Glass</option>
+                </select>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
@@ -327,6 +348,43 @@ export function BrandingStep() {
                 </div>
               </div>
             ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="background" className="mt-4 space-y-4">
+          <div className="space-y-3 rounded-xl border bg-white/70 p-4">
+            <div>
+              <h3 className="text-sm font-semibold">Web Background</h3>
+              <p className="text-xs text-muted-foreground">
+                Customize page backgrounds, patterns, and gradients for the web preview.
+              </p>
+            </div>
+            <BackgroundPicker
+              conferenceId={overview.id || 'demo'}
+              backgroundUrl={web.backgroundImageUrl}
+              backgroundPattern={web.backgroundPattern}
+              gradientStart={web.backgroundGradientStart}
+              gradientEnd={web.backgroundGradientEnd}
+              patternColor={web.backgroundPatternColor}
+              onBackgroundUrlChange={(url) => updateWebSettings({ backgroundImageUrl: url })}
+              onPatternChange={(pattern) => {
+                updateWebSettings({
+                  backgroundPattern: pattern,
+                  backgroundGradientStart: pattern ? null : web.backgroundGradientStart,
+                  backgroundGradientEnd: pattern ? null : web.backgroundGradientEnd,
+                  backgroundImageUrl: pattern ? null : web.backgroundImageUrl,
+                })
+              }}
+              onGradientChange={(start, end) =>
+                updateWebSettings({
+                  backgroundGradientStart: start,
+                  backgroundGradientEnd: end,
+                  backgroundPattern: start ? null : web.backgroundPattern,
+                  backgroundImageUrl: start ? null : web.backgroundImageUrl,
+                })
+              }
+              onPatternColorChange={(color) => updateWebSettings({ backgroundPatternColor: color })}
+            />
           </div>
         </TabsContent>
       </Tabs>

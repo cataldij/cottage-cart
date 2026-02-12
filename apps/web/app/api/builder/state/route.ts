@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 
   const { data: conferences, error: confError } = await supabase
     .from('conferences')
-    .select('id, name, tagline, description, start_date, end_date, venue_name, venue_address, logo_url, banner_url, primary_color, secondary_color, accent_color, background_color, font_heading, font_body')
+    .select('id, name, tagline, description, start_date, end_date, venue_name, venue_address, logo_url, banner_url, primary_color, secondary_color, accent_color, background_color, font_heading, font_body, nav_background_color, nav_text_color, hero_style, hero_height, hero_background_url, hero_video_url, hero_overlay_opacity, background_pattern, background_pattern_color, background_gradient_start, background_gradient_end, background_image_url, background_image_overlay')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false })
 
