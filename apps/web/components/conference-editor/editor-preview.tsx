@@ -29,6 +29,9 @@ export function EditorPreview() {
       navText: conference.navTextColor || '#374151',
       button: conference.buttonColor || conference.primaryColor || '#2563eb',
       buttonText: conference.buttonTextColor || '#ffffff',
+      surface: '#ffffff',
+      textMuted: `${conference.textColor || '#1f2937'}99`,
+      border: `${conference.textColor || '#1f2937'}20`,
     },
     cardStyle: {
       variant: 'white',

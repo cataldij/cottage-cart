@@ -14,6 +14,7 @@ interface DesktopWebsitePreviewProps {
   accentColor?: string
   backgroundColor?: string
   textColor?: string
+  headingColor?: string
   navBackgroundColor?: string
   navTextColor?: string
   buttonColor?: string
@@ -85,6 +86,7 @@ export function DesktopWebsitePreview({
   accentColor,
   backgroundColor = '#ffffff',
   textColor = '#1f2937',
+  headingColor,
   navBackgroundColor = '#ffffff',
   navTextColor = '#374151',
   buttonColor,
@@ -114,6 +116,7 @@ export function DesktopWebsitePreview({
 }: DesktopWebsitePreviewProps) {
   const gradientHero = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor || adjustColor(primaryColor, -20)} 100%)`
   const effectiveButtonColor = buttonColor || primaryColor
+  const effectiveHeadingColor = headingColor || textColor
   const heroMinHeight = getHeroMinHeight(heroHeight)
 
   // Use heroBackgroundUrl if set, otherwise fall back to bannerUrl
@@ -362,7 +365,7 @@ export function DesktopWebsitePreview({
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <stat.icon className="h-6 w-6 mx-auto mb-2" style={{ color: primaryColor }} />
-              <div className="text-3xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>{stat.value}</div>
+              <div className="text-3xl font-bold" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>{stat.value}</div>
               <div className="text-sm" style={{ color: `${textColor}80` }}>{stat.label}</div>
             </div>
           ))}
@@ -374,7 +377,7 @@ export function DesktopWebsitePreview({
       <section className="max-w-6xl mx-auto px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Featured Sessions</h2>
+            <h2 className="text-2xl font-bold" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>Featured Sessions</h2>
             <p style={{ color: `${textColor}99` }}>Explore our curated selection of talks and workshops</p>
           </div>
           <a
@@ -403,7 +406,7 @@ export function DesktopWebsitePreview({
               >
                 {index === 0 ? 'Keynote' : index === 2 ? 'Workshop' : 'Talk'}
               </div>
-              <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>
+              <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>
                 {session.title}
               </h3>
               <div className="flex items-center gap-4 text-sm" style={{ color: `${textColor}80` }}>
@@ -428,7 +431,7 @@ export function DesktopWebsitePreview({
         <div className="max-w-6xl mx-auto px-8 py-16">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Featured Speakers</h2>
+              <h2 className="text-2xl font-bold" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>Featured Speakers</h2>
               <p style={{ color: `${textColor}99` }}>Learn from industry leaders and innovators</p>
             </div>
             <a
@@ -460,7 +463,7 @@ export function DesktopWebsitePreview({
                     </div>
                   )}
                 </div>
-                <h3 className="font-semibold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>{speaker.name}</h3>
+                <h3 className="font-semibold" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>{speaker.name}</h3>
                 {speaker.title && (
                   <p className="text-sm" style={{ color: `${textColor}80` }}>{speaker.title}</p>
                 )}
@@ -476,7 +479,7 @@ export function DesktopWebsitePreview({
       <section className="max-w-6xl mx-auto px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Sponsors</h2>
+            <h2 className="text-2xl font-bold" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>Sponsors</h2>
             <p style={{ color: `${textColor}99` }}>Our partners powering the event</p>
           </div>
         </div>
@@ -508,7 +511,7 @@ export function DesktopWebsitePreview({
       <section className="max-w-6xl mx-auto px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold" style={{ color: textColor, fontFamily: `"${fontHeading}", sans-serif` }}>Venue</h2>
+            <h2 className="text-2xl font-bold" style={{ color: effectiveHeadingColor, fontFamily: `"${fontHeading}", sans-serif` }}>Venue</h2>
             <p style={{ color: `${textColor}99` }}>Find your way around the event</p>
           </div>
         </div>

@@ -335,6 +335,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
                 accentColor={config.colors.accent}
                 backgroundColor={config.colors.background}
                 textColor={config.colors.text}
+                headingColor={config.colors.heading}
                 navBackgroundColor={config.colors.navBackground}
                 navTextColor={config.colors.navText}
                 buttonColor={config.colors.button}
