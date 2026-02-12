@@ -6,7 +6,7 @@ import { BrandingStep } from './steps/branding-step'
 import { NavigationStep } from './steps/navigation-step'
 import { PublishStep } from './steps/publish-step'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, AlertTriangle, LogIn } from 'lucide-react'
 
 export function BuilderContent() {
   const {
@@ -21,10 +21,28 @@ export function BuilderContent() {
     saveDraft,
     isSaving,
     lastSavedAt,
+    saveError,
+    isAuthenticated,
   } = useBuilder()
 
   return (
     <div className="flex h-full flex-col">
+      {/* Auth warning */}
+      {isAuthenticated === false && (
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <LogIn className="h-5 w-5 shrink-0 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-800">Not logged in</p>
+            <p className="text-xs text-amber-700">
+              Sign in to save your work and preview your conference.
+            </p>
+          </div>
+          <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100" asChild>
+            <a href="/login">Sign In</a>
+          </Button>
+        </div>
+      )}
+
       <div className="mb-4 flex items-center justify-between rounded-2xl border bg-white/80 px-4 py-3">
         <div>
           <p className="text-sm font-semibold text-slate-900">Preview changes</p>
@@ -34,6 +52,12 @@ export function BuilderContent() {
           {lastSavedAt && (
             <p className="mt-1 text-[11px] text-slate-400">
               Last saved {new Date(lastSavedAt).toLocaleTimeString()}
+            </p>
+          )}
+          {saveError && (
+            <p className="mt-1 flex items-center gap-1 text-[11px] text-red-600">
+              <AlertTriangle className="h-3 w-3" />
+              {saveError}
             </p>
           )}
         </div>

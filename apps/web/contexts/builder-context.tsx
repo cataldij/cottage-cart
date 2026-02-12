@@ -106,6 +106,8 @@ interface BuilderContextValue {
   saveDraft: () => Promise<void>
   isSaving: boolean
   lastSavedAt: string | null
+  saveError: string | null
+  isAuthenticated: boolean | null
   // Step navigation
   currentStep: number
   setStep: (step: number) => void
@@ -213,6 +215,8 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
   const [previewEnabled, setPreviewEnabled] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
   const setStep = useCallback((step: number) => {
     setState(prev => ({ ...prev, step: Math.max(0, Math.min(3, step)) }))
@@ -328,6 +332,11 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     const load = async () => {
       try {
         const response = await fetch('/api/builder/state')
+        if (response.status === 401) {
+          if (isMounted) setIsAuthenticated(false)
+          return
+        }
+        if (isMounted) setIsAuthenticated(true)
         if (!response.ok) return
         const data = await response.json()
 
@@ -414,13 +423,26 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
   const saveDraft = useCallback(async () => {
     try {
       setIsSaving(true)
-      await fetch('/api/builder/save', {
+      setSaveError(null)
+      const res = await fetch('/api/builder/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(state),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        const msg = res.status === 401
+          ? 'Not logged in — please sign in first'
+          : res.status === 400
+            ? 'No conference found — create one first'
+            : data.error || `Save failed (${res.status})`
+        setSaveError(msg)
+        return
+      }
       setSavedState(state)
       setLastSavedAt(new Date().toISOString())
+    } catch (err) {
+      setSaveError('Network error — could not reach server')
     } finally {
       setIsSaving(false)
     }
@@ -434,6 +456,8 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     saveDraft,
     isSaving,
     lastSavedAt,
+    saveError,
+    isAuthenticated,
     currentStep: state.step,
     setStep,
     nextStep,
