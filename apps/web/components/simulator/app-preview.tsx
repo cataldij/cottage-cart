@@ -136,6 +136,14 @@ interface PreviewConfig {
     iconStyle?: 'solid' | 'outline' | 'pill'
   }
   iconTheme?: 'solid' | 'outline' | 'duotone' | 'glass'
+  appBackground?: {
+    pattern?: string | null
+    patternColor?: string | null
+    gradientStart?: string | null
+    gradientEnd?: string | null
+    imageUrl?: string | null
+    imageOverlay?: number
+  }
   hero?: {
     height?: 'small' | 'medium' | 'large' | 'full'
     style?: 'image' | 'video' | 'gradient'
@@ -199,6 +207,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
       fontBody: config.fonts?.body,
       cardStyle: config.cardStyle,
       iconTheme: config.iconTheme,
+      appBackground: config.appBackground,
       scale,
     }
 
@@ -228,6 +237,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
         fontBody={config.fonts?.body}
         cardStyle={config.cardStyle}
         iconTheme={config.iconTheme}
+        appBackground={config.appBackground}
         modules={config.modules}
         onModuleTap={handleModuleTap}
         scale={scale}

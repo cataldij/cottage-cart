@@ -19,6 +19,8 @@ export function BuilderContent() {
     previewEnabled,
     setPreviewEnabled,
     saveDraft,
+    isSaving,
+    lastSavedAt,
   } = useBuilder()
 
   return (
@@ -29,6 +31,11 @@ export function BuilderContent() {
           <p className="text-xs text-slate-500">
             Toggle live preview without saving.
           </p>
+          {lastSavedAt && (
+            <p className="mt-1 text-[11px] text-slate-400">
+              Last saved {new Date(lastSavedAt).toLocaleTimeString()}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -38,8 +45,8 @@ export function BuilderContent() {
           >
             {previewEnabled ? 'Preview On' : 'Preview Off'}
           </Button>
-          <Button size="sm" onClick={saveDraft}>
-            Save Changes
+          <Button size="sm" onClick={saveDraft} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>

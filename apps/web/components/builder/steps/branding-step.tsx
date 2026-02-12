@@ -45,8 +45,8 @@ const FONTS = [
 ]
 
 export function BrandingStep() {
-  const { state, updateDesignTokens, updateGradients, updateCardStyle, updateIconTheme, updateWebSettings } = useBuilder()
-  const { design, overview, web } = state
+  const { state, updateDesignTokens, updateGradients, updateCardStyle, updateIconTheme, updateWebSettings, updateAppSettings } = useBuilder()
+  const { design, overview, web, app } = state
 
   const [prompt, setPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -354,6 +354,67 @@ export function BrandingStep() {
         <TabsContent value="background" className="mt-4 space-y-4">
           <div className="space-y-3 rounded-xl border bg-white/70 p-4">
             <div>
+              <h3 className="text-sm font-semibold">Hero</h3>
+              <p className="text-xs text-muted-foreground">
+                Set the hero style for the web preview.
+              </p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Hero Style</label>
+                <select
+                  value={web.heroStyle}
+                  onChange={(e) => updateWebSettings({ heroStyle: e.target.value as any })}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                >
+                  <option value="gradient">Gradient</option>
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Hero Height</label>
+                <select
+                  value={web.heroHeight}
+                  onChange={(e) => updateWebSettings({ heroHeight: e.target.value as any })}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                  <option value="full">Full</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Overlay Opacity</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={web.heroOverlayOpacity}
+                  onChange={(e) => updateWebSettings({ heroOverlayOpacity: parseFloat(e.target.value) })}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            {web.heroStyle === 'image' && (
+              <Input
+                value={web.heroBackgroundUrl || ''}
+                onChange={(e) => updateWebSettings({ heroBackgroundUrl: e.target.value })}
+                placeholder="Hero image URL"
+              />
+            )}
+            {web.heroStyle === 'video' && (
+              <Input
+                value={web.heroVideoUrl || ''}
+                onChange={(e) => updateWebSettings({ heroVideoUrl: e.target.value })}
+                placeholder="Hero video URL"
+              />
+            )}
+          </div>
+          <div className="space-y-3 rounded-xl border bg-white/70 p-4">
+            <div>
               <h3 className="text-sm font-semibold">Web Background</h3>
               <p className="text-xs text-muted-foreground">
                 Customize page backgrounds, patterns, and gradients for the web preview.
@@ -384,6 +445,40 @@ export function BrandingStep() {
                 })
               }
               onPatternColorChange={(color) => updateWebSettings({ backgroundPatternColor: color })}
+            />
+          </div>
+          <div className="space-y-3 rounded-xl border bg-white/70 p-4">
+            <div>
+              <h3 className="text-sm font-semibold">App Background</h3>
+              <p className="text-xs text-muted-foreground">
+                Control background patterns or gradients inside the mobile app preview.
+              </p>
+            </div>
+            <BackgroundPicker
+              conferenceId={overview.id || 'demo'}
+              backgroundUrl={app.backgroundImageUrl}
+              backgroundPattern={app.backgroundPattern}
+              gradientStart={app.backgroundGradientStart}
+              gradientEnd={app.backgroundGradientEnd}
+              patternColor={app.backgroundPatternColor}
+              onBackgroundUrlChange={(url) => updateAppSettings({ backgroundImageUrl: url })}
+              onPatternChange={(pattern) => {
+                updateAppSettings({
+                  backgroundPattern: pattern,
+                  backgroundGradientStart: pattern ? null : app.backgroundGradientStart,
+                  backgroundGradientEnd: pattern ? null : app.backgroundGradientEnd,
+                  backgroundImageUrl: pattern ? null : app.backgroundImageUrl,
+                })
+              }}
+              onGradientChange={(start, end) =>
+                updateAppSettings({
+                  backgroundGradientStart: start,
+                  backgroundGradientEnd: end,
+                  backgroundPattern: start ? null : app.backgroundPattern,
+                  backgroundImageUrl: start ? null : app.backgroundImageUrl,
+                })
+              }
+              onPatternColorChange={(color) => updateAppSettings({ backgroundPatternColor: color })}
             />
           </div>
         </TabsContent>

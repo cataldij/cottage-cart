@@ -67,6 +67,14 @@ interface BuilderState {
     }
     iconTheme: 'solid' | 'outline' | 'duotone' | 'glass'
   }
+  app: {
+    backgroundPattern: string | null
+    backgroundPatternColor: string | null
+    backgroundGradientStart: string | null
+    backgroundGradientEnd: string | null
+    backgroundImageUrl: string | null
+    backgroundImageOverlay: number
+  }
   navigation: NavigationModule[]
   publish: {
     eventCode: string
@@ -96,6 +104,8 @@ interface BuilderContextValue {
   previewEnabled: boolean
   setPreviewEnabled: (enabled: boolean) => void
   saveDraft: () => Promise<void>
+  isSaving: boolean
+  lastSavedAt: string | null
   // Step navigation
   currentStep: number
   setStep: (step: number) => void
@@ -111,6 +121,7 @@ interface BuilderContextValue {
   updateCardStyle: (cardStyle: BuilderState['design']['cardStyle']) => void
   updateIconTheme: (iconTheme: BuilderState['design']['iconTheme']) => void
   updateWebSettings: (updates: Partial<BuilderState['web']>) => void
+  updateAppSettings: (updates: Partial<BuilderState['app']>) => void
   // Navigation
   toggleModule: (moduleId: string) => void
   reorderModules: (modules: NavigationModule[]) => void
@@ -159,6 +170,14 @@ const DEFAULT_STATE: BuilderState = {
     },
     iconTheme: 'solid',
   },
+  app: {
+    backgroundPattern: null,
+    backgroundPatternColor: '#00000010',
+    backgroundGradientStart: null,
+    backgroundGradientEnd: null,
+    backgroundImageUrl: null,
+    backgroundImageOverlay: 0.5,
+  },
   navigation: DEFAULT_MODULES,
   publish: {
     eventCode: '',
@@ -192,6 +211,8 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<BuilderState>(DEFAULT_STATE)
   const [savedState, setSavedState] = useState<BuilderState>(DEFAULT_STATE)
   const [previewEnabled, setPreviewEnabled] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
 
   const setStep = useCallback((step: number) => {
     setState(prev => ({ ...prev, step: Math.max(0, Math.min(3, step)) }))
@@ -247,6 +268,13 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  const updateAppSettings = useCallback((updates: Partial<BuilderState['app']>) => {
+    setState(prev => ({
+      ...prev,
+      app: { ...prev.app, ...updates },
+    }))
+  }, [])
+
   const toggleModule = useCallback((moduleId: string) => {
     setState(prev => ({
       ...prev,
@@ -291,6 +319,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
       },
       navigation: data.navigation || prev.navigation,
       web: { ...prev.web, ...(data.web || {}) },
+      app: { ...prev.app, ...(data.app || {}) },
     }))
   }, [])
 
@@ -357,6 +386,14 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
             backgroundImageUrl: conference?.background_image_url || null,
             backgroundImageOverlay: conference?.background_image_overlay ?? 0.5,
           },
+          app: {
+            backgroundPattern: tokens?.app?.backgroundPattern || null,
+            backgroundPatternColor: tokens?.app?.backgroundPatternColor || '#00000010',
+            backgroundGradientStart: tokens?.app?.backgroundGradientStart || null,
+            backgroundGradientEnd: tokens?.app?.backgroundGradientEnd || null,
+            backgroundImageUrl: tokens?.app?.backgroundImageUrl || null,
+            backgroundImageOverlay: tokens?.app?.backgroundImageOverlay ?? 0.5,
+          },
         }
 
         hydrateFromServer(hydrated)
@@ -374,12 +411,18 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const saveDraft = useCallback(async () => {
-    await fetch('/api/builder/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state),
-    })
-    setSavedState(state)
+    try {
+      setIsSaving(true)
+      await fetch('/api/builder/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state),
+      })
+      setSavedState(state)
+      setLastSavedAt(new Date().toISOString())
+    } finally {
+      setIsSaving(false)
+    }
   }, [state])
 
   const value: BuilderContextValue = {
@@ -388,6 +431,8 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     previewEnabled,
     setPreviewEnabled,
     saveDraft,
+    isSaving,
+    lastSavedAt,
     currentStep: state.step,
     setStep,
     nextStep,
@@ -400,6 +445,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     updateCardStyle,
     updateIconTheme,
     updateWebSettings,
+    updateAppSettings,
     toggleModule,
     reorderModules,
     generateEventCode,

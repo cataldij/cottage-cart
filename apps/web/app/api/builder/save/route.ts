@@ -67,6 +67,12 @@ export async function POST(req: Request) {
     app: {
       ...(design.tokens?.app || {}),
       iconTheme: design.iconTheme || 'solid',
+      backgroundPattern: body?.app?.backgroundPattern || null,
+      backgroundPatternColor: body?.app?.backgroundPatternColor || null,
+      backgroundGradientStart: body?.app?.backgroundGradientStart || null,
+      backgroundGradientEnd: body?.app?.backgroundGradientEnd || null,
+      backgroundImageUrl: body?.app?.backgroundImageUrl || null,
+      backgroundImageOverlay: body?.app?.backgroundImageOverlay ?? null,
     },
   }
 

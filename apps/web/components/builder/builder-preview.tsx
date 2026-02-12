@@ -6,7 +6,7 @@ import { AppPreview } from '@/components/simulator/app-preview'
 export function BuilderPreview() {
   const { state, savedState, previewEnabled } = useBuilder()
   const activeState = previewEnabled ? state : savedState
-  const { overview, design, navigation, web } = activeState
+  const { overview, design, navigation, web, app } = activeState
   const { tokens, gradients } = design
 
   // Build the config object for the preview
@@ -38,6 +38,14 @@ export function BuilderPreview() {
     modules: navigation,
     cardStyle: design.cardStyle,
     iconTheme: design.iconTheme,
+    appBackground: {
+      pattern: app.backgroundPattern,
+      patternColor: app.backgroundPatternColor || undefined,
+      gradientStart: app.backgroundGradientStart || undefined,
+      gradientEnd: app.backgroundGradientEnd || undefined,
+      imageUrl: app.backgroundImageUrl || undefined,
+      imageOverlay: app.backgroundImageOverlay,
+    },
     hero: {
       style: web.heroStyle,
       height: web.heroHeight,
