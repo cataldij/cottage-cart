@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { getSupabaseBrowser } from '@/lib/supabase-browser'
+
 import { IphoneSimulator } from '@/components/simulator/iphone-simulator'
 import { DesktopBrowser, TabletFrame } from '@/components/simulator/desktop-browser'
 import { DesktopWebsitePreview } from '@/components/simulator/desktop-website-preview'
@@ -19,7 +20,6 @@ import {
   Settings,
   Sparkles,
   RotateCcw,
-  Download,
   Share2,
   Zap,
   Sun,
@@ -73,41 +73,22 @@ export default function PreviewPage() {
   const [loading, setLoading] = useState(true)
   const [conference, setConference] = useState<Conference | null>(null)
   const [designTokens, setDesignTokens] = useState<any | null>(null)
-  const [authError, setAuthError] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  const supabase = createClientComponentClient()
   const searchParams = useSearchParams()
   const conferenceId = searchParams.get('conferenceId')
 
   useEffect(() => {
     async function loadData() {
       try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser()
-        if (userError || !user) {
-          setAuthError(true)
-          return
-        }
+        const supabase = getSupabaseBrowser()
 
-        // Try with created_by first
-        let conferenceQuery = supabase
-          .from('conferences')
-          .select('*')
-          .eq('created_by', user.id)
+        // Load conference directly - no auth required
+        const query = supabase.from('conferences').select('*')
 
-        let { data: conferences, error: confError } = conferenceId
-          ? await conferenceQuery.eq('id', conferenceId).limit(1)
-          : await conferenceQuery.order('created_at', { ascending: false }).limit(1)
-
-        // If no results with created_by, try without (in case column doesn't match)
-        if ((!conferences || conferences.length === 0) && !conferenceId) {
-          const { data: allConfs } = await supabase
-            .from('conferences')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1)
-          conferences = allConfs
-        }
+        const { data: conferences, error: confError } = conferenceId
+          ? await query.eq('id', conferenceId).limit(1)
+          : await query.order('created_at', { ascending: false }).limit(1)
 
         if (confError) {
           setLoadError(confError.message)
@@ -115,7 +96,7 @@ export default function PreviewPage() {
         }
 
         if (conferences && conferences.length > 0) {
-          const activeConference = conferences[0]
+          const activeConference = conferences[0] as any
           setConference(activeConference)
 
           const { data: tokenRow } = await supabase
@@ -125,7 +106,7 @@ export default function PreviewPage() {
             .eq('is_active', true)
             .maybeSingle()
 
-          setDesignTokens(tokenRow?.tokens ?? null)
+          setDesignTokens((tokenRow as any)?.tokens ?? null)
         }
       } catch (error) {
         console.error('Error loading preview data:', error)
@@ -136,7 +117,7 @@ export default function PreviewPage() {
     }
 
     loadData()
-  }, [supabase, conferenceId])
+  }, [conferenceId])
 
   const handleDeviceChange = (newDevice: DeviceType) => {
     if (newDevice !== device) {
@@ -189,19 +170,6 @@ export default function PreviewPage() {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Loading Preview...</p>
         </div>
-      </div>
-    )
-  }
-
-  if (authError) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4">
-        <Eye className="h-12 w-12 text-amber-400" />
-        <h2 className="text-xl font-semibold">Not Logged In</h2>
-        <p className="text-muted-foreground">Sign in to preview your conference.</p>
-        <Button asChild>
-          <a href="/login">Sign In</a>
-        </Button>
       </div>
     )
   }
