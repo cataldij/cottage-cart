@@ -41,7 +41,7 @@ export function ThemedBackground({ children, style }: ThemedBackgroundProps) {
         <View
           style={[
             StyleSheet.absoluteFill,
-            { backgroundColor: `rgba(255, 255, 255, 0.5)` },
+            { backgroundColor: `rgba(255, 255, 255, ${theme.backgroundImageOverlay ?? 0.5})` },
           ]}
         />
         <View style={styles.content}>{children}</View>

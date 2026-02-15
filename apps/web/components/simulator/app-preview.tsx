@@ -139,7 +139,7 @@ interface PreviewConfig {
   appButtonStyle?: 'solid' | 'outline' | 'soft'
   appButtonColor?: string
   appButtonTextColor?: string
-  appTileSize?: 'sm' | 'md' | 'lg'
+  appTileSize?: 'sm' | 'md' | 'lg' | 'xl'
   appTileColumns?: 2 | 3 | 4 | 5 | 6
   appTileLayout?: 'grid' | 'row'
   appTileGap?: number

@@ -93,6 +93,15 @@ export interface DesignTokens {
     tabBarBlur?: boolean
     gradientHero?: string
   }
+  // App-specific preview/runtime settings from builder
+  app?: {
+    backgroundPattern?: string | null
+    backgroundPatternColor?: string | null
+    backgroundGradientStart?: string | null
+    backgroundGradientEnd?: string | null
+    backgroundImageUrl?: string | null
+    backgroundImageOverlay?: number | null
+  }
 }
 
 // Default tokens matching the "Tech Minimal" preset

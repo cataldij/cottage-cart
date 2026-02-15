@@ -102,12 +102,16 @@ export function ConferenceEditorClient({
       throw new Error(error.message)
     }
 
-    const { data: existingToken } = await supabase
+    const { data: existingToken, error: existingTokenError } = await supabase
       .from('design_tokens')
       .select('id, tokens')
       .eq('conference_id', conferenceId)
       .eq('is_active', true)
       .maybeSingle()
+
+    if (existingTokenError) {
+      throw new Error(existingTokenError.message)
+    }
 
     const existingTokens = existingToken?.tokens || {}
     const tokens = {
@@ -149,18 +153,34 @@ export function ConferenceEditorClient({
     }
 
     if (existingToken?.id) {
-      await supabase
+      const { error: updateTokenError } = await supabase
         .from('design_tokens')
         .update({ tokens, updated_at: new Date().toISOString() })
         .eq('id', existingToken.id)
+      if (updateTokenError) {
+        throw new Error(updateTokenError.message)
+      }
     } else {
-      await supabase
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
+
+      if (userError || !user) {
+        throw new Error(userError?.message || 'Could not determine user for design token save')
+      }
+
+      const { error: insertTokenError } = await supabase
         .from('design_tokens')
         .insert({
           conference_id: conferenceId,
           tokens,
           is_active: true,
+          created_by: user.id,
         })
+      if (insertTokenError) {
+        throw new Error(insertTokenError.message)
+      }
     }
   }
 

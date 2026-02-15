@@ -25,6 +25,7 @@ interface ConferenceTheme {
 
   // Background
   backgroundImageUrl: string | null
+  backgroundImageOverlay: number
   backgroundPattern: string | null
   backgroundPatternColor: string | null
   backgroundGradientStart: string | null
@@ -87,6 +88,7 @@ const defaultTheme: ConferenceTheme = {
   tabBarColor: '#ffffff',
   tabBarActiveColor: '#2563eb',
   backgroundImageUrl: null,
+  backgroundImageOverlay: 0.5,
   backgroundPattern: null,
   backgroundPatternColor: null,
   backgroundGradientStart: null,
@@ -184,6 +186,15 @@ export function ConferenceProvider({ children }: { children: ReactNode }) {
 
     const c = activeConference as any // Type assertion for all the new fields
     const tokens = designTokens
+    const appTokens = tokens.app || {}
+    const appPattern =
+      appTokens.backgroundPattern && appTokens.backgroundPattern !== 'none'
+        ? appTokens.backgroundPattern
+        : null
+    const conferencePattern =
+      c.background_pattern && c.background_pattern !== 'none'
+        ? c.background_pattern
+        : null
 
     return {
       // Colors - prefer design tokens, fallback to conference settings
@@ -206,11 +217,12 @@ export function ConferenceProvider({ children }: { children: ReactNode }) {
       tabBarActiveColor: tokens.colors?.primary || c.mobile_tab_bar_active_color || c.primary_color || defaultTheme.tabBarActiveColor,
 
       // Background
-      backgroundImageUrl: c.background_image_url || null,
-      backgroundPattern: c.background_pattern || null,
-      backgroundPatternColor: c.background_pattern_color || null,
-      backgroundGradientStart: tokens.colors?.primary || c.background_gradient_start || null,
-      backgroundGradientEnd: tokens.colors?.primaryDark || c.background_gradient_end || null,
+      backgroundImageUrl: appTokens.backgroundImageUrl || c.background_image_url || null,
+      backgroundImageOverlay: appTokens.backgroundImageOverlay ?? c.background_image_overlay ?? 0.5,
+      backgroundPattern: appPattern || conferencePattern,
+      backgroundPatternColor: appTokens.backgroundPatternColor || c.background_pattern_color || null,
+      backgroundGradientStart: appTokens.backgroundGradientStart || c.background_gradient_start || null,
+      backgroundGradientEnd: appTokens.backgroundGradientEnd || c.background_gradient_end || null,
       gradientHero: tokens.mobile?.gradientHero || null,
 
       // Typography

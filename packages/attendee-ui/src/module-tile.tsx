@@ -82,7 +82,7 @@ export const moduleConfigs: Record<string, ModuleConfig> = {
 interface ModuleTileProps {
   module: ModuleConfig | string
   onPress?: () => void
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   showDescription?: boolean
   iconStyle?: 'solid' | 'outline' | 'duotone' | 'glass'
   className?: string
@@ -136,6 +136,15 @@ export function ModuleTile({
       borderRadius: ios.radius.xl,
       fontSize: 13,
       gap: 8,
+    },
+    xl: {
+      width: 116,
+      height: 116,
+      iconSize: 36,
+      padding: 18,
+      borderRadius: ios.radius.xl,
+      fontSize: 14,
+      gap: 9,
     },
   }
 
@@ -202,7 +211,7 @@ interface ModuleGridProps {
   modules?: string[]
   onModulePress?: (moduleId: string) => void
   columns?: 2 | 3 | 4
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   gap?: number
   style?: React.CSSProperties
 }
@@ -338,7 +347,7 @@ interface CompactModuleGridProps {
   onModulePress?: (moduleId: string) => void
   columns?: 2 | 3 | 4 | 5 | 6
   layout?: 'grid' | 'row'
-  tileSize?: 'sm' | 'md' | 'lg'
+  tileSize?: 'sm' | 'md' | 'lg' | 'xl'
   scale?: number
   gap?: number
   iconStyle?: 'solid' | 'outline' | 'duotone' | 'glass'
@@ -367,7 +376,7 @@ export function CompactModuleGrid({
     : modules
 
   const tileScale =
-    tileSize === 'sm' ? 0.85 : tileSize === 'lg' ? 1.15 : 1
+    tileSize === 'sm' ? 0.85 : tileSize === 'lg' ? 1.15 : tileSize === 'xl' ? 1.35 : 1
 
   return (
     <div

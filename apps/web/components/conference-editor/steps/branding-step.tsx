@@ -512,6 +512,7 @@ export function BrandingStep() {
                   <option value="sm">Small</option>
                   <option value="md">Medium</option>
                   <option value="lg">Large</option>
+                  <option value="xl">Extra Large</option>
                 </select>
               </div>
               <div className="space-y-2">

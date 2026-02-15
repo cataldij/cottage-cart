@@ -8,6 +8,7 @@ export function BuilderPreview() {
   const activeState = previewEnabled ? state : savedState
   const { overview, design, navigation, web, app } = activeState
   const { tokens, gradients } = design
+  const appTokenSettings = (tokens as any)?.app || {}
 
   // Build the config object for the preview
   const previewConfig = {
@@ -38,6 +39,13 @@ export function BuilderPreview() {
     modules: navigation,
     cardStyle: design.cardStyle,
     iconTheme: design.iconTheme,
+    appButtonStyle: appTokenSettings.appButtonStyle || 'solid',
+    appButtonColor: appTokenSettings.appButtonColor || tokens?.colors?.primary || '#2563eb',
+    appButtonTextColor: appTokenSettings.appButtonTextColor || '#ffffff',
+    appTileSize: appTokenSettings.appTileSize || 'md',
+    appTileColumns: appTokenSettings.appTileColumns || 3,
+    appTileLayout: appTokenSettings.appTileLayout || 'grid',
+    appTileGap: appTokenSettings.appTileGap ?? 8,
     appBackground: {
       pattern: app.backgroundPattern,
       patternColor: app.backgroundPatternColor || undefined,

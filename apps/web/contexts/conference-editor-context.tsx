@@ -41,7 +41,7 @@ export interface ConferenceData {
   appButtonColor: string
   appButtonTextColor: string
   // App Tile Layout
-  appTileSize: 'sm' | 'md' | 'lg'
+  appTileSize: 'sm' | 'md' | 'lg' | 'xl'
   appTileColumns: 2 | 3 | 4 | 5 | 6
   appTileLayout: 'grid' | 'row'
   appTileGap: number

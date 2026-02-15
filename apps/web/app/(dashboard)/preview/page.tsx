@@ -49,6 +49,8 @@ interface Conference {
   venue_name?: string
   primary_color?: string
   secondary_color?: string
+  font_heading?: string
+  font_body?: string
   logo_url?: string | null
   banner_url?: string | null
 }
@@ -112,7 +114,19 @@ export default function PreviewPage() {
             .eq('is_active', true)
             .maybeSingle()
 
-          setDesignTokens((tokenRow as any)?.tokens ?? null)
+          if ((tokenRow as any)?.tokens) {
+            setDesignTokens((tokenRow as any).tokens)
+          } else {
+            // Fallback for older rows where active flag may not be set correctly.
+            const { data: latestTokenRows } = await supabase
+              .from('design_tokens')
+              .select('tokens')
+              .eq('conference_id', activeConference.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+
+            setDesignTokens((latestTokenRows as any)?.[0]?.tokens ?? null)
+          }
         }
       } catch (error) {
         console.error('Error loading preview data:', error)
@@ -341,11 +355,11 @@ export default function PreviewPage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-slate-700">Modules</span>
                     <span className="text-xs text-slate-500">
-                      {DEFAULT_MODULES.filter(m => m.enabled).length} active
+                      {appModules.filter(m => m.enabled).length} active
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {DEFAULT_MODULES.filter(m => m.enabled).map(m => (
+                    {appModules.filter(m => m.enabled).map(m => (
                       <span
                         key={m.id}
                         className="px-2 py-0.5 rounded-full text-[10px] font-medium"
