@@ -12,7 +12,7 @@ import {
   Avatar,
   Button,
   Separator,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   ChevronLeft,
   MapPin,

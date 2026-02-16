@@ -15,7 +15,7 @@ import {
   Card,
   Avatar,
   SessionCard,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   Calendar,
   MapPin,
@@ -29,7 +29,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useConference } from '../../hooks/useConference'
 import { ThemedBackground } from '../../components/ThemedBackground'
 import { ConferenceSwitcher } from '../../components/ConferenceSwitcher'
-import { getUserConferences, getSessionsByDate, getUserSavedSessions, saveSession, unsaveSession, getSessionRecommendations } from '@conference-os/api'
+import { getUserConferences, getSessionsByDate, getUserSavedSessions, saveSession, unsaveSession, getSessionRecommendations } from '@cottage-cart/api'
 
 export default function TodayScreen() {
   const insets = useSafeAreaInsets()

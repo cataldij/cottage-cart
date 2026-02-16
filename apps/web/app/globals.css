@@ -10,10 +10,10 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 32 95% 44%;
+    --primary-foreground: 40 100% 97%;
+    --secondary: 25 75% 20%;
+    --secondary-foreground: 40 100% 97%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96.1%;
@@ -22,11 +22,11 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 32 95% 44%;
     --radius: 0.5rem;
-    --glow-blue: 219 100% 70%;
     --glow-amber: 38 92% 62%;
-    --glow-teal: 188 86% 53%;
+    --glow-warm: 25 85% 55%;
+    --glow-sage: 140 30% 50%;
   }
 
   .dark {
@@ -117,7 +117,7 @@
   }
 
   .text-gradient {
-    background: linear-gradient(120deg, hsl(var(--primary)) 0%, #f97316 50%, #14b8a6 100%);
+    background: linear-gradient(120deg, #D97706 0%, #92400E 50%, #B45309 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
@@ -125,10 +125,10 @@
 
   .bg-hero {
     background:
-      radial-gradient(1200px 600px at 8% -10%, rgba(59, 130, 246, 0.22), transparent 60%),
+      radial-gradient(1200px 600px at 8% -10%, rgba(217, 119, 6, 0.18), transparent 60%),
       radial-gradient(900px 600px at 90% 0%, rgba(245, 158, 11, 0.2), transparent 55%),
-      radial-gradient(900px 700px at 80% 90%, rgba(20, 184, 166, 0.18), transparent 60%),
-      linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 1) 50%, rgba(248, 250, 252, 1) 100%);
+      radial-gradient(900px 700px at 80% 90%, rgba(101, 163, 13, 0.14), transparent 60%),
+      linear-gradient(180deg, rgba(255, 251, 245, 1) 0%, rgba(254, 243, 226, 1) 50%, rgba(255, 251, 245, 1) 100%);
   }
 
   .bg-grid {
@@ -141,7 +141,7 @@
   .cursor-glow {
     background: radial-gradient(
       600px 600px at var(--cursor-x, 50%) var(--cursor-y, 20%),
-      rgba(59, 130, 246, 0.18),
+      rgba(217, 119, 6, 0.14),
       transparent 65%
     );
   }
@@ -149,7 +149,7 @@
   .cursor-glow-amber {
     background: radial-gradient(
       520px 520px at var(--cursor-x, 60%) var(--cursor-y, 30%),
-      rgba(245, 158, 11, 0.14),
+      rgba(180, 83, 9, 0.12),
       transparent 65%
     );
   }

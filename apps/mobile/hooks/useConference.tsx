@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useMemo, useEffect, ReactNode } from 'react'
-import { Conference, ConferenceMember, supabase } from '@conference-os/api'
+import { Conference, ConferenceMember, supabase } from '@cottage-cart/api'
 import { DesignTokens, DEFAULT_TOKENS } from './useDesignTokens'
 
 // Conference theme derived from design tokens

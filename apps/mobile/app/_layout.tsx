@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font'
 import { TamaguiProvider, Theme } from '@tamagui/core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import { tamaguiConfig } from '@conference-os/ui'
+import { tamaguiConfig } from '@cottage-cart/ui'
 import { AuthProvider } from '../hooks/useAuth'
 import { ConferenceProvider } from '../hooks/useConference'
 

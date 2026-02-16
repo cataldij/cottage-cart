@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Smartphone, Monitor, RotateCcw } from 'lucide-react'
-import { ios } from '@conference-os/attendee-ui'
+import { ios } from '@cottage-cart/shop-ui'
 import { IphoneSimulator } from './iphone-simulator'
 import { DesktopBrowser } from './desktop-browser'
 import { DesktopWebsitePreview } from './desktop-website-preview'

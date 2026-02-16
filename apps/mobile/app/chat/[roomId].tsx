@@ -17,7 +17,7 @@ import {
   Text,
   Avatar,
   Spinner,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import { ChevronLeft, Send, Image as ImageIcon } from '@tamagui/lucide-icons'
 import {
   getChatRoom,
@@ -28,7 +28,7 @@ import {
   MessageWithSender,
   ChatRoomWithDetails,
   Profile,
-} from '@conference-os/api'
+} from '@cottage-cart/api'
 import { useAuth } from '../../hooks/useAuth'
 
 // Format message timestamp

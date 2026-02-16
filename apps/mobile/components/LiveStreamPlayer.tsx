@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native'
-import { YStack, XStack, Text, Button } from '@conference-os/ui'
+import { YStack, XStack, Text, Button } from '@cottage-cart/ui'
 import {
   Play,
   Pause,

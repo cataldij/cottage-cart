@@ -14,7 +14,7 @@ import {
   Button,
   Avatar,
   Progress,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   Clock,
   MapPin,
@@ -43,7 +43,7 @@ import {
   getUserPollResponses,
   submitPollResponse,
   getSessionAttendanceCount,
-} from '@conference-os/api'
+} from '@cottage-cart/api'
 
 export default function SessionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()

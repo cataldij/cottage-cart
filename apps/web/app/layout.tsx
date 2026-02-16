@@ -20,11 +20,11 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'Conference OS - Organizer Dashboard',
-  description: 'Manage your conferences with ease',
+  title: 'CottageCart - Your Cottage Food Storefront',
+  description: 'The platform for cottage bakers, chocolatiers, hot sauce makers, and artisan food producers to build their own branded storefront and take pre-orders.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  keywords: ['conference', 'event management', 'organizer', 'dashboard'],
-  authors: [{ name: 'Conference OS' }],
+  keywords: ['cottage food', 'home bakery', 'artisan food', 'pre-order', 'local food', 'storefront'],
+  authors: [{ name: 'CottageCart' }],
   robots: {
     index: true,
     follow: true,

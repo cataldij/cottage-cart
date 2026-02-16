@@ -5,7 +5,7 @@ import {
   ios,
   CompactTabBar,
   type TabItem,
-} from '@conference-os/attendee-ui'
+} from '@cottage-cart/shop-ui'
 import {
   Home,
   Calendar,
@@ -35,7 +35,7 @@ interface AttendeeAppShellProps {
 
 /**
  * Shell component for the attendee app preview
- * Uses shared components from @conference-os/attendee-ui
+ * Uses shared components from @cottage-cart/shop-ui
  */
 export function AttendeeAppShell({
   tabs = DEFAULT_TABS,

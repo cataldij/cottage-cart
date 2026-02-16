@@ -17,7 +17,7 @@ import {
   SpeakerBioContext,
   ScheduleContext,
   MarketingCopyContext,
-} from '@conference-os/api'
+} from '@cottage-cart/api'
 
 // Hook for AI chat assistant
 export function useAIChat() {

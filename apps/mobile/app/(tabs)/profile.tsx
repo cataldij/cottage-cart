@@ -12,7 +12,7 @@ import {
   Card,
   Avatar,
   Button,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   Settings,
   ChevronRight,
@@ -28,7 +28,7 @@ import {
   Edit,
 } from '@tamagui/lucide-icons'
 import { useAuth } from '../../hooks/useAuth'
-import { getUserConferences, getConnectionStats } from '@conference-os/api'
+import { getUserConferences, getConnectionStats } from '@cottage-cart/api'
 
 // Menu item component
 function MenuItem({

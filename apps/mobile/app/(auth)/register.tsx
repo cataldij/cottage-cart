@@ -13,7 +13,7 @@ import {
   Button,
   H2,
   Paragraph,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import { User, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Check } from '@tamagui/lucide-icons'
 import { useAuth } from '../../hooks/useAuth'
 

@@ -13,7 +13,7 @@ import {
   Avatar,
   Button,
   Input,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import { Search, Filter, UserPlus, MessageCircle, MapPin, Check, X, UserCheck } from '@tamagui/lucide-icons'
 import { useAuth } from '../../hooks/useAuth'
 import { useConference } from '../../hooks/useConference'
@@ -24,7 +24,7 @@ import {
   respondToConnectionRequest,
   getOrCreateDirectChat,
   AttendeeProfile,
-} from '@conference-os/api'
+} from '@cottage-cart/api'
 
 // Attendee card component
 function AttendeeCard({

@@ -21,7 +21,7 @@ import {
   Input,
   TextArea,
   Avatar,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   ChevronLeft,
   Camera,
@@ -38,7 +38,7 @@ import {
   Plus,
 } from '@tamagui/lucide-icons'
 import { useAuth } from '../hooks/useAuth'
-import { updateProfile, getSupabase } from '@conference-os/api'
+import { updateProfile, getSupabase } from '@cottage-cart/api'
 
 // Common interests for conference attendees
 const SUGGESTED_INTERESTS = [

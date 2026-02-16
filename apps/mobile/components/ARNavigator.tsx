@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { View, StyleSheet, Pressable, Linking, Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { YStack, XStack, Text, Button, Card } from '@conference-os/ui'
+import { YStack, XStack, Text, Button, Card } from '@cottage-cart/ui'
 import {
   Navigation,
   Camera,

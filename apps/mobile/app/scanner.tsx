@@ -9,7 +9,7 @@ import {
   Text,
   Button,
   Card,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   Camera,
   X,
@@ -19,7 +19,7 @@ import {
   FlashlightOff,
 } from '@tamagui/lucide-icons'
 import { useAuth } from '../hooks/useAuth'
-import { checkInAttendee, getSupabase } from '@conference-os/api'
+import { checkInAttendee, getSupabase } from '@cottage-cart/api'
 
 interface ScanResult {
   success: boolean

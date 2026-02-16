@@ -12,9 +12,9 @@ import {
   H2,
   Avatar,
   Spinner,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import { Search, Edit, MessageCircle } from '@tamagui/lucide-icons'
-import { getUserChatRooms, subscribeToUserChats, ChatRoomWithDetails } from '@conference-os/api'
+import { getUserChatRooms, subscribeToUserChats, ChatRoomWithDetails } from '@cottage-cart/api'
 import { useAuth } from '../../hooks/useAuth'
 
 // Conversation item component

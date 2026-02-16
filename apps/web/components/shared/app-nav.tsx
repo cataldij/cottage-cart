@@ -5,19 +5,16 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
-  Calendar,
-  Users,
-  UserCog,
-  Building2,
+  ChefHat,
+  UtensilsCrossed,
+  ShoppingBag,
+  Clock,
   BarChart3,
   Settings,
-  Ticket,
-  MessageSquare,
-  Bell,
-  ListChecks,
-  BadgeCheck,
   Eye,
   Plus,
+  Star,
+  Users,
 } from 'lucide-react'
 
 interface NavItem {
@@ -33,7 +30,7 @@ interface NavSection {
 }
 
 interface AppNavProps {
-  basePath: string // '/demo' or '/dashboard' or '' for root
+  basePath: string
   isDemo?: boolean
   user?: {
     name: string
@@ -44,7 +41,6 @@ interface AppNavProps {
 export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
   const pathname = usePathname()
 
-  // For non-demo mode with empty basePath, use /dashboard as the overview page
   const overviewHref = basePath ? basePath : (isDemo ? '/' : '/dashboard')
 
   const sections: NavSection[] = [
@@ -57,9 +53,9 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
           icon: LayoutDashboard,
         },
         {
-          name: 'Conferences',
-          href: `${basePath}/conferences`,
-          icon: Calendar,
+          name: 'My Shop',
+          href: `${basePath}/builder`,
+          icon: ChefHat,
           highlight: true,
         },
         {
@@ -70,62 +66,47 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
       ],
     },
     {
-      title: 'Content',
+      title: 'Products',
       items: [
         {
-          name: 'Sessions',
-          href: `${basePath}/sessions/agenda`,
-          icon: Calendar,
+          name: 'Menu Items',
+          href: `${basePath}/products`,
+          icon: UtensilsCrossed,
         },
         {
-          name: 'Speakers',
-          href: `${basePath}/speakers`,
-          icon: UserCog,
-        },
-        {
-          name: 'Sponsors',
-          href: `${basePath}/sponsors`,
-          icon: Building2,
+          name: 'Categories',
+          href: `${basePath}/categories`,
+          icon: LayoutDashboard,
         },
       ],
     },
     {
-      title: 'Attendees',
+      title: 'Orders',
       items: [
         {
-          name: 'Attendees',
-          href: `${basePath}/attendees`,
+          name: 'Orders',
+          href: `${basePath}/orders`,
+          icon: ShoppingBag,
+        },
+        {
+          name: 'Schedule',
+          href: `${basePath}/schedule`,
+          icon: Clock,
+        },
+      ],
+    },
+    {
+      title: 'Customers',
+      items: [
+        {
+          name: 'Customers',
+          href: `${basePath}/customers`,
           icon: Users,
         },
         {
-          name: 'Tickets',
-          href: `${basePath}/tickets`,
-          icon: Ticket,
-        },
-        {
-          name: 'Check-in',
-          href: `${basePath}/check-in`,
-          icon: BadgeCheck,
-        },
-      ],
-    },
-    {
-      title: 'Engagement',
-      items: [
-        {
-          name: 'Messages',
-          href: `${basePath}/messages`,
-          icon: MessageSquare,
-        },
-        {
-          name: 'Notifications',
-          href: `${basePath}/notifications`,
-          icon: Bell,
-        },
-        {
-          name: 'Live Polls',
-          href: `${basePath}/polls`,
-          icon: ListChecks,
+          name: 'Reviews',
+          href: `${basePath}/reviews`,
+          icon: Star,
         },
       ],
     },
@@ -147,39 +128,39 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
   ]
 
   const defaultUser = {
-    name: isDemo ? 'Demo User' : 'Organizer',
-    email: isDemo ? 'demo@conference-os.com' : 'admin@example.com',
+    name: isDemo ? 'Demo User' : 'Shop Owner',
+    email: isDemo ? 'demo@cottagecart.com' : 'owner@example.com',
   }
 
   const displayUser = user || defaultUser
 
   return (
     <div className="relative flex h-screen w-72 flex-col border-r border-white/60 bg-white/70 backdrop-blur-xl">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,_rgba(217,119,6,0.14),_transparent_70%)]" />
 
       {/* Logo */}
       <div className="relative flex h-20 items-center border-b border-white/70 px-6">
         <Link href={overviewHref} className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-amber-400 to-teal-400 text-white shadow-soft">
-            <span className="text-lg font-bold">C</span>
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white shadow-soft">
+            <ChefHat className="h-6 w-6" />
           </div>
           <div>
-            <div className="font-display text-sm font-semibold">Conference OS</div>
+            <div className="font-display text-sm font-semibold">CottageCart</div>
             <div className="text-xs text-muted-foreground">
-              {isDemo ? 'Demo Mode' : 'Organizer Suite'}
+              {isDemo ? 'Demo Mode' : 'Shop Dashboard'}
             </div>
           </div>
         </Link>
       </div>
 
-      {/* Quick Action: Create Conference */}
+      {/* Quick Action: Create Shop */}
       <div className="relative px-4 pt-4">
         <Link
-          href={`${basePath}/conferences/new`}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-blue-700 hover:to-violet-700 hover:shadow-lg"
+          href={`${basePath}/builder`}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-amber-700 hover:to-orange-700 hover:shadow-lg"
         >
           <Plus className="h-4 w-4" />
-          New Conference
+          Edit My Shop
         </Link>
       </div>
 
@@ -201,9 +182,9 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
                     className={cn(
                       'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
                       isActive
-                        ? 'bg-slate-900 text-white shadow-soft'
+                        ? 'bg-amber-800 text-white shadow-soft'
                         : 'text-slate-600 hover:bg-white/80 hover:text-slate-900',
-                      item.highlight && !isActive && 'text-primary'
+                      item.highlight && !isActive && 'text-amber-700'
                     )}
                   >
                     <item.icon className="h-5 w-5 transition-transform group-hover:-translate-y-0.5" />
@@ -219,7 +200,7 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
       {/* User section */}
       <div className="relative border-t border-white/70 p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700">
             <Users className="h-5 w-5" />
           </div>
           <div className="flex-1 truncate">

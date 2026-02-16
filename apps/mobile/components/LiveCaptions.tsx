@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { ScrollView, Animated } from 'react-native'
-import { YStack, XStack, Text, Card, Button } from '@conference-os/ui'
+import { YStack, XStack, Text, Card, Button } from '@cottage-cart/ui'
 import {
   Captions,
   Languages,

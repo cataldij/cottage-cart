@@ -17,7 +17,7 @@ import {
   CompactModuleGrid,
   moduleConfigs,
   type ModuleConfig,
-} from '@conference-os/attendee-ui'
+} from '@cottage-cart/shop-ui'
 
 interface NavigationModule {
   id: string
@@ -73,7 +73,7 @@ interface AttendeeAppHomeProps {
 
 /**
  * Home screen for the attendee app
- * Uses shared components from @conference-os/attendee-ui
+ * Uses shared components from @cottage-cart/shop-ui
  */
 export function AttendeeAppHome({
   eventName,

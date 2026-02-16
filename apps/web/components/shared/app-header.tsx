@@ -42,18 +42,15 @@ export function AppHeader({ isDemo = false, user, onSignOut }: AppHeaderProps) {
     const titles: Record<string, string> = {
       demo: 'Overview',
       dashboard: 'Overview',
-      builder: 'App Builder',
+      builder: 'Shop Builder',
       design: 'Design Studio',
       preview: 'Live Preview',
-      conferences: 'Conferences',
-      attendees: 'Attendees',
-      speakers: 'Speakers',
-      sponsors: 'Sponsors',
-      tickets: 'Tickets',
-      messages: 'Messages',
-      notifications: 'Notifications',
-      polls: 'Live Polls',
-      badges: 'Badges',
+      products: 'Menu Items',
+      categories: 'Categories',
+      orders: 'Orders',
+      schedule: 'Schedule',
+      customers: 'Customers',
+      reviews: 'Reviews',
       analytics: 'Analytics',
       settings: 'Settings',
     }
@@ -62,8 +59,8 @@ export function AppHeader({ isDemo = false, user, onSignOut }: AppHeaderProps) {
   }
 
   const defaultUser = {
-    name: isDemo ? 'Demo User' : 'Organizer',
-    email: isDemo ? 'demo@conference-os.com' : 'admin@example.com',
+    name: isDemo ? 'Demo User' : 'Shop Owner',
+    email: isDemo ? 'demo@cottagecart.com' : 'owner@example.com',
   }
 
   const displayUser = user || defaultUser
@@ -86,7 +83,7 @@ export function AppHeader({ isDemo = false, user, onSignOut }: AppHeaderProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search conferences, attendees, sessions..."
+            placeholder="Search products, orders, customers..."
             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-10 pr-4 text-sm placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
           <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
@@ -122,7 +119,7 @@ export function AppHeader({ isDemo = false, user, onSignOut }: AppHeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2 pl-2 pr-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-white text-sm font-medium">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-sm font-medium">
                 {displayUser.name.charAt(0).toUpperCase()}
               </div>
               <span className="hidden sm:inline text-sm font-medium text-slate-700">

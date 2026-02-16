@@ -13,4 +13,4 @@ export {
   CompactHeroCard,
   TabBar,
   CompactTabBar,
-} from '@conference-os/attendee-ui'
+} from '@cottage-cart/shop-ui'

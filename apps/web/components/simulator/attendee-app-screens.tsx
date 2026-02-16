@@ -1,6 +1,6 @@
 'use client'
 
-import { ios } from '@conference-os/attendee-ui'
+import { ios } from '@cottage-cart/shop-ui'
 import { Calendar, MapPin, Users, User, Clock } from 'lucide-react'
 
 interface ScreenProps {

@@ -6,19 +6,23 @@ import React, { createContext, useContext, useState, useCallback, useEffect, Rea
 // TYPES
 // =============================================
 
-export interface ConferenceData {
+export interface ShopData {
   id?: string
   slug?: string
   // Basic Info
   name: string
   tagline: string
   description: string
-  startDate: string
-  endDate: string
-  timezone: string
-  venueName: string
-  venueAddress: string
+  category: 'bakery' | 'chocolatier' | 'hot_sauce' | 'food_truck' | 'jams_preserves' | 'specialty' | 'other'
+  // Location
+  locationName: string
+  locationAddress: string
   websiteUrl: string
+  // Pickup & Delivery
+  pickupInstructions: string
+  deliveryAvailable: boolean
+  deliveryRadius: number | null
+  deliveryFee: number | null
   // Branding Assets
   logoUrl: string | null
   bannerUrl: string | null
@@ -35,7 +39,7 @@ export interface ConferenceData {
   // Button Colors
   buttonColor: string
   buttonTextColor: string
-  registrationButtonText: string
+  orderButtonText: string
   // App Button Styles
   appButtonStyle: 'solid' | 'outline' | 'soft'
   appButtonColor: string
@@ -72,19 +76,15 @@ export interface ConferenceData {
   appIconTheme: 'solid' | 'outline' | 'duotone' | 'glass'
   // Footer & Legal
   footerText: string
-  privacyPolicyUrl: string
   termsUrl: string
-  codeOfConductUrl: string
   // Social Links
-  twitterUrl: string
-  linkedinUrl: string
   instagramUrl: string
-  youtubeUrl: string
+  facebookUrl: string
+  tiktokUrl: string
   // Settings
   isPublic: boolean
-  isHybrid: boolean
-  registrationOpen: boolean
-  maxAttendees: number | null
+  acceptingOrders: boolean
+  requiresPreorder: boolean
   // Custom
   customCss: string
 }
@@ -98,14 +98,14 @@ export interface NavigationModule {
 }
 
 export type EditorMode = 'wizard' | 'tabs'
-export type EditorStep = 'overview' | 'branding' | 'features' | 'publish'
+export type EditorStep = 'overview' | 'menu' | 'branding' | 'publish'
 
-const STEPS: EditorStep[] = ['overview', 'branding', 'features', 'publish']
+const STEPS: EditorStep[] = ['overview', 'menu', 'branding', 'publish']
 
 interface EditorState {
   mode: EditorMode
   currentStep: EditorStep
-  conference: ConferenceData
+  shop: ShopData
   modules: NavigationModule[]
   isDirty: boolean
   isSaving: boolean
@@ -126,7 +126,7 @@ interface EditorContextValue {
   mode: EditorMode
   setMode: (mode: EditorMode) => void
   // Data updates
-  updateConference: (updates: Partial<ConferenceData>) => void
+  updateShop: (updates: Partial<ShopData>) => void
   toggleModule: (moduleId: string) => void
   reorderModules: (modules: NavigationModule[]) => void
   updateModule: (moduleId: string, updates: Partial<NavigationModule>) => void
@@ -145,33 +145,35 @@ interface EditorContextValue {
 
 const DEFAULT_MODULES: NavigationModule[] = [
   { id: 'home', name: 'Home', icon: 'Home', enabled: true, order: 0 },
-  { id: 'schedule', name: 'Schedule', icon: 'Calendar', enabled: true, order: 1 },
-  { id: 'speakers', name: 'Speakers', icon: 'Users', enabled: true, order: 2 },
-  { id: 'sponsors', name: 'Sponsors', icon: 'Building2', enabled: true, order: 3 },
-  { id: 'networking', name: 'Networking', icon: 'MessageCircle', enabled: true, order: 4 },
-  { id: 'map', name: 'Venue Map', icon: 'Map', enabled: true, order: 5 },
-  { id: 'notifications', name: 'Notifications', icon: 'Bell', enabled: true, order: 6 },
-  { id: 'profile', name: 'My Profile', icon: 'User', enabled: true, order: 7 },
+  { id: 'menu', name: 'Menu', icon: 'UtensilsCrossed', enabled: true, order: 1 },
+  { id: 'preorder', name: 'Pre-Order', icon: 'ShoppingBag', enabled: true, order: 2 },
+  { id: 'hours', name: 'Hours & Pickup', icon: 'Clock', enabled: true, order: 3 },
+  { id: 'about', name: 'About', icon: 'Heart', enabled: true, order: 4 },
+  { id: 'reviews', name: 'Reviews', icon: 'Star', enabled: false, order: 5 },
 ]
 
-const DEFAULT_CONFERENCE: ConferenceData = {
+const DEFAULT_SHOP: ShopData = {
   // Basic Info
   name: '',
   tagline: '',
   description: '',
-  startDate: new Date().toISOString().split('T')[0],
-  endDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-  timezone: 'America/New_York',
-  venueName: '',
-  venueAddress: '',
+  category: 'bakery',
+  // Location
+  locationName: '',
+  locationAddress: '',
   websiteUrl: '',
+  // Pickup & Delivery
+  pickupInstructions: '',
+  deliveryAvailable: false,
+  deliveryRadius: null,
+  deliveryFee: null,
   // Branding Assets
   logoUrl: null,
   bannerUrl: null,
   // Colors
-  primaryColor: '#2563eb',
-  secondaryColor: '#8b5cf6',
-  accentColor: '#f59e0b',
+  primaryColor: '#D97706',
+  secondaryColor: '#92400E',
+  accentColor: '#F59E0B',
   backgroundColor: '#ffffff',
   textColor: '#1f2937',
   headingColor: '#111827',
@@ -179,12 +181,12 @@ const DEFAULT_CONFERENCE: ConferenceData = {
   navBackgroundColor: '#ffffff',
   navTextColor: '#374151',
   // Button Colors
-  buttonColor: '#2563eb',
+  buttonColor: '#D97706',
   buttonTextColor: '#ffffff',
-  registrationButtonText: 'Register Now',
+  orderButtonText: 'Pre-Order Now',
   // App Button Styles
   appButtonStyle: 'solid',
-  appButtonColor: '#2563eb',
+  appButtonColor: '#D97706',
   appButtonTextColor: '#ffffff',
   // App Tile Layout
   appTileSize: 'md',
@@ -218,19 +220,15 @@ const DEFAULT_CONFERENCE: ConferenceData = {
   appIconTheme: 'solid',
   // Footer & Legal
   footerText: '',
-  privacyPolicyUrl: '',
   termsUrl: '',
-  codeOfConductUrl: '',
   // Social Links
-  twitterUrl: '',
-  linkedinUrl: '',
   instagramUrl: '',
-  youtubeUrl: '',
+  facebookUrl: '',
+  tiktokUrl: '',
   // Settings
   isPublic: true,
-  isHybrid: false,
-  registrationOpen: true,
-  maxAttendees: null,
+  acceptingOrders: true,
+  requiresPreorder: true,
   // Custom
   customCss: '',
 }
@@ -243,16 +241,16 @@ const EditorContext = createContext<EditorContextValue | null>(null)
 
 interface EditorProviderProps {
   children: ReactNode
-  initialConference?: Partial<ConferenceData>
+  initialShop?: Partial<ShopData>
   initialModules?: NavigationModule[]
   mode?: EditorMode
-  onSave?: (data: { conference: ConferenceData; modules: NavigationModule[] }) => Promise<void>
-  onPublish?: (data: { conference: ConferenceData; modules: NavigationModule[] }) => Promise<void>
+  onSave?: (data: { shop: ShopData; modules: NavigationModule[] }) => Promise<void>
+  onPublish?: (data: { shop: ShopData; modules: NavigationModule[] }) => Promise<void>
 }
 
-export function ConferenceEditorProvider({
+export function ShopEditorProvider({
   children,
-  initialConference,
+  initialShop,
   initialModules,
   mode: initialMode = 'wizard',
   onSave,
@@ -261,11 +259,11 @@ export function ConferenceEditorProvider({
   const [state, setState] = useState<EditorState>({
     mode: initialMode,
     currentStep: 'overview',
-    conference: { ...DEFAULT_CONFERENCE, ...initialConference },
+    shop: { ...DEFAULT_SHOP, ...initialShop },
     modules: initialModules || DEFAULT_MODULES,
     isDirty: false,
     isSaving: false,
-    isPublished: !!initialConference?.id,
+    isPublished: !!initialShop?.id,
   })
 
   // Step navigation
@@ -302,10 +300,10 @@ export function ConferenceEditorProvider({
   }, [])
 
   // Data updates
-  const updateConference = useCallback((updates: Partial<ConferenceData>) => {
+  const updateShop = useCallback((updates: Partial<ShopData>) => {
     setState(prev => ({
       ...prev,
-      conference: { ...prev.conference, ...updates },
+      shop: { ...prev.shop, ...updates },
       isDirty: true,
     }))
   }, [])
@@ -341,25 +339,25 @@ export function ConferenceEditorProvider({
     if (!onSave) return
     setState(prev => ({ ...prev, isSaving: true }))
     try {
-      await onSave({ conference: state.conference, modules: state.modules })
+      await onSave({ shop: state.shop, modules: state.modules })
       setState(prev => ({ ...prev, isDirty: false, isSaving: false }))
     } catch (error) {
       setState(prev => ({ ...prev, isSaving: false }))
       throw error
     }
-  }, [onSave, state.conference, state.modules])
+  }, [onSave, state.shop, state.modules])
 
   const publish = useCallback(async () => {
     if (!onPublish) return
     setState(prev => ({ ...prev, isSaving: true }))
     try {
-      await onPublish({ conference: state.conference, modules: state.modules })
+      await onPublish({ shop: state.shop, modules: state.modules })
       setState(prev => ({ ...prev, isDirty: false, isSaving: false, isPublished: true }))
     } catch (error) {
       setState(prev => ({ ...prev, isSaving: false }))
       throw error
     }
-  }, [onPublish, state.conference, state.modules])
+  }, [onPublish, state.shop, state.modules])
 
   const value: EditorContextValue = {
     state,
@@ -372,7 +370,7 @@ export function ConferenceEditorProvider({
     canGoPrev,
     mode: state.mode,
     setMode,
-    updateConference,
+    updateShop,
     toggleModule,
     reorderModules,
     updateModule,
@@ -390,10 +388,10 @@ export function ConferenceEditorProvider({
   )
 }
 
-export function useConferenceEditor() {
+export function useShopEditor() {
   const context = useContext(EditorContext)
   if (!context) {
-    throw new Error('useConferenceEditor must be used within a ConferenceEditorProvider')
+    throw new Error('useShopEditor must be used within a ShopEditorProvider')
   }
   return context
 }

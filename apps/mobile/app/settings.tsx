@@ -12,7 +12,7 @@ import {
   Card,
   Button,
   Separator,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   ChevronLeft,
   ChevronRight,
@@ -33,7 +33,7 @@ import {
 } from '@tamagui/lucide-icons'
 import { useAuth } from '../hooks/useAuth'
 import { useColorScheme } from 'react-native'
-import { updateProfile } from '@conference-os/api'
+import { updateProfile } from '@cottage-cart/api'
 
 interface SettingItemProps {
   icon: React.ReactNode

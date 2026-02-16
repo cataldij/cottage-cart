@@ -12,9 +12,9 @@ import {
   Card,
   Avatar,
   Button,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import { X, Check, Calendar, MapPin, Users } from '@tamagui/lucide-icons'
-import { getUserConferences, Conference } from '@conference-os/api'
+import { getUserConferences, Conference } from '@cottage-cart/api'
 import { useAuth } from '../hooks/useAuth'
 import { useConference } from '../hooks/useConference'
 

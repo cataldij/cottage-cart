@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, createContext, useContext, ReactNode } from 'react'
-import { supabase } from '@conference-os/api'
+import { supabase } from '@cottage-cart/api'
 
 // Full design token structure matching the web builder
 export interface DesignTokens {

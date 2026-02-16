@@ -12,7 +12,7 @@ import {
   H2,
   Card,
   SessionCard,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import { Calendar, Filter, Search } from '@tamagui/lucide-icons'
 import { useAuth } from '../../hooks/useAuth'
 import { useConference } from '../../hooks/useConference'
@@ -25,7 +25,7 @@ import {
   unsaveSession,
   Session,
   Track,
-} from '@conference-os/api'
+} from '@cottage-cart/api'
 
 // Date pill component
 function DatePill({

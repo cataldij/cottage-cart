@@ -1,5 +1,5 @@
 {
-  "name": "@conference-os/api",
+  "name": "@cottage-cart/api",
   "version": "0.0.1",
   "main": "./src/index.ts",
   "types": "./src/index.ts",

@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
-import type { Database } from '@conference-os/api'
+import type { Database } from '@cottage-cart/api'
 
 export function createClient() {
   return createBrowserClient<Database>(

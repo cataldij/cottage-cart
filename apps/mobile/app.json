@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Conference OS",
-    "slug": "conference-os",
+    "name": "Cottage Cart",
+    "slug": "cottage-cart",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "conference-os",
+    "scheme": "cottage-cart",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
@@ -56,13 +56,13 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Conference OS to access your camera for QR code scanning."
+          "cameraPermission": "Allow Cottage Cart to access your camera for QR code scanning."
         }
       ],
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Conference OS to use your location for venue navigation."
+          "locationAlwaysAndWhenInUsePermission": "Allow Cottage Cart to use your location for venue navigation."
         }
       ],
       [

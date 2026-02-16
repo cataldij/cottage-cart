@@ -9,7 +9,7 @@ import {
   signUp as apiSignUp,
   signOut as apiSignOut,
   onAuthStateChange,
-} from '@conference-os/api'
+} from '@cottage-cart/api'
 import type { User, Session } from '@supabase/supabase-js'
 
 interface AuthContextType {

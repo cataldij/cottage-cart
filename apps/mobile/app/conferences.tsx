@@ -11,7 +11,7 @@ import {
   Card,
   Button,
   Input,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   ChevronLeft,
   Search,

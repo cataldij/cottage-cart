@@ -15,7 +15,7 @@ import {
   Card,
   Button,
   Avatar,
-} from '@conference-os/ui'
+} from '@cottage-cart/ui'
 import {
   ChevronLeft,
   Share2,
@@ -27,7 +27,7 @@ import {
 } from '@tamagui/lucide-icons'
 import { useConference } from '../hooks/useConference'
 import { useAuth } from '../hooks/useAuth'
-import { getConferenceMembership } from '@conference-os/api'
+import { getConferenceMembership } from '@cottage-cart/api'
 
 const { width: screenWidth } = Dimensions.get('window')
 
