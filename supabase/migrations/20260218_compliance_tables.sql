@@ -218,7 +218,7 @@ INSERT INTO state_compliance_rules (
  false, false,
  '[{"category":"Allowed Foods","items":["Baked goods (non-hazardous)","Candy and confections","Jams, jellies, preserves (high-acid)","Fruit butters","Honey","Dried herbs and spices","Cereal, granola, trail mix","Dried fruit","Roasted nuts","Chocolate-covered non-perishables","Popcorn and popcorn balls","Canned pickles (high-acid)","Vinegar and flavored vinegars"]}]'::jsonb,
  NULL,
- 'Made in a cottage food operation that is not subject to Florida's food safety regulations.',
+ 'Made in a cottage food operation that is not subject to Florida''s food safety regulations.',
  '[{"field":"Product name","required":true},{"field":"Name and address of cottage food operation","required":true},{"field":"Ingredients list (in descending order by weight)","required":true},{"field":"Net weight or volume","required":true},{"field":"Allergen statement","required":true},{"field":"Disclaimer statement","required":true}]'::jsonb,
  'Must be sold direct to consumer. Internet sales allowed only if customer picks up in person. No sales to stores, restaurants, or for resale.',
  '[{"label":"Florida DACS Cottage Food","url":"https://www.fdacs.gov/Business-Services/Cottage-Food"}]'::jsonb),
