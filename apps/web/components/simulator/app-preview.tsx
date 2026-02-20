@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Smartphone, Monitor, RotateCcw } from 'lucide-react'
+import { Smartphone, Monitor, RotateCcw, Expand, X } from 'lucide-react'
 import { IphoneSimulator } from './iphone-simulator'
 import { DesktopBrowser } from './desktop-browser'
 import { DesktopWebsitePreview } from './desktop-website-preview'
@@ -181,11 +181,13 @@ type TabId = 'home' | 'catalog' | 'orders' | 'pickup' | 'account'
 export function AppPreview({ config, className = '' }: AppPreviewProps) {
   const [device, setDevice] = useState<DeviceType>('iphone')
   const [activeTab, setActiveTab] = useState<TabId>('home')
+  const [expanded, setExpanded] = useState(false)
 
   // Load Google Fonts for preview
   useGoogleFonts(config.fonts?.heading, config.fonts?.body)
 
-  const scale = 0.7
+  const scale = 0.82
+  const expandedScale = device === 'iphone' ? 0.95 : 0.58
 
   const handleModuleTap = (moduleId: string) => {
     const moduleToTab: Record<string, TabId> = {
@@ -205,7 +207,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
     if (target) setActiveTab(target)
   }
 
-  const renderActiveAppScreen = () => {
+  const renderActiveAppScreen = (s: number) => {
     const sharedProps = {
       primaryColor: config.colors.primary,
       secondaryColor: config.colors.secondary,
@@ -227,7 +229,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
       appTileLayout: config.appTileLayout,
       appTileGap: config.appTileGap,
       appBackground: config.appBackground,
-      scale,
+      scale: s,
     }
 
     if (activeTab === 'catalog') return <CatalogScreen {...sharedProps} />
@@ -266,126 +268,181 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
         appBackground={config.appBackground}
         modules={config.modules}
         onModuleTap={handleModuleTap}
-        scale={scale}
+        scale={s}
       />
     )
   }
 
+  const desktopScale = 0.38
+
+  const websitePreviewProps = {
+    eventName: config.eventName,
+    tagline: config.tagline,
+    startDate: config.startDate,
+    endDate: config.endDate,
+    venueName: config.venueName,
+    primaryColor: config.colors.primary,
+    secondaryColor: config.colors.secondary,
+    accentColor: config.colors.accent,
+    backgroundColor: config.colors.background,
+    textColor: config.colors.text,
+    headingColor: config.colors.heading,
+    navBackgroundColor: config.colors.navBackground,
+    navTextColor: config.colors.navText,
+    buttonColor: config.colors.button,
+    buttonTextColor: config.colors.buttonText,
+    registrationButtonText: config.registrationButtonText,
+    bannerUrl: config.bannerUrl,
+    logoUrl: config.logoUrl,
+    fontHeading: config.fonts?.heading,
+    fontBody: config.fonts?.body,
+    heroStyle: config.hero?.style,
+    heroHeight: config.hero?.height,
+    heroBackgroundUrl: config.hero?.backgroundUrl,
+    heroVideoUrl: config.hero?.videoUrl,
+    heroOverlayOpacity: config.hero?.overlayOpacity,
+    backgroundPattern: config.background?.pattern,
+    backgroundPatternColor: config.background?.patternColor,
+    backgroundGradientStart: config.background?.gradientStart,
+    backgroundGradientEnd: config.background?.gradientEnd,
+    backgroundImageUrl: config.background?.imageUrl,
+    backgroundImageOverlay: config.background?.imageOverlay,
+  }
+
+  const shopUrl = `${config.eventName.toLowerCase().replace(/\s+/g, '-')}.makers.market`
+
+  const renderDevice = (s: number) => (
+    device === 'iphone' ? (
+      <IphoneSimulator scale={s}>
+        <AttendeeAppShell
+          tabs={DEFAULT_TABS}
+          activeTabId={activeTab}
+          onTabChange={(id) => setActiveTab(id as TabId)}
+          primaryColor={config.colors.primary}
+          scale={s}
+        >
+          {renderActiveAppScreen(s)}
+        </AttendeeAppShell>
+      </IphoneSimulator>
+    ) : (
+      <DesktopBrowser url={shopUrl} scale={s}>
+        <DesktopWebsitePreview {...websitePreviewProps} />
+      </DesktopBrowser>
+    )
+  )
+
   return (
-    <div className={`flex h-full flex-col ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-1 pb-4">
-        <div>
-          <h3 className="text-sm font-semibold text-slate-800">
-            Live Store Preview
-          </h3>
-          <p className="text-xs text-slate-500">
-            Real customer UI
-          </p>
-        </div>
+    <>
+      <div className={`flex h-full flex-col ${className}`}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-1 pb-4">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-800">Live Store Preview</h3>
+            <p className="text-xs text-slate-500">Real customer UI</p>
+          </div>
 
-        {/* Device toggle */}
-        <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
-          <button
-            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
-              device === 'iphone'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-            onClick={() => setDevice('iphone')}
-          >
-            <Smartphone className="h-3.5 w-3.5" />
-            iPhone
-          </button>
-          <button
-            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
-              device === 'desktop'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-            onClick={() => setDevice('desktop')}
-          >
-            <Monitor className="h-3.5 w-3.5" />
-            Web
-          </button>
-        </div>
-      </div>
-
-      {/* Preview container */}
-      <div className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 to-stone-200 p-4">
-        {/* Subtle pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0)`,
-            backgroundSize: '24px 24px',
-          }}
-        />
-
-        {/* Device preview */}
-        <div className="relative flex h-full items-center justify-center">
-          {device === 'iphone' ? (
-            <IphoneSimulator scale={scale}>
-              <AttendeeAppShell
-                tabs={DEFAULT_TABS}
-                activeTabId={activeTab}
-                onTabChange={(id) => setActiveTab(id as TabId)}
-                primaryColor={config.colors.primary}
-                scale={scale}
+          <div className="flex items-center gap-2">
+            {/* Device toggle */}
+            <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+              <button
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                  device === 'iphone' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                onClick={() => setDevice('iphone')}
               >
-              {renderActiveAppScreen()}
-              </AttendeeAppShell>
-            </IphoneSimulator>
-          ) : (
-            <DesktopBrowser
-              url={`${config.eventName.toLowerCase().replace(/\s+/g, '-')}.makers.market`}
-              scale={0.35}
+                <Smartphone className="h-3.5 w-3.5" />
+                iPhone
+              </button>
+              <button
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                  device === 'desktop' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                onClick={() => setDevice('desktop')}
+              >
+                <Monitor className="h-3.5 w-3.5" />
+                Web
+              </button>
+            </div>
+
+            {/* Expand button */}
+            <button
+              onClick={() => setExpanded(true)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-amber-300 hover:text-amber-700"
+              title="Expand preview"
             >
-              <DesktopWebsitePreview
-                eventName={config.eventName}
-                tagline={config.tagline}
-                startDate={config.startDate}
-                endDate={config.endDate}
-                venueName={config.venueName}
-                primaryColor={config.colors.primary}
-                secondaryColor={config.colors.secondary}
-                accentColor={config.colors.accent}
-                backgroundColor={config.colors.background}
-                textColor={config.colors.text}
-                headingColor={config.colors.heading}
-                navBackgroundColor={config.colors.navBackground}
-                navTextColor={config.colors.navText}
-                buttonColor={config.colors.button}
-                buttonTextColor={config.colors.buttonText}
-                registrationButtonText={config.registrationButtonText}
-                bannerUrl={config.bannerUrl}
-                logoUrl={config.logoUrl}
-                fontHeading={config.fonts?.heading}
-                fontBody={config.fonts?.body}
-                // Hero settings
-                heroStyle={config.hero?.style}
-                heroHeight={config.hero?.height}
-                heroBackgroundUrl={config.hero?.backgroundUrl}
-                heroVideoUrl={config.hero?.videoUrl}
-                heroOverlayOpacity={config.hero?.overlayOpacity}
-                // Background settings
-                backgroundPattern={config.background?.pattern}
-                backgroundPatternColor={config.background?.patternColor}
-                backgroundGradientStart={config.background?.gradientStart}
-                backgroundGradientEnd={config.background?.gradientEnd}
-                backgroundImageUrl={config.background?.imageUrl}
-                backgroundImageOverlay={config.background?.imageOverlay}
-              />
-            </DesktopBrowser>
-          )}
+              <Expand className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
 
-        {/* Refresh hint */}
-        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-1 text-[10px] text-slate-500 shadow-sm backdrop-blur-sm">
-          <RotateCcw className="h-3 w-3" />
-          Auto-sync
+        {/* Preview container */}
+        <div className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 to-stone-200 p-4">
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0)`,
+              backgroundSize: '24px 24px',
+            }}
+          />
+          <div className="relative flex h-full items-center justify-center">
+            {renderDevice(device === 'iphone' ? scale : desktopScale)}
+          </div>
+          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-1 text-[10px] text-slate-500 shadow-sm backdrop-blur-sm">
+            <RotateCcw className="h-3 w-3" />
+            Auto-sync
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Fullscreen expand modal */}
+      {expanded && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setExpanded(false)}
+        >
+          <div
+            className="relative flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-1.5">
+                <div className="flex items-center gap-1 rounded-lg bg-white/20 p-1">
+                  <button
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                      device === 'iphone' ? 'bg-white text-slate-900 shadow-sm' : 'text-white/70 hover:text-white'
+                    }`}
+                    onClick={() => setDevice('iphone')}
+                  >
+                    <Smartphone className="h-3.5 w-3.5" />
+                    iPhone
+                  </button>
+                  <button
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                      device === 'desktop' ? 'bg-white text-slate-900 shadow-sm' : 'text-white/70 hover:text-white'
+                    }`}
+                    onClick={() => setDevice('desktop')}
+                  >
+                    <Monitor className="h-3.5 w-3.5" />
+                    Web
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={() => setExpanded(false)}
+                className="ml-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Large preview */}
+            <div className="flex items-center justify-center overflow-auto rounded-2xl">
+              {renderDevice(device === 'iphone' ? expandedScale : 0.58)}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

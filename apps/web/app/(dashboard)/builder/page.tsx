@@ -20,7 +20,7 @@ export default function BuilderPage() {
           </div>
 
           {/* Right: Live Preview */}
-          <div className="w-[400px] shrink-0">
+          <div className="w-[500px] shrink-0">
             <BuilderPreview />
           </div>
         </div>
