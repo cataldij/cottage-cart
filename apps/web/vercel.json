@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install",
-  "buildCommand": "cd ../.. && npx turbo build --filter=@cottage-cart/web",
+  "buildCommand": "cd ../.. && npx turbo build --filter=@makers-market/web",
   "outputDirectory": ".next",
   "framework": "nextjs"
 }

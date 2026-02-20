@@ -62,14 +62,14 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <span className="text-3xl font-bold text-primary-foreground">C</span>
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white shadow-lg">
+            <span className="text-3xl font-bold">M</span>
           </div>
           <CardTitle className="text-2xl font-bold">
-            Conference OS
+            Maker's Market
           </CardTitle>
           <CardDescription>
-            Sign in to the organizer dashboard
+            Sign in to your shop dashboard
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -109,7 +109,7 @@ export default function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" loading={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In (v2)'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               Don't have an account?{' '}

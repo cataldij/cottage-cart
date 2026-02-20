@@ -34,7 +34,7 @@ export function BuilderContent() {
           <div className="flex-1">
             <p className="text-sm font-semibold text-amber-800">Not logged in</p>
             <p className="text-xs text-amber-700">
-              Sign in to save your work and preview your conference.
+              Sign in to save your shop setup and preview your storefront.
             </p>
           </div>
           <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100" asChild>
@@ -101,7 +101,7 @@ export function BuilderContent() {
           </Button>
         ) : (
           <Button onClick={generateEventCode} className="gap-2 bg-green-600 hover:bg-green-700">
-            Publish App
+            Publish Storefront
             <ArrowRight className="h-4 w-4" />
           </Button>
         )}

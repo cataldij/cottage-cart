@@ -22,6 +22,13 @@ export function PublishStep() {
   const { publish, overview } = state
   const [copied, setCopied] = useState(false)
 
+  const formatDate = (value?: string) => {
+    if (!value) return 'TBD'
+    const parsed = new Date(value)
+    if (Number.isNaN(parsed.getTime())) return 'TBD'
+    return parsed.toLocaleDateString()
+  }
+
   const handleCopy = async (text: string) => {
     await navigator.clipboard.writeText(text)
     setCopied(true)
@@ -37,32 +44,32 @@ export function PublishStep() {
             Ready to Publish
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Review your settings and publish your conference app.
+            Review your setup and publish your storefront preview.
           </p>
         </div>
 
         {/* Summary */}
         <div className="space-y-4 rounded-2xl border bg-gradient-to-br from-slate-50 to-white p-6">
-          <h3 className="font-semibold">Conference Summary</h3>
+          <h3 className="font-semibold">Shop Summary</h3>
           <div className="grid gap-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Event Name</span>
+              <span className="text-muted-foreground">Shop Name</span>
               <span className="font-medium">{overview.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Dates</span>
+              <span className="text-muted-foreground">Order Window</span>
               <span className="font-medium">
-                {new Date(overview.startDate).toLocaleDateString()} - {new Date(overview.endDate).toLocaleDateString()}
+                {formatDate(overview.startDate)} - {formatDate(overview.endDate)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Venue</span>
+              <span className="text-muted-foreground">Pickup Location</span>
               <span className="font-medium">{overview.venueName}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Active Modules</span>
+              <span className="text-muted-foreground">Active Tabs</span>
               <span className="font-medium">
-                {state.navigation.filter(m => m.enabled).length} modules
+                {state.navigation.filter(m => m.enabled).length} tabs
               </span>
             </div>
           </div>
@@ -75,11 +82,11 @@ export function PublishStep() {
           onClick={generateEventCode}
         >
           <Rocket className="h-5 w-5" />
-          Publish Conference App
+          Publish Storefront
         </Button>
 
         <p className="text-center text-xs text-muted-foreground">
-          In demo mode, this generates a preview link. Sign up to publish for real!
+          In demo mode, this generates a preview link. Sign up to publish your live maker shop.
         </p>
       </div>
     )
@@ -92,15 +99,15 @@ export function PublishStep() {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <PartyPopper className="h-8 w-8 text-green-600" />
         </div>
-        <h2 className="text-2xl font-bold">Your App is Live!</h2>
+        <h2 className="text-2xl font-bold">Your Storefront is Live!</h2>
         <p className="mt-1 text-muted-foreground">
-          Share the link or QR code with your attendees.
+          Share the link or QR code with your customers.
         </p>
       </div>
 
-      {/* Event Code */}
+      {/* Shop Code */}
       <div className="rounded-2xl border bg-gradient-to-br from-primary/5 to-secondary/5 p-6 text-center">
-        <p className="text-sm text-muted-foreground">Event Code</p>
+        <p className="text-sm text-muted-foreground">Shop Code</p>
         <p className="mt-2 font-mono text-4xl font-bold tracking-widest text-primary">
           {publish.eventCode}
         </p>
@@ -112,7 +119,7 @@ export function PublishStep() {
           <QrCode className="h-20 w-20 text-slate-300" />
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          Scan to open attendee app
+          Scan to open the storefront
         </p>
         <Button variant="outline" size="sm" className="mt-3 gap-2">
           <Download className="h-4 w-4" />
@@ -120,9 +127,9 @@ export function PublishStep() {
         </Button>
       </div>
 
-      {/* Attendee URL */}
+      {/* Storefront URL */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Attendee URL</label>
+        <label className="text-sm font-medium">Storefront URL</label>
         <div className="flex gap-2">
           <Input
             value={publish.attendeeUrl}
@@ -159,7 +166,7 @@ export function PublishStep() {
       {/* Demo Notice */}
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
         <p className="text-sm text-amber-800">
-          <strong>Demo Mode:</strong> This is a preview. Sign up to publish real conference apps!
+          <strong>Demo Mode:</strong> This is a preview. Sign up to publish real storefronts.
         </p>
         <Button asChild className="mt-3" size="sm">
           <Link href="/register">Get Started Free</Link>

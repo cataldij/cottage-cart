@@ -5,22 +5,22 @@ import {
   ios,
   CompactTabBar,
   type TabItem,
-} from '@cottage-cart/shop-ui'
+} from '@makers-market/shop-ui'
 import {
   Home,
-  Calendar,
-  Users,
-  Map,
+  ShoppingBag,
+  ClipboardList,
+  MapPin,
   User,
 } from 'lucide-react'
 
-// Default tabs for the attendee app
+// Default tabs for the customer app
 export const DEFAULT_TABS: TabItem[] = [
   { id: 'home', label: 'Home', icon: Home },
-  { id: 'agenda', label: 'Agenda', icon: Calendar },
-  { id: 'speakers', label: 'Speakers', icon: Users },
-  { id: 'map', label: 'Map', icon: Map },
-  { id: 'profile', label: 'Profile', icon: User },
+  { id: 'catalog', label: 'Shop', icon: ShoppingBag },
+  { id: 'orders', label: 'Orders', icon: ClipboardList },
+  { id: 'pickup', label: 'Pickup', icon: MapPin },
+  { id: 'account', label: 'Account', icon: User },
 ]
 
 interface AttendeeAppShellProps {
@@ -34,8 +34,8 @@ interface AttendeeAppShellProps {
 }
 
 /**
- * Shell component for the attendee app preview
- * Uses shared components from @cottage-cart/shop-ui
+ * Shell component for the customer app preview
+ * Uses shared components from @makers-market/shop-ui
  */
 export function AttendeeAppShell({
   tabs = DEFAULT_TABS,

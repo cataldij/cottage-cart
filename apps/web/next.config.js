@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@cottage-cart/api', '@cottage-cart/ui'],
+  transpilePackages: ['@makers-market/api', '@makers-market/ui'],
 
   // Skip type checking during build (types checked in CI)
   typescript: {

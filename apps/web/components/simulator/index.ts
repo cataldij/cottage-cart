@@ -3,7 +3,7 @@ export { AttendeeAppHome } from './attendee-app-home'
 export { AttendeeAppShell, DEFAULT_TABS } from './attendee-app-shell'
 export { AppPreview } from './app-preview'
 
-// Re-export shared components from attendee-ui
+// Re-export shared components from shop-ui
 export {
   ModuleTile,
   ModuleGrid,
@@ -13,4 +13,4 @@ export {
   CompactHeroCard,
   TabBar,
   CompactTabBar,
-} from '@cottage-cart/shop-ui'
+} from '@makers-market/shop-ui'

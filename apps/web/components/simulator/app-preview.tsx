@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { Smartphone, Monitor, RotateCcw } from 'lucide-react'
-import { ios } from '@cottage-cart/shop-ui'
 import { IphoneSimulator } from './iphone-simulator'
 import { DesktopBrowser } from './desktop-browser'
 import { DesktopWebsitePreview } from './desktop-website-preview'
 import { AttendeeAppShell, DEFAULT_TABS } from './attendee-app-shell'
 import { AttendeeAppHome } from './attendee-app-home'
 import {
-  AgendaScreen,
-  SpeakersScreen,
-  MapScreen,
-  ProfileScreen,
+  CatalogScreen,
+  OrdersScreen,
+  PickupScreen,
+  AccountScreen,
 } from './attendee-app-screens'
 
 // Google Fonts loader - comprehensive font map
@@ -177,7 +176,7 @@ interface AppPreviewProps {
 }
 
 type DeviceType = 'iphone' | 'desktop'
-type TabId = 'home' | 'agenda' | 'speakers' | 'map' | 'profile'
+type TabId = 'home' | 'catalog' | 'orders' | 'pickup' | 'account'
 
 export function AppPreview({ config, className = '' }: AppPreviewProps) {
   const [device, setDevice] = useState<DeviceType>('iphone')
@@ -190,11 +189,17 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
 
   const handleModuleTap = (moduleId: string) => {
     const moduleToTab: Record<string, TabId> = {
-      agenda: 'agenda',
-      schedule: 'agenda',
-      speakers: 'speakers',
-      map: 'map',
-      profile: 'profile',
+      catalog: 'catalog',
+      orders: 'orders',
+      pickup: 'pickup',
+      account: 'account',
+      reviews: 'orders',
+      messages: 'account',
+      agenda: 'catalog',
+      schedule: 'catalog',
+      speakers: 'orders',
+      map: 'pickup',
+      profile: 'account',
     }
     const target = moduleToTab[moduleId]
     if (target) setActiveTab(target)
@@ -225,10 +230,10 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
       scale,
     }
 
-    if (activeTab === 'agenda') return <AgendaScreen {...sharedProps} />
-    if (activeTab === 'speakers') return <SpeakersScreen {...sharedProps} />
-    if (activeTab === 'map') return <MapScreen {...sharedProps} />
-    if (activeTab === 'profile') return <ProfileScreen {...sharedProps} />
+    if (activeTab === 'catalog') return <CatalogScreen {...sharedProps} />
+    if (activeTab === 'orders') return <OrdersScreen {...sharedProps} />
+    if (activeTab === 'pickup') return <PickupScreen {...sharedProps} />
+    if (activeTab === 'account') return <AccountScreen {...sharedProps} />
 
     return (
       <AttendeeAppHome
@@ -272,10 +277,10 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
       <div className="flex items-center justify-between px-1 pb-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-800">
-            Live App Preview
+            Live Store Preview
           </h3>
           <p className="text-xs text-slate-500">
-            Real attendee UI
+            Real customer UI
           </p>
         </div>
 
@@ -307,7 +312,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
       </div>
 
       {/* Preview container */}
-      <div className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 p-4">
+      <div className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 to-stone-200 p-4">
         {/* Subtle pattern overlay */}
         <div
           className="absolute inset-0 opacity-30"
@@ -333,7 +338,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
             </IphoneSimulator>
           ) : (
             <DesktopBrowser
-              url={`${config.eventName.toLowerCase().replace(/\s+/g, '-')}.confapp.io`}
+              url={`${config.eventName.toLowerCase().replace(/\s+/g, '-')}.makers.market`}
               scale={0.35}
             >
               <DesktopWebsitePreview

@@ -22,10 +22,10 @@ import {
 } from 'lucide-react'
 
 const EXAMPLE_PROMPTS = [
-  { label: 'Tech Conference', prompt: 'Modern tech conference, sleek and innovative. Blues and purples.' },
-  { label: 'Medical Summit', prompt: 'Healthcare summit, professional and trustworthy. Blues and greens.' },
-  { label: 'Creative Festival', prompt: 'Design festival, bold and artistic. Vibrant colors.' },
-  { label: 'Finance Forum', prompt: 'Finance forum, premium and sophisticated. Dark with gold accents.' },
+  { label: 'Hearth Bakery', prompt: 'Warm handcrafted bakery brand with parchment tones, deep sage, and classic serif headers.' },
+  { label: 'Small Batch Jams', prompt: 'Rustic preserves shop with orchard greens, berry accents, and soft cream backgrounds.' },
+  { label: 'Modern Cottage Foods', prompt: 'Clean farmhouse aesthetic, professional and friendly, with natural colors and gentle contrasts.' },
+  { label: 'Farmstand Premium', prompt: 'Elevated local food brand, refined typography, earthy neutrals, and elegant hero imagery.' },
 ]
 
 const REFINEMENTS = [
@@ -127,7 +127,7 @@ export function BrandingStep() {
           Branding & Design
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Generate a unique design system with AI or customize manually.
+          Create a warm, trustworthy storefront look that still feels professional.
         </p>
       </div>
 
@@ -173,7 +173,7 @@ export function BrandingStep() {
           {/* Prompt Input */}
           <div className="space-y-2">
             <Textarea
-              placeholder="Describe your conference and desired style..."
+              placeholder="Describe your shop style (example: cozy sourdough bakery, heirloom branding, warm cream + sage palette)..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               className="min-h-[80px] resize-none"
@@ -356,7 +356,7 @@ export function BrandingStep() {
             <div>
               <h3 className="text-sm font-semibold">Hero</h3>
               <p className="text-xs text-muted-foreground">
-                Set the hero style for the web preview.
+                Set the top hero style for the storefront preview.
               </p>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
@@ -417,7 +417,7 @@ export function BrandingStep() {
             <div>
               <h3 className="text-sm font-semibold">Web Background</h3>
               <p className="text-xs text-muted-foreground">
-                Customize page backgrounds, patterns, and gradients for the web preview.
+                Customize backgrounds, textures, and gradients for the storefront page.
               </p>
             </div>
             <BackgroundPicker
@@ -451,7 +451,7 @@ export function BrandingStep() {
             <div>
               <h3 className="text-sm font-semibold">App Background</h3>
               <p className="text-xs text-muted-foreground">
-                Control background patterns or gradients inside the mobile app preview.
+                Control patterns and gradients inside the customer app preview.
               </p>
             </div>
             <BackgroundPicker

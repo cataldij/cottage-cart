@@ -15,22 +15,22 @@ export function OverviewStep() {
       <div>
         <h2 className="flex items-center gap-2 text-xl font-bold">
           <FileText className="h-5 w-5 text-primary" />
-          Event Overview
+          Shop Overview
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Set up the basic details for your conference app.
+          Set up the core details customers see first.
         </p>
       </div>
 
       <div className="grid gap-6">
-        {/* Event Name */}
+        {/* Shop Name */}
         <div className="space-y-2">
-          <Label htmlFor="name">Event Name</Label>
+          <Label htmlFor="name">Shop Name</Label>
           <Input
             id="name"
             value={overview.name}
             onChange={(e) => updateOverview({ name: e.target.value })}
-            placeholder="My Awesome Conference"
+            placeholder="Lisa's Home Bakery"
             className="text-lg font-semibold"
           />
         </div>
@@ -42,7 +42,7 @@ export function OverviewStep() {
             id="tagline"
             value={overview.tagline}
             onChange={(e) => updateOverview({ tagline: e.target.value })}
-            placeholder="Where Innovation Meets Inspiration"
+            placeholder="Small-batch bakes for weekly porch pickup"
           />
         </div>
 
@@ -53,17 +53,17 @@ export function OverviewStep() {
             id="description"
             value={overview.description}
             onChange={(e) => updateOverview({ description: e.target.value })}
-            placeholder="Tell attendees what to expect..."
+            placeholder="Tell customers what you make, when you bake, and how pickup works..."
             rows={3}
           />
         </div>
 
-        {/* Dates */}
+        {/* Order Window */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="startDate" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Start Date
+              Order Window Opens
             </Label>
             <Input
               id="startDate"
@@ -75,7 +75,7 @@ export function OverviewStep() {
           <div className="space-y-2">
             <Label htmlFor="endDate" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              End Date
+              Order Window Closes
             </Label>
             <Input
               id="endDate"
@@ -86,27 +86,27 @@ export function OverviewStep() {
           </div>
         </div>
 
-        {/* Venue */}
+        {/* Pickup */}
         <div className="space-y-2">
           <Label htmlFor="venueName" className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
-            Venue Name
+            Pickup Location Name
           </Label>
           <Input
             id="venueName"
             value={overview.venueName}
             onChange={(e) => updateOverview({ venueName: e.target.value })}
-            placeholder="Moscone Center"
+            placeholder="Front Porch Pickup"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="venueAddress">Venue Address</Label>
+          <Label htmlFor="venueAddress">Pickup Address</Label>
           <Input
             id="venueAddress"
             value={overview.venueAddress}
             onChange={(e) => updateOverview({ venueAddress: e.target.value })}
-            placeholder="747 Howard St, San Francisco, CA 94103"
+            placeholder="123 Maple St, Hometown, ST 12345"
           />
         </div>
 
@@ -118,16 +118,16 @@ export function OverviewStep() {
               Logo
             </Label>
             <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-muted-foreground">
-              Drag & drop or click to upload
+              Drag and drop or click to upload
             </div>
           </div>
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Image className="h-4 w-4" />
-              Banner Image
+              Hero Image
             </Label>
             <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-muted-foreground">
-              Drag & drop or click to upload
+              Drag and drop or click to upload
             </div>
           </div>
         </div>

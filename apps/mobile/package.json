@@ -1,5 +1,5 @@
 {
-  "name": "@cottage-cart/mobile",
+  "name": "@makers-market/mobile",
   "version": "0.0.1",
   "main": "expo-router/entry",
   "scripts": {
@@ -18,8 +18,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@cottage-cart/api": "*",
-    "@cottage-cart/ui": "*",
+    "@makers-market/api": "*",
+    "@makers-market/ui": "*",
     "@expo/vector-icons": "^14.0.0",
     "@hookform/resolvers": "^3.6.0",
     "@stripe/stripe-react-native": "^0.38.0",

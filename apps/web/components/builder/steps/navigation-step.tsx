@@ -6,29 +6,37 @@ import { Label } from '@/components/ui/label'
 import {
   LayoutGrid,
   Home,
+  ShoppingBag,
+  ClipboardList,
+  Star,
+  MessageCircle,
+  MapPin,
+  User,
   Calendar,
   Users,
   Building2,
-  MessageCircle,
   Map,
   Bell,
-  User,
   GripVertical,
 } from 'lucide-react'
 
 const ICON_MAP: Record<string, any> = {
   Home,
+  ShoppingBag,
+  ClipboardList,
+  Star,
+  MessageCircle,
+  MapPin,
+  User,
   Calendar,
   Users,
   Building2,
-  MessageCircle,
   Map,
   Bell,
-  User,
 }
 
 export function NavigationStep() {
-  const { state, toggleModule, reorderModules } = useBuilder()
+  const { state, toggleModule } = useBuilder()
   const { navigation } = state
 
   const enabledModules = navigation.filter(m => m.enabled)
@@ -42,7 +50,7 @@ export function NavigationStep() {
           Navigation Modules
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Choose which modules to include in your conference app.
+          Choose which tabs customers see in your app.
         </p>
       </div>
 
@@ -119,9 +127,9 @@ export function NavigationStep() {
       )}
 
       {/* Preview Info */}
-      <div className="rounded-xl border bg-blue-50 p-4">
-        <p className="text-sm text-blue-800">
-          <strong>Tip:</strong> Drag modules to reorder them. The order here will be reflected in your app&apos;s bottom navigation.
+      <div className="rounded-xl border bg-emerald-50 p-4">
+        <p className="text-sm text-emerald-800">
+          <strong>Tip:</strong> Reorder tabs to match your customer journey. Put shopping tabs first, utility tabs later.
         </p>
       </div>
     </div>
@@ -130,14 +138,13 @@ export function NavigationStep() {
 
 function getModuleDescription(id: string): string {
   const descriptions: Record<string, string> = {
-    home: 'Landing page with event overview',
-    schedule: 'Session agenda and personal schedule',
-    speakers: 'Speaker profiles and bios',
-    sponsors: 'Sponsor booths and information',
-    networking: 'Chat and attendee networking',
-    map: 'Interactive venue map',
-    notifications: 'Push notifications and alerts',
-    profile: 'Attendee profile and settings',
+    home: 'Featured products, maker story, and quick actions',
+    catalog: 'Browse categories and shop all products',
+    orders: 'Track upcoming, active, and past orders',
+    pickup: 'Pickup windows, location, and instructions',
+    reviews: 'Ratings, testimonials, and social proof',
+    messages: 'Buyer messages and support requests',
+    account: 'Customer profile, preferences, and saved details',
   }
   return descriptions[id] || 'Module description'
 }

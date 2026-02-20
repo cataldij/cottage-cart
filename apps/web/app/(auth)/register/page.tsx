@@ -64,14 +64,14 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <span className="text-3xl font-bold text-primary-foreground">C</span>
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white shadow-lg">
+            <span className="text-3xl font-bold">M</span>
           </div>
           <CardTitle className="text-2xl font-bold">
-            Create an Account
+            Maker's Market
           </CardTitle>
           <CardDescription>
-            Sign up to start organizing conferences
+            Create your shop and start selling
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>

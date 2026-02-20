@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
-import type { Database } from '@cottage-cart/api'
+import type { Database } from '@makers-market/api'
 
 let supabaseInstance: ReturnType<typeof createBrowserClient<Database>> | null = null
 

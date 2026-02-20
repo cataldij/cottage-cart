@@ -1,5 +1,5 @@
 {
-  "name": "cottage-cart",
+  "name": "makers-market",
   "private": true,
   "workspaces": [
     "apps/*",

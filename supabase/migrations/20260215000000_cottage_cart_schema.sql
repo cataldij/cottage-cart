@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS products (
 -- 5. ORDERS TABLE
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE IF NOT EXISTS shop_orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id UUID NOT NULL REFERENCES shops(id),
   customer_id UUID REFERENCES auth.users(id),
@@ -182,9 +182,9 @@ CREATE TABLE IF NOT EXISTS orders (
 -- 6. ORDER ITEMS TABLE
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS order_items (
+CREATE TABLE IF NOT EXISTS shop_order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  order_id UUID NOT NULL REFERENCES shop_orders(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id),
   product_name TEXT NOT NULL,
   quantity INTEGER NOT NULL DEFAULT 1,
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   customer_id UUID REFERENCES auth.users(id),
-  order_id UUID REFERENCES orders(id),
+  order_id UUID REFERENCES shop_orders(id),
   rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -244,10 +244,10 @@ CREATE INDEX IF NOT EXISTS idx_shops_slug ON shops(slug);
 CREATE INDEX IF NOT EXISTS idx_shops_category ON shops(category);
 CREATE INDEX IF NOT EXISTS idx_shops_created_by ON shops(created_by);
 CREATE INDEX IF NOT EXISTS idx_products_shop_id ON products(shop_id);
-CREATE INDEX IF NOT EXISTS idx_orders_shop_id ON orders(shop_id);
-CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_shop_orders_shop_id ON shop_orders(shop_id);
+CREATE INDEX IF NOT EXISTS idx_shop_orders_customer_id ON shop_orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_product_categories_shop_id ON product_categories(shop_id);
-CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_shop_order_items_order_id ON shop_order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_shop_hours_shop_id ON shop_hours(shop_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_shop_id ON reviews(shop_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_customer_id ON reviews(customer_id);
@@ -267,8 +267,8 @@ CREATE TRIGGER set_products_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER set_orders_updated_at
-  BEFORE UPDATE ON orders
+CREATE TRIGGER set_shop_orders_updated_at
+  BEFORE UPDATE ON shop_orders
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
@@ -284,8 +284,8 @@ CREATE TRIGGER set_shop_design_tokens_updated_at
 ALTER TABLE shops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE product_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shop_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shop_order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shop_hours ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shop_design_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
@@ -457,39 +457,39 @@ CREATE POLICY product_categories_delete ON product_categories
 -- --------------------------------------------------------------------------
 
 -- Customers can read their own orders
-CREATE POLICY orders_select_customer ON orders
+CREATE POLICY shop_orders_select_customer ON shop_orders
   FOR SELECT
   USING (auth.uid() = customer_id);
 
 -- Shop owners can read orders for their shops
-CREATE POLICY orders_select_shop_owner ON orders
+CREATE POLICY shop_orders_select_shop_owner ON shop_orders
   FOR SELECT
   USING (
     EXISTS (
       SELECT 1 FROM shops
-      WHERE shops.id = orders.shop_id
+      WHERE shops.id = shop_orders.shop_id
         AND shops.created_by = auth.uid()
     )
   );
 
 -- Authenticated users can create orders
-CREATE POLICY orders_insert ON orders
+CREATE POLICY shop_orders_insert ON shop_orders
   FOR INSERT
   WITH CHECK (auth.uid() = customer_id);
 
 -- Shop owners can update order status
-CREATE POLICY orders_update_shop_owner ON orders
+CREATE POLICY shop_orders_update_shop_owner ON shop_orders
   FOR UPDATE
   USING (
     EXISTS (
       SELECT 1 FROM shops
-      WHERE shops.id = orders.shop_id
+      WHERE shops.id = shop_orders.shop_id
         AND shops.created_by = auth.uid()
     )
   );
 
 -- Customers can cancel their own pending orders
-CREATE POLICY orders_update_customer ON orders
+CREATE POLICY shop_orders_update_customer ON shop_orders
   FOR UPDATE
   USING (auth.uid() = customer_id AND status = 'pending')
   WITH CHECK (auth.uid() = customer_id AND status = 'cancelled');
@@ -499,36 +499,36 @@ CREATE POLICY orders_update_customer ON orders
 -- --------------------------------------------------------------------------
 
 -- Customers can read items for their own orders
-CREATE POLICY order_items_select_customer ON order_items
+CREATE POLICY shop_order_items_select_customer ON shop_order_items
   FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM orders
-      WHERE orders.id = order_items.order_id
-        AND orders.customer_id = auth.uid()
+      SELECT 1 FROM shop_orders
+      WHERE shop_orders.id = shop_order_items.order_id
+        AND shop_orders.customer_id = auth.uid()
     )
   );
 
 -- Shop owners can read items for orders at their shops
-CREATE POLICY order_items_select_shop_owner ON order_items
+CREATE POLICY shop_order_items_select_shop_owner ON shop_order_items
   FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM orders
-      JOIN shops ON shops.id = orders.shop_id
-      WHERE orders.id = order_items.order_id
+      SELECT 1 FROM shop_orders
+      JOIN shops ON shops.id = shop_orders.shop_id
+      WHERE shop_orders.id = shop_order_items.order_id
         AND shops.created_by = auth.uid()
     )
   );
 
 -- Authenticated users can insert order items (when creating an order)
-CREATE POLICY order_items_insert ON order_items
+CREATE POLICY shop_order_items_insert ON shop_order_items
   FOR INSERT
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM orders
-      WHERE orders.id = order_items.order_id
-        AND orders.customer_id = auth.uid()
+      SELECT 1 FROM shop_orders
+      WHERE shop_orders.id = shop_order_items.order_id
+        AND shop_orders.customer_id = auth.uid()
     )
   );
 
@@ -686,10 +686,10 @@ CREATE POLICY reviews_insert ON reviews
   WITH CHECK (
     auth.uid() = customer_id
     AND EXISTS (
-      SELECT 1 FROM orders
-      WHERE orders.id = reviews.order_id
-        AND orders.customer_id = auth.uid()
-        AND orders.status = 'picked_up'
+      SELECT 1 FROM shop_orders
+      WHERE shop_orders.id = reviews.order_id
+        AND shop_orders.customer_id = auth.uid()
+        AND shop_orders.status = 'picked_up'
     )
   );
 

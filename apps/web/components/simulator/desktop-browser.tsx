@@ -16,7 +16,7 @@ interface DesktopBrowserProps {
  */
 export function DesktopBrowser({
   children,
-  url = 'conference.app',
+  url = 'makers.market',
   scale = 0.5,
   className = '',
 }: DesktopBrowserProps) {

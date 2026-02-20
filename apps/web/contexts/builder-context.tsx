@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react'
-import { DEMO_CONFERENCE, DEMO_DESIGN_TOKENS, DEMO_GRADIENTS } from '@/lib/demo-data'
+import { DEMO_CONFERENCE, DEMO_DESIGN_TOKENS } from '@/lib/demo-data'
 
 // =============================================
 // TYPES
@@ -138,39 +138,74 @@ interface BuilderContextValue {
 
 const DEFAULT_MODULES: NavigationModule[] = [
   { id: 'home', name: 'Home', icon: 'Home', enabled: true, order: 0 },
-  { id: 'schedule', name: 'Schedule', icon: 'Calendar', enabled: true, order: 1 },
-  { id: 'speakers', name: 'Speakers', icon: 'Users', enabled: true, order: 2 },
-  { id: 'sponsors', name: 'Sponsors', icon: 'Building2', enabled: true, order: 3 },
-  { id: 'networking', name: 'Networking', icon: 'MessageCircle', enabled: true, order: 4 },
-  { id: 'map', name: 'Venue Map', icon: 'Map', enabled: true, order: 5 },
-  { id: 'notifications', name: 'Notifications', icon: 'Bell', enabled: true, order: 6 },
-  { id: 'profile', name: 'My Profile', icon: 'User', enabled: true, order: 7 },
+  { id: 'catalog', name: 'Catalog', icon: 'ShoppingBag', enabled: true, order: 1 },
+  { id: 'orders', name: 'Orders', icon: 'ClipboardList', enabled: true, order: 2 },
+  { id: 'pickup', name: 'Pickup', icon: 'MapPin', enabled: true, order: 3 },
+  { id: 'reviews', name: 'Reviews', icon: 'Star', enabled: true, order: 4 },
+  { id: 'messages', name: 'Messages', icon: 'MessageCircle', enabled: true, order: 5 },
+  { id: 'account', name: 'Account', icon: 'User', enabled: true, order: 6 },
 ]
+
+const DEFAULT_MAKER_TOKENS: DesignTokens = {
+  ...(DEMO_DESIGN_TOKENS as unknown as DesignTokens),
+  colors: {
+    ...(DEMO_DESIGN_TOKENS.colors || {}),
+    primary: '#4E6E52',
+    primaryLight: '#6F8B73',
+    primaryDark: '#36503A',
+    secondary: '#7A5C45',
+    secondaryLight: '#9A7A61',
+    secondaryDark: '#5E4331',
+    accent: '#C66A3D',
+    accentLight: '#DA8C62',
+    accentDark: '#A7542C',
+    background: '#F7F2E8',
+    surface: '#FFF9EF',
+    surfaceHover: '#F1E8D9',
+    text: '#2F241D',
+    textMuted: '#74665B',
+    textInverse: '#FFFDF8',
+    border: '#DFCFBC',
+  },
+  typography: {
+    ...(DEMO_DESIGN_TOKENS.typography || {}),
+    fontFamily: {
+      ...(DEMO_DESIGN_TOKENS.typography?.fontFamily || {}),
+      heading: 'Playfair Display',
+      body: 'DM Sans',
+      mono: 'JetBrains Mono',
+    },
+  },
+}
 
 const DEFAULT_STATE: BuilderState = {
   step: 0,
   overview: {
     id: DEMO_CONFERENCE.id,
-    name: DEMO_CONFERENCE.name,
-    tagline: DEMO_CONFERENCE.tagline || '',
-    description: DEMO_CONFERENCE.description || '',
+    name: "Maker's Market Demo Shop",
+    tagline: 'Fresh from a local kitchen, ready for pickup.',
+    description: 'Small-batch breads, pastries, and seasonal treats made for our neighborhood.',
     startDate: DEMO_CONFERENCE.start_date,
     endDate: DEMO_CONFERENCE.end_date,
-    venueName: DEMO_CONFERENCE.venue_name || '',
-    venueAddress: DEMO_CONFERENCE.venue_address || '',
+    venueName: 'Front Porch Pickup',
+    venueAddress: '123 Maple St, Hometown, USA',
     logoUrl: null,
     bannerUrl: null,
   },
   design: {
-    tokens: DEMO_DESIGN_TOKENS as unknown as DesignTokens,
-    gradients: DEMO_GRADIENTS,
+    tokens: DEFAULT_MAKER_TOKENS,
+    gradients: {
+      hero: 'linear-gradient(135deg, #4E6E52 0%, #7A5C45 55%, #C66A3D 100%)',
+      accent: 'linear-gradient(90deg, #4E6E52, #C66A3D)',
+      card: 'linear-gradient(180deg, #FFF9EF 0%, #F3E8D6 100%)',
+    },
     darkMode: null,
     cardStyle: {
-      variant: 'white',
-      border: 'primary',
-      iconStyle: 'solid',
+      variant: 'tinted',
+      border: 'secondary',
+      iconStyle: 'pill',
     },
-    iconTheme: 'solid',
+    iconTheme: 'duotone',
   },
   app: {
     backgroundPattern: null,
@@ -187,17 +222,17 @@ const DEFAULT_STATE: BuilderState = {
     isPublished: false,
   },
   web: {
-    navBackgroundColor: '#ffffff',
-    navTextColor: '#374151',
-    heroStyle: 'gradient',
+    navBackgroundColor: '#FFF8EE',
+    navTextColor: '#4E6E52',
+    heroStyle: 'image',
     heroHeight: 'medium',
-    heroBackgroundUrl: null,
+    heroBackgroundUrl: 'https://images.pexels.com/photos/2280545/pexels-photo-2280545.jpeg?auto=compress&cs=tinysrgb&w=1200',
     heroVideoUrl: null,
-    heroOverlayOpacity: 0.3,
+    heroOverlayOpacity: 0.28,
     backgroundPattern: null,
     backgroundPatternColor: '#00000010',
-    backgroundGradientStart: null,
-    backgroundGradientEnd: null,
+    backgroundGradientStart: '#FFF9EF',
+    backgroundGradientEnd: '#F3E6D1',
     backgroundImageUrl: null,
     backgroundImageOverlay: 0.5,
   },
@@ -301,7 +336,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
       ...prev,
       publish: {
         eventCode: code,
-        attendeeUrl: `https://conference-os.vercel.app/c/${code.toLowerCase()}`,
+        attendeeUrl: prev.publish.attendeeUrl || 'https://cottage-cart.vercel.app/shop/demo',
         isPublished: true,
       },
     }))
@@ -342,67 +377,76 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
 
         if (!isMounted) return
 
-        const conference = data.conference
+        const shop = data.shop || data.conference
         const tokens = data.designTokens
         const baseTokens = tokens || {
           ...DEFAULT_STATE.design.tokens,
           colors: {
             ...DEFAULT_STATE.design.tokens.colors,
-            primary: conference?.primary_color || DEFAULT_STATE.design.tokens.colors.primary,
-            secondary: conference?.secondary_color || DEFAULT_STATE.design.tokens.colors.secondary,
-            accent: conference?.accent_color || DEFAULT_STATE.design.tokens.colors.accent,
-            background: conference?.background_color || DEFAULT_STATE.design.tokens.colors.background,
+            primary: shop?.primary_color || DEFAULT_STATE.design.tokens.colors.primary,
+            secondary: shop?.secondary_color || DEFAULT_STATE.design.tokens.colors.secondary,
+            accent: shop?.accent_color || DEFAULT_STATE.design.tokens.colors.accent,
+            background: shop?.background_color || DEFAULT_STATE.design.tokens.colors.background,
+            text: shop?.text_color || DEFAULT_STATE.design.tokens.colors.text,
           },
           typography: {
             ...DEFAULT_STATE.design.tokens.typography,
             fontFamily: {
               ...DEFAULT_STATE.design.tokens.typography.fontFamily,
-              heading: conference?.font_heading || DEFAULT_STATE.design.tokens.typography.fontFamily.heading,
-              body: conference?.font_body || DEFAULT_STATE.design.tokens.typography.fontFamily.body,
+              heading: shop?.font_heading || DEFAULT_STATE.design.tokens.typography.fontFamily.heading,
+              body: shop?.font_body || DEFAULT_STATE.design.tokens.typography.fontFamily.body,
             },
           },
         }
 
+        const parseNumberish = (value: unknown, fallback: number) => {
+          if (value === null || value === undefined || value === '') return fallback
+          const parsed = Number(value)
+          return Number.isFinite(parsed) ? parsed : fallback
+        }
+
         const hydrated: Partial<BuilderState> = {
           overview: {
-            id: conference?.id,
-            name: conference?.name || '',
-            tagline: conference?.tagline || '',
-            description: conference?.description || '',
-            startDate: conference?.start_date || '',
-            endDate: conference?.end_date || '',
-            venueName: conference?.venue_name || '',
-            venueAddress: conference?.venue_address || '',
-            logoUrl: conference?.logo_url || null,
-            bannerUrl: conference?.banner_url || null,
+            id: shop?.id,
+            name: shop?.name || '',
+            tagline: shop?.tagline || '',
+            description: shop?.description || '',
+            startDate: '',
+            endDate: '',
+            venueName: shop?.location_name || shop?.venue_name || '',
+            venueAddress: shop?.location_address || shop?.venue_address || '',
+            logoUrl: shop?.logo_url || null,
+            bannerUrl: shop?.banner_url || null,
           },
           design: {
             tokens: baseTokens,
+            gradients: DEFAULT_STATE.design.gradients,
+            darkMode: DEFAULT_STATE.design.darkMode,
             iconTheme: (tokens?.app?.iconTheme as BuilderState['design']['iconTheme']) || 'solid',
             cardStyle: (tokens?.app?.cardStyle as BuilderState['design']['cardStyle']) || DEFAULT_STATE.design.cardStyle,
           },
           web: {
-            navBackgroundColor: conference?.nav_background_color || '#ffffff',
-            navTextColor: conference?.nav_text_color || '#374151',
-            heroStyle: conference?.hero_style || 'gradient',
-            heroHeight: conference?.hero_height || 'medium',
-            heroBackgroundUrl: conference?.hero_background_url || null,
-            heroVideoUrl: conference?.hero_video_url || null,
-            heroOverlayOpacity: conference?.hero_overlay_opacity ?? 0.3,
-            backgroundPattern: conference?.background_pattern || null,
-            backgroundPatternColor: conference?.background_pattern_color || '#00000010',
-            backgroundGradientStart: conference?.background_gradient_start || null,
-            backgroundGradientEnd: conference?.background_gradient_end || null,
-            backgroundImageUrl: conference?.background_image_url || null,
-            backgroundImageOverlay: conference?.background_image_overlay ?? 0.5,
+            navBackgroundColor: shop?.nav_background_color || '#ffffff',
+            navTextColor: shop?.nav_text_color || '#374151',
+            heroStyle: shop?.hero_style || 'gradient',
+            heroHeight: shop?.hero_height || 'medium',
+            heroBackgroundUrl: shop?.hero_background_url || null,
+            heroVideoUrl: shop?.hero_video_url || null,
+            heroOverlayOpacity: parseNumberish(shop?.hero_overlay_opacity, 0.3),
+            backgroundPattern: shop?.background_pattern || null,
+            backgroundPatternColor: shop?.background_pattern_color || '#00000010',
+            backgroundGradientStart: shop?.background_gradient_start || null,
+            backgroundGradientEnd: shop?.background_gradient_end || null,
+            backgroundImageUrl: shop?.background_image_url || null,
+            backgroundImageOverlay: parseNumberish(shop?.background_image_overlay, 0.5),
           },
           app: {
-            backgroundPattern: tokens?.app?.backgroundPattern || null,
-            backgroundPatternColor: tokens?.app?.backgroundPatternColor || '#00000010',
-            backgroundGradientStart: tokens?.app?.backgroundGradientStart || null,
-            backgroundGradientEnd: tokens?.app?.backgroundGradientEnd || null,
-            backgroundImageUrl: tokens?.app?.backgroundImageUrl || null,
-            backgroundImageOverlay: tokens?.app?.backgroundImageOverlay ?? 0.5,
+            backgroundPattern: tokens?.app?.backgroundPattern || shop?.app_background_pattern || null,
+            backgroundPatternColor: tokens?.app?.backgroundPatternColor || shop?.app_background_pattern_color || '#00000010',
+            backgroundGradientStart: tokens?.app?.backgroundGradientStart || shop?.app_background_gradient_start || null,
+            backgroundGradientEnd: tokens?.app?.backgroundGradientEnd || shop?.app_background_gradient_end || null,
+            backgroundImageUrl: tokens?.app?.backgroundImageUrl || shop?.app_background_image_url || null,
+            backgroundImageOverlay: parseNumberish(tokens?.app?.backgroundImageOverlay ?? shop?.app_background_image_overlay, 0.5),
           },
         }
 
@@ -432,17 +476,35 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         const msg = res.status === 401
-          ? 'Not logged in — please sign in first'
+          ? 'Not logged in - please sign in first'
           : res.status === 400
-            ? 'No conference found — create one first'
+            ? 'No shop found - create one first'
             : data.error || `Save failed (${res.status})`
         setSaveError(msg)
         return
       }
+      const result = await res.json().catch(() => null)
+      if (result?.shop) {
+        const shopId = result.shop.id as string | undefined
+        const shopSlug = result.shop.slug as string | undefined
+        setState(prev => ({
+          ...prev,
+          overview: {
+            ...prev.overview,
+            id: shopId || prev.overview.id,
+          },
+          publish: {
+            ...prev.publish,
+            attendeeUrl: shopSlug
+              ? `${window.location.origin}/shop/${shopSlug}`
+              : prev.publish.attendeeUrl,
+          },
+        }))
+      }
       setSavedState(state)
       setLastSavedAt(new Date().toISOString())
     } catch (err) {
-      setSaveError('Network error — could not reach server')
+      setSaveError('Network error - could not reach server')
     } finally {
       setIsSaving(false)
     }

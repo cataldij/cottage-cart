@@ -12,8 +12,8 @@ export function BuilderPreview() {
 
   // Build the config object for the preview
   const previewConfig = {
-    eventName: overview.name || 'Conference Name',
-    tagline: overview.tagline || 'Your tagline here',
+    eventName: overview.name || "Maker's Market Shop",
+    tagline: overview.tagline || 'Fresh from our kitchen this week',
     startDate: overview.startDate,
     endDate: overview.endDate,
     venueName: overview.venueName,

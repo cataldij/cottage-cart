@@ -1,5 +1,5 @@
 {
-  "name": "@cottage-cart/api",
+  "name": "@makers-market/api",
   "version": "0.0.1",
   "main": "./src/index.ts",
   "types": "./src/index.ts",

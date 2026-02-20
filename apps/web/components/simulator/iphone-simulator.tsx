@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { ios } from '@cottage-cart/shop-ui'
+import { ios } from '@makers-market/shop-ui'
 
 interface IphoneSimulatorProps {
   children: ReactNode

@@ -5,16 +5,17 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
-  ChefHat,
   UtensilsCrossed,
   ShoppingBag,
-  Clock,
-  BarChart3,
   Settings,
-  Eye,
   Plus,
-  Star,
   Users,
+  Calculator,
+  MessageCircle,
+  Bell,
+  Store,
+  ShieldCheck,
+  Tag,
 } from 'lucide-react'
 
 interface NavItem {
@@ -55,13 +56,8 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
         {
           name: 'My Shop',
           href: `${basePath}/builder`,
-          icon: ChefHat,
+          icon: Store,
           highlight: true,
-        },
-        {
-          name: 'Preview',
-          href: `${basePath}/preview`,
-          icon: Eye,
         },
       ],
     },
@@ -69,14 +65,15 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
       title: 'Products',
       items: [
         {
-          name: 'Menu Items',
+          name: 'Products',
           href: `${basePath}/products`,
           icon: UtensilsCrossed,
         },
         {
-          name: 'Categories',
-          href: `${basePath}/categories`,
-          icon: LayoutDashboard,
+          name: 'Price Calculator',
+          href: `${basePath}/calculator`,
+          icon: Calculator,
+          highlight: true,
         },
       ],
     },
@@ -89,34 +86,40 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
           icon: ShoppingBag,
         },
         {
-          name: 'Schedule',
-          href: `${basePath}/schedule`,
-          icon: Clock,
-        },
-      ],
-    },
-    {
-      title: 'Customers',
-      items: [
-        {
           name: 'Customers',
           href: `${basePath}/customers`,
           icon: Users,
         },
+      ],
+    },
+    {
+      title: 'Compliance',
+      items: [
         {
-          name: 'Reviews',
-          href: `${basePath}/reviews`,
-          icon: Star,
+          name: 'Compliance Center',
+          href: `${basePath}/compliance`,
+          icon: ShieldCheck,
+          highlight: true,
+        },
+        {
+          name: 'Label Generator',
+          href: `${basePath}/labels`,
+          icon: Tag,
         },
       ],
     },
     {
-      title: 'Insights',
+      title: 'Operations',
       items: [
         {
-          name: 'Analytics',
-          href: `${basePath}/analytics`,
-          icon: BarChart3,
+          name: 'Notifications',
+          href: `${basePath}/notifications`,
+          icon: Bell,
+        },
+        {
+          name: 'Messages',
+          href: `${basePath}/messages`,
+          icon: MessageCircle,
         },
         {
           name: 'Settings',
@@ -129,7 +132,7 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
 
   const defaultUser = {
     name: isDemo ? 'Demo User' : 'Shop Owner',
-    email: isDemo ? 'demo@cottagecart.com' : 'owner@example.com',
+    email: isDemo ? 'demo@makersmarket.com' : 'owner@example.com',
   }
 
   const displayUser = user || defaultUser
@@ -142,10 +145,10 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
       <div className="relative flex h-20 items-center border-b border-white/70 px-6">
         <Link href={overviewHref} className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-600 text-white shadow-soft">
-            <ChefHat className="h-6 w-6" />
+            <span className="text-lg font-bold">M</span>
           </div>
           <div>
-            <div className="font-display text-sm font-semibold">CottageCart</div>
+            <div className="font-display text-sm font-semibold">Maker's Market</div>
             <div className="text-xs text-muted-foreground">
               {isDemo ? 'Demo Mode' : 'Shop Dashboard'}
             </div>

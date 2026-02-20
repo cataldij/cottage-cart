@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils'
 import { Check, FileText, Palette, LayoutGrid, Rocket } from 'lucide-react'
 
 const STEPS = [
-  { id: 0, name: 'Overview', description: 'Event details', icon: FileText },
-  { id: 1, name: 'Branding', description: 'Design system', icon: Palette },
-  { id: 2, name: 'Navigation', description: 'App modules', icon: LayoutGrid },
-  { id: 3, name: 'Publish', description: 'Go live', icon: Rocket },
+  { id: 0, name: 'Overview', description: 'Shop details', icon: FileText },
+  { id: 1, name: 'Branding', description: 'Look and feel', icon: Palette },
+  { id: 2, name: 'Navigation', description: 'Customer app tabs', icon: LayoutGrid },
+  { id: 3, name: 'Publish', description: 'Launch storefront', icon: Rocket },
 ]
 
 export function BuilderStepper() {
@@ -25,7 +25,7 @@ export function BuilderStepper() {
 
       {/* Animated progress fill */}
       <motion.div
-        className="absolute left-[72px] top-[42px] h-[2px] bg-gradient-to-r from-blue-500 via-violet-500 to-purple-500"
+        className="absolute left-[72px] top-[42px] h-[2px] bg-gradient-to-r from-emerald-600 via-amber-600 to-orange-600"
         initial={{ width: 0 }}
         animate={{
           width: `calc(${progressPercent}% * ((100% - 144px) / 100))`,
@@ -64,9 +64,9 @@ export function BuilderStepper() {
                     className={cn(
                       'relative flex h-11 w-11 items-center justify-center rounded-full border-2 transition-colors duration-200',
                       isComplete
-                        ? 'border-transparent bg-gradient-to-br from-blue-500 to-violet-600 text-white shadow-lg shadow-blue-500/30'
+                        ? 'border-transparent bg-gradient-to-br from-emerald-600 to-amber-600 text-white shadow-lg shadow-emerald-500/25'
                         : isCurrent
-                        ? 'border-blue-500 bg-white text-blue-600 shadow-lg shadow-blue-500/20'
+                        ? 'border-emerald-600 bg-white text-emerald-700 shadow-lg shadow-emerald-500/15'
                         : 'border-slate-200 bg-white text-slate-400'
                     )}
                     initial={false}
@@ -93,7 +93,7 @@ export function BuilderStepper() {
                       className={cn(
                         'block text-sm font-semibold transition-colors',
                         isCurrent
-                          ? 'text-blue-600'
+                          ? 'text-emerald-700'
                           : isComplete
                           ? 'text-slate-900'
                           : 'text-slate-400'
@@ -114,7 +114,7 @@ export function BuilderStepper() {
                   {/* Current step indicator dot */}
                   {isCurrent && (
                     <motion.div
-                      className="absolute -bottom-1 h-1 w-8 rounded-full bg-gradient-to-r from-blue-500 to-violet-500"
+                      className="absolute -bottom-1 h-1 w-8 rounded-full bg-gradient-to-r from-emerald-600 to-amber-600"
                       layoutId="currentStepIndicator"
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}

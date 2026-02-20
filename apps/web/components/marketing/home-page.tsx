@@ -19,10 +19,10 @@ import {
 } from 'lucide-react'
 
 const stats = [
-  { label: 'Shop categories', value: '7+' },
+  { label: 'States covered', value: '50' },
   { label: 'Setup time', value: '10 min' },
-  { label: 'Transaction fee', value: '5%' },
-  { label: 'Pre-orders', value: 'Built-in' },
+  { label: 'Starting at', value: 'Free' },
+  { label: 'Compliance', value: 'Built-in' },
 ]
 
 const categories = [
@@ -65,60 +65,60 @@ const showcases = [
 
 const capabilities = [
   {
-    title: 'Branded storefront in minutes',
-    copy: 'Custom colors, fonts, logo, and hero image. Your shop, your brand.',
+    title: 'State compliance, handled',
+    copy: 'Revenue caps, permits, food handler certs, and labeling requirements - tracked for your state automatically.',
     icon: Store,
   },
   {
-    title: 'Menu & product management',
-    copy: 'Add items with photos, prices, allergens, and dietary tags.',
+    title: 'Compliant label generator',
+    copy: 'Generate labels with correct allergens, disclaimers, and state-specific wording. Print-ready.',
     icon: UtensilsCrossed,
   },
   {
-    title: 'Pre-order & pickup scheduling',
-    copy: 'Customers order ahead, you set availability windows and pickup instructions.',
+    title: 'AI-powered recipe pricing',
+    copy: 'Paste a recipe, get ingredient costs, competitive pricing, and profit projections instantly.',
     icon: ShoppingBag,
   },
   {
-    title: 'Local discovery',
-    copy: 'Customers browse shops near them by category. New customers find you.',
+    title: 'Storefront + orders + customers',
+    copy: 'Your own branded shop with ordering, customer management, loyalty rewards, and messaging.',
     icon: Heart,
   },
 ]
 
 const steps = [
   {
-    title: 'Build your shop',
-    detail: 'Set up your branded storefront with menu, hours, and pickup details.',
+    title: 'Set up your shop',
+    detail: 'Tell us your state, add your products, and get your compliance checklist.',
   },
   {
-    title: 'Start taking orders',
-    detail: 'Customers pre-order from your menu and pick up on your schedule.',
+    title: 'Stay compliant',
+    detail: 'Track permits, revenue caps, labels, and certifications - all in one dashboard.',
   },
   {
     title: 'Grow your business',
-    detail: 'Get discovered by local customers. Build reviews and repeat buyers.',
+    detail: 'Take orders, manage customers, and use AI pricing to maximize your profit.',
   },
 ]
 
 const liveNow = [
-  'Branded shop builder with live preview',
+  'Branded storefront with your own URL',
   'Product catalog with categories & allergens',
-  'Pre-order system with pickup scheduling',
-  'Custom hours and availability windows',
-  'Customer-facing storefront at your own URL',
+  'AI-powered recipe costing & pricing',
   'Order management dashboard',
-  'Mobile-friendly for customers and shop owners',
-  'Local shop discovery by category',
+  'State-by-state compliance tracking',
+  'Revenue cap monitoring with alerts',
+  'Compliant label generator',
+  'Mobile-friendly for customers and makers',
 ]
 
 const comingNext = [
   'Stripe payment processing',
-  'Customer reviews and ratings',
-  'Delivery zone management',
-  'SMS order notifications',
-  'Seasonal menu scheduling',
-  'Loyalty rewards program',
+  'Customer loyalty & rewards program',
+  'In-app messaging & notifications',
+  'Permit & certification tracking',
+  'Revenue analytics & tax export',
+  'Customer-facing mobile app',
 ]
 
 const heroBackdrop =
@@ -182,9 +182,9 @@ export default function HomePage() {
             </div>
             <div>
               <p className="font-display text-sm font-semibold text-slate-900">
-                CottageCart
+                Maker's Market
               </p>
-              <p className="text-xs text-slate-500">Your food, your storefront</p>
+              <p className="text-xs text-slate-500">Run your food business, stay compliant</p>
             </div>
           </div>
           <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
@@ -202,8 +202,8 @@ export default function HomePage() {
             </a>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="hidden rounded-full md:inline-flex">
-              Browse shops
+            <Button asChild variant="outline" className="hidden rounded-full md:inline-flex">
+              <Link href="/shops">Browse shops</Link>
             </Button>
             <Button asChild className="rounded-full bg-amber-700 text-white shadow-soft hover:bg-amber-800">
               <Link href="/dashboard">Open dashboard</Link>
@@ -234,26 +234,27 @@ export default function HomePage() {
               </div>
               <div className="space-y-4">
                 <h1 className="font-display text-4xl font-semibold leading-[1.05] text-slate-900 md:text-6xl">
-                  Your cottage food{' '}
-                  <span className="text-gradient">deserves a storefront</span>.
+                  Your cottage food business,{' '}
+                  <span className="text-gradient">fully managed</span>.
                 </h1>
                 <p className="text-base text-slate-600 md:text-lg">
-                  CottageCart gives home bakers, chocolatiers, hot sauce makers, and
-                  artisan food producers their own branded shop — with menus,
-                  pre-orders, and local pickup. Set up in 10 minutes.
+                  Maker's Market helps home bakers, chocolatiers, hot sauce makers, and
+                  artisan food producers run their entire business - storefront, orders,
+                  compliance, labels, and pricing. All in one place.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4">
-                <Button className="rounded-full bg-amber-700 px-6 text-white shadow-soft hover:bg-amber-800">
-                  Create your shop
-                  <ArrowRight className="h-4 w-4" />
+                <Button asChild className="rounded-full bg-amber-700 px-6 text-white shadow-soft hover:bg-amber-800">
+                  <Link href="/register">
+                    Create your shop
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-full border-white/70 bg-white/80 px-6 shadow-soft"
-                >
-                  See examples
-                  <Flame className="h-4 w-4" />
+                <Button asChild variant="outline" className="rounded-full border-white/70 bg-white/80 px-6 shadow-soft">
+                  <Link href="/shops">
+                    See examples
+                    <Flame className="h-4 w-4" />
+                  </Link>
                 </Button>
               </div>
               <div className="grid gap-6 sm:grid-cols-2">
@@ -399,12 +400,14 @@ export default function HomePage() {
               Built for every maker
             </p>
             <h2 className="font-display mt-3 text-3xl text-slate-900 md:text-4xl">
-              Whatever you make, we&apos;ve got your cart.
+              Whatever you make, we&apos;ve got your back.
             </h2>
           </div>
-          <Button variant="outline" className="rounded-full border-white/70 bg-white/80">
-            Browse all shops
-            <ArrowUpRight className="h-4 w-4" />
+          <Button asChild variant="outline" className="rounded-full border-white/70 bg-white/80">
+            <Link href="/shops">
+              Browse all shops
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </Button>
         </motion.div>
         <motion.div className="mt-10 grid gap-6 lg:grid-cols-3" variants={stagger}>
@@ -462,7 +465,7 @@ export default function HomePage() {
           </div>
           <div className="text-sm text-slate-600">
             From a beautiful branded storefront to pre-order management and local
-            discovery — CottageCart handles the tech so you can focus on what
+            discovery - Maker's Market handles the tech so you can focus on what
             you do best: making incredible food.
           </div>
         </motion.div>
@@ -538,13 +541,15 @@ export default function HomePage() {
                 From kitchen to customers in three steps.
               </h2>
               <p className="text-sm text-slate-600">
-                CottageCart is built to be simple. Set up your shop, add your
-                products, and start taking pre-orders. Your customers get a
-                beautiful storefront. You get a business.
+                Maker's Market is built to be simple. Set up your shop, check
+                your compliance, and start selling. Your customers get a
+                beautiful storefront. You get a business that's legal.
               </p>
-              <Button className="rounded-full bg-amber-700 text-white shadow-soft hover:bg-amber-800">
-                Create your shop
-                <ArrowRight className="h-4 w-4" />
+              <Button asChild className="rounded-full bg-amber-700 text-white shadow-soft hover:bg-amber-800">
+                <Link href="/register">
+                  Create your shop
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </Button>
             </div>
             <div className="space-y-6">
@@ -639,11 +644,11 @@ export default function HomePage() {
               </h2>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Button className="rounded-full bg-amber-700 px-6 text-white shadow-soft hover:bg-amber-800">
-                Create your shop free
+              <Button asChild className="rounded-full bg-amber-700 px-6 text-white shadow-soft hover:bg-amber-800">
+                <Link href="/register">Create your shop free</Link>
               </Button>
-              <Button variant="outline" className="rounded-full border-white/70 bg-white/80 px-6">
-                Browse shops near you
+              <Button asChild variant="outline" className="rounded-full border-white/70 bg-white/80 px-6">
+                <Link href="/shops">Browse shops near you</Link>
               </Button>
             </div>
           </div>
@@ -656,10 +661,10 @@ export default function HomePage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-700 text-white">
               <ChefHat className="h-4 w-4" />
             </div>
-            <span>CottageCart</span>
+            <span>Maker's Market</span>
           </div>
           <div className="flex items-center gap-6">
-            <span>hello@cottagecart.com</span>
+            <span>hello@makersmarket.com</span>
             <span>Made for makers everywhere</span>
           </div>
         </div>
@@ -667,3 +672,4 @@ export default function HomePage() {
     </div>
   )
 }
+
