@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { ShoppingBag, Instagram, ExternalLink } from 'lucide-react'
 import { DEFAULT_SECTIONS } from '@/lib/builder-sections'
 import { SectionRenderer } from '@/components/storefront/sections/section-renderer'
+import { CartDrawer } from '@/components/storefront/cart-drawer'
 import type { SectionProps, Shop, Product, Category, ShopHours, AdvancedSettings } from '@/components/storefront/sections/types'
 import { formatTime, formatMoney } from '@/components/storefront/sections/types'
 
@@ -27,8 +28,7 @@ interface StorefrontProps {
 export function ShopStorefront({ shop, products, categories, hours, sections, advanced }: StorefrontProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [cart, setCart] = useState<Record<string, number>>({})
-  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
-  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
 
   const primaryColor = shop.primary_color || '#4E6E52'
   const secondaryColor = shop.secondary_color || '#7A5C45'
@@ -64,48 +64,7 @@ export function ShopStorefront({ shop, products, categories, hours, sections, ad
     })
   }
 
-  const submitOrder = async () => {
-    if (!cartCount || isSubmittingOrder) return
-    if (shop.slug === 'demo') {
-      setCheckoutMessage('Demo storefront checkout is preview-only. Publish your shop to accept orders.')
-      return
-    }
-
-    const items = Object.entries(cart).map(([productId, quantity]) => ({
-      productId,
-      quantity,
-    }))
-
-    try {
-      setIsSubmittingOrder(true)
-      setCheckoutMessage(null)
-
-      const response = await fetch(`/api/shop/${shop.slug}/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items }),
-      })
-
-      if (response.status === 401) {
-        setCheckoutMessage('Please sign in to place your order.')
-        return
-      }
-
-      const data = await response.json().catch(() => ({}))
-
-      if (!response.ok) {
-        setCheckoutMessage(data.error || 'Could not place order right now.')
-        return
-      }
-
-      setCart({})
-      setCheckoutMessage(`Order placed successfully (${data.order?.id?.slice(0, 8) || 'new order'}).`)
-    } catch {
-      setCheckoutMessage('Network error. Please try again.')
-    } finally {
-      setIsSubmittingOrder(false)
-    }
-  }
+  const clearCart = () => setCart({})
 
   const openNowLabel = useMemo(() => {
     if (!hours.length) return null
@@ -154,15 +113,22 @@ export function ShopStorefront({ shop, products, categories, hours, sections, ad
               {shop.name}
             </p>
           </div>
-          {cartCount > 0 ? (
-            <p className="text-sm font-semibold" style={{ color: primaryColor }}>
-              {cartCount} item{cartCount > 1 ? 's' : ''} - {formatMoney(cartTotal)}
-            </p>
-          ) : (
-            <p className="text-sm" style={{ color: `${textColor}99` }}>
-              {openNowLabel || 'Fresh local goods'}
-            </p>
-          )}
+          <div className="flex items-center gap-3">
+            {cartCount > 0 ? (
+              <button
+                onClick={() => setCartOpen(true)}
+                className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold text-white transition hover:opacity-90"
+                style={{ backgroundColor: primaryColor }}
+              >
+                <ShoppingBag className="h-4 w-4" />
+                {cartCount} — {formatMoney(cartTotal)}
+              </button>
+            ) : (
+              <p className="text-sm" style={{ color: `${textColor}99` }}>
+                {openNowLabel || 'Fresh local goods'}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -195,42 +161,35 @@ export function ShopStorefront({ shop, products, categories, hours, sections, ad
         )}
       </main>
 
-      {/* Floating cart bar */}
+      {/* Floating cart button (mobile/desktop) */}
       {cartCount > 0 && (
-        <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 space-y-2">
-          {checkoutMessage && (
-            <div
-              className="mx-auto w-fit rounded-full border px-4 py-2 text-xs font-semibold"
-              style={{ borderColor: `${textColor}22`, backgroundColor: '#fff9ef', color: textColor }}
-            >
-              {checkoutMessage}
-            </div>
-          )}
-          <button
-            className="flex items-center gap-3 rounded-full px-6 py-3 text-white shadow-xl transition-transform hover:scale-[1.02]"
-            style={{ backgroundColor: primaryColor }}
-            onClick={submitOrder}
-            disabled={isSubmittingOrder}
-          >
-            <ShoppingBag className="h-5 w-5" />
-            <span className="font-semibold">
-              {isSubmittingOrder
-                ? 'Placing order...'
-                : `${cartCount} item${cartCount === 1 ? '' : 's'} - ${formatMoney(cartTotal)}`}
-            </span>
-            <span className="rounded-full px-3 py-1 text-sm font-medium" style={{ backgroundColor: `${accentColor}bb` }}>
-              {isSubmittingOrder ? 'Please wait' : (shop.order_button_text || 'Pre-Order')}
-            </span>
-          </button>
-          {checkoutMessage === 'Please sign in to place your order.' && (
-            <div className="text-center text-xs">
-              <Link href="/login" className="font-semibold underline" style={{ color: primaryColor }}>
-                Sign in to continue
-              </Link>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={() => setCartOpen(true)}
+          className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full px-6 py-3 text-white shadow-xl transition-transform hover:scale-[1.02]"
+          style={{ backgroundColor: primaryColor }}
+        >
+          <ShoppingBag className="h-5 w-5" />
+          <span className="font-semibold">
+            {cartCount} item{cartCount === 1 ? '' : 's'} — {formatMoney(cartTotal)}
+          </span>
+          <span className="rounded-full px-3 py-1 text-sm font-medium" style={{ backgroundColor: `${accentColor}bb` }}>
+            {shop.order_button_text || 'View Cart'}
+          </span>
+        </button>
       )}
+
+      {/* Cart Drawer with full checkout flow */}
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        shop={shop}
+        theme={theme}
+        products={products}
+        cart={cart}
+        addToCart={addToCart}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
+      />
     </div>
   )
 }
