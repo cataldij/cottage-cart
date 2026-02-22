@@ -13,6 +13,12 @@ import {
   ShoppingBag,
   TrendingUp,
   UtensilsCrossed,
+  ShieldCheck,
+  AlertTriangle,
+  Users,
+  BarChart3,
+  Gift,
+  Star,
 } from 'lucide-react'
 
 async function getDashboardData() {
@@ -40,6 +46,10 @@ async function getDashboardData() {
     { count: productCount },
     { data: recentOrders },
     { data: allOrders },
+    { data: compliance },
+    { data: stateRules },
+    { data: customerProfiles },
+    { data: loyaltyProgram },
   ] = await Promise.all([
     supabase
       .from('products')
@@ -53,15 +63,58 @@ async function getDashboardData() {
       .limit(5),
     supabase
       .from('shop_orders')
-      .select('total, status')
+      .select('total, status, created_at, customer_email')
       .eq('shop_id', shop.id),
+    supabase
+      .from('shop_compliance')
+      .select('state_code, registration_status, food_handler_status, insurance_status')
+      .eq('shop_id', shop.id)
+      .maybeSingle(),
+    supabase
+      .from('state_compliance_rules')
+      .select('state_code, revenue_cap, state_name')
+      .in('state_code', [(await supabase.from('shop_compliance').select('state_code').eq('shop_id', shop.id).maybeSingle()).data?.state_code || 'XX']),
+    supabase
+      .from('customer_profiles')
+      .select('is_favorite')
+      .eq('shop_id', shop.id),
+    supabase
+      .from('loyalty_programs')
+      .select('id, is_active')
+      .eq('shop_id', shop.id)
+      .maybeSingle(),
   ])
 
   const orders = allOrders || []
-  const totalRevenue = orders
-    .filter((o: any) => o.status !== 'cancelled')
-    .reduce((sum: number, o: any) => sum + (o.total || 0), 0)
+  const nonCancelled = orders.filter((o: any) => o.status !== 'cancelled')
+  const totalRevenue = nonCancelled.reduce((sum: number, o: any) => sum + (o.total || 0), 0)
   const pendingOrders = orders.filter((o: any) => o.status === 'pending').length
+
+  // This month's revenue
+  const now = new Date()
+  const thisMonthOrders = nonCancelled.filter((o: any) => {
+    const d = new Date(o.created_at)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  })
+  const thisMonthRevenue = thisMonthOrders.reduce((sum: number, o: any) => sum + (o.total || 0), 0)
+
+  // Unique customers
+  const uniqueCustomers = new Set(orders.map((o: any) => o.customer_email?.toLowerCase()).filter(Boolean)).size
+
+  // Revenue cap
+  const stateRule = stateRules?.[0]
+  const revenueCap = stateRule?.revenue_cap || null
+  const ytdRevenue = nonCancelled
+    .filter((o: any) => new Date(o.created_at).getFullYear() === now.getFullYear())
+    .reduce((sum: number, o: any) => sum + (o.total || 0), 0)
+  const capPercent = revenueCap ? (ytdRevenue / revenueCap) * 100 : null
+
+  // Compliance score
+  const complianceItems = compliance ? [
+    compliance.registration_status,
+    compliance.food_handler_status,
+    compliance.insurance_status,
+  ].filter(s => s === 'active').length : 0
 
   return {
     shop,
@@ -70,6 +123,16 @@ async function getDashboardData() {
     totalRevenue,
     pendingOrders,
     totalOrders: orders.length,
+    thisMonthRevenue,
+    uniqueCustomers,
+    revenueCap,
+    ytdRevenue,
+    capPercent,
+    stateName: stateRule?.state_name || null,
+    complianceItems,
+    complianceTotal: compliance ? 3 : 0,
+    favoriteCustomers: (customerProfiles || []).filter((p: any) => p.is_favorite).length,
+    hasLoyalty: loyaltyProgram?.is_active || false,
   }
 }
 
@@ -102,11 +165,11 @@ export default async function DashboardPage() {
 
   const stats = [
     {
-      name: 'Products',
-      value: data.products,
-      icon: UtensilsCrossed,
-      color: 'from-amber-500 to-orange-500',
-      href: '/products',
+      name: 'This Month',
+      value: `$${formatNumber(data.thisMonthRevenue)}`,
+      icon: DollarSign,
+      color: 'from-green-500 to-emerald-500',
+      href: '/revenue',
     },
     {
       name: 'Total Orders',
@@ -123,11 +186,11 @@ export default async function DashboardPage() {
       href: '/orders',
     },
     {
-      name: 'Revenue',
-      value: `$${formatNumber(data.totalRevenue)}`,
-      icon: DollarSign,
-      color: 'from-green-500 to-emerald-500',
-      href: '/orders',
+      name: 'Customers',
+      value: data.uniqueCustomers,
+      icon: Users,
+      color: 'from-purple-500 to-pink-500',
+      href: '/customers',
     },
   ]
 
@@ -166,6 +229,28 @@ export default async function DashboardPage() {
         </div>
       </section>
 
+      {/* Revenue Cap Alert */}
+      {data.capPercent !== null && data.capPercent >= 80 && (
+        <div className={`flex items-center gap-3 rounded-2xl p-4 ${
+          data.capPercent >= 95
+            ? 'border border-red-200 bg-red-50'
+            : 'border border-amber-200 bg-amber-50'
+        }`}>
+          <AlertTriangle className={`h-5 w-5 ${data.capPercent >= 95 ? 'text-red-600' : 'text-amber-600'}`} />
+          <div className="flex-1">
+            <p className={`text-sm font-semibold ${data.capPercent >= 95 ? 'text-red-800' : 'text-amber-800'}`}>
+              {data.capPercent >= 95 ? 'Revenue cap nearly reached!' : 'Approaching revenue cap'}
+            </p>
+            <p className={`text-xs ${data.capPercent >= 95 ? 'text-red-600' : 'text-amber-600'}`}>
+              ${data.ytdRevenue.toFixed(0)} of ${data.revenueCap.toFixed(0)} YTD ({data.capPercent.toFixed(1)}%) — {data.stateName}
+            </p>
+          </div>
+          <Link href="/compliance" className="text-xs font-medium underline">
+            View Details
+          </Link>
+        </div>
+      )}
+
       {/* Stats */}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
@@ -189,7 +274,7 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      {/* Recent Orders + Quick Actions */}
+      {/* Content Grid */}
       <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
         {/* Recent Orders */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6">
@@ -237,8 +322,65 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* Quick Actions */}
+        {/* Right Column */}
         <div className="space-y-4">
+          {/* Compliance Summary */}
+          {data.complianceTotal > 0 && (
+            <Link
+              href="/compliance"
+              className="block rounded-3xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-slate-900">Compliance</h3>
+                <ShieldCheck className="h-5 w-5 text-amber-600" />
+              </div>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-500"
+                    style={{ width: `${(data.complianceItems / data.complianceTotal) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-slate-700">
+                  {data.complianceItems}/{data.complianceTotal}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                {data.complianceItems === data.complianceTotal
+                  ? 'All requirements met'
+                  : `${data.complianceTotal - data.complianceItems} item${data.complianceTotal - data.complianceItems > 1 ? 's' : ''} need attention`}
+              </p>
+            </Link>
+          )}
+
+          {/* Revenue Cap Widget */}
+          {data.revenueCap && (
+            <Link
+              href="/revenue"
+              className="block rounded-3xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-slate-900">Revenue Cap</h3>
+                <BarChart3 className="h-5 w-5 text-amber-600" />
+              </div>
+              <p className="mt-3 text-2xl font-bold text-slate-900">${formatNumber(data.ytdRevenue)}</p>
+              <div className="mt-2 flex items-center gap-3">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full ${
+                      data.capPercent! >= 95 ? 'bg-red-500' : data.capPercent! >= 80 ? 'bg-amber-500' : 'bg-green-500'
+                    }`}
+                    style={{ width: `${Math.min(data.capPercent!, 100)}%` }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-slate-500">
+                  ${formatNumber(data.revenueCap)}
+                </span>
+              </div>
+            </Link>
+          )}
+
+          {/* Quick Actions */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6">
             <h2 className="text-lg font-bold text-slate-900">Quick Actions</h2>
             <div className="mt-4 space-y-3">
@@ -255,27 +397,27 @@ export default async function DashboardPage() {
                 </div>
               </Link>
               <Link
-                href="/calculator"
+                href="/revenue"
                 className="flex items-center gap-3 rounded-xl border border-slate-100 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Revenue Analytics</p>
+                  <p className="text-xs text-slate-500">Track your earnings</p>
+                </div>
+              </Link>
+              <Link
+                href="/calculator"
+                className="flex items-center gap-3 rounded-xl border border-slate-100 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                   <Calculator className="h-5 w-5" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">Price Calculator</p>
                   <p className="text-xs text-slate-500">AI-powered recipe costing</p>
-                </div>
-              </Link>
-              <Link
-                href="/orders"
-                className="flex items-center gap-3 rounded-xl border border-slate-100 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
-                  <ShoppingBag className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">Manage Orders</p>
-                  <p className="text-xs text-slate-500">{data.pendingOrders} pending</p>
                 </div>
               </Link>
             </div>
@@ -294,4 +436,3 @@ export default async function DashboardPage() {
     </div>
   )
 }
-

@@ -16,6 +16,8 @@ import {
   Store,
   ShieldCheck,
   Tag,
+  TrendingUp,
+  Gift,
 } from 'lucide-react'
 
 interface NavItem {
@@ -90,6 +92,12 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
           href: `${basePath}/customers`,
           icon: Users,
         },
+        {
+          name: 'Revenue',
+          href: `${basePath}/revenue`,
+          icon: TrendingUp,
+          highlight: true,
+        },
       ],
     },
     {
@@ -109,17 +117,23 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
       ],
     },
     {
-      title: 'Operations',
+      title: 'Engagement',
       items: [
         {
-          name: 'Notifications',
-          href: `${basePath}/notifications`,
-          icon: Bell,
+          name: 'Rewards',
+          href: `${basePath}/rewards`,
+          icon: Gift,
+          highlight: true,
         },
         {
           name: 'Messages',
           href: `${basePath}/messages`,
           icon: MessageCircle,
+        },
+        {
+          name: 'Notifications',
+          href: `${basePath}/notifications`,
+          icon: Bell,
         },
         {
           name: 'Settings',
