@@ -19,6 +19,7 @@ import {
   Sliders,
   Users,
   Image,
+  ChevronDown,
 } from 'lucide-react'
 
 const EXAMPLE_PROMPTS = [
@@ -43,6 +44,124 @@ const FONTS = [
   'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Raleway',
   'Playfair Display', 'Merriweather', 'Bebas Neue', 'Oswald',
 ]
+
+function AdvancedControls() {
+  const { state, updateDesignTokens } = useBuilder()
+  const [isOpen, setIsOpen] = useState(false)
+  const { design } = state
+  const advanced = (design.tokens as any).advanced || {}
+
+  const updateAdvanced = (key: string, value: string) => {
+    updateDesignTokens({
+      ...design.tokens,
+      advanced: { ...advanced, [key]: value },
+    } as any)
+  }
+
+  return (
+    <div className="rounded-xl border bg-white/70">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between p-4"
+      >
+        <div>
+          <h3 className="text-sm font-semibold">Advanced Storefront</h3>
+          <p className="text-xs text-muted-foreground">Button style, spacing, and more</p>
+        </div>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="space-y-4 border-t px-4 pb-4 pt-3">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium">Button Shape</label>
+              <div className="flex gap-1.5">
+                {(['rounded', 'pill', 'square'] as const).map(shape => (
+                  <button
+                    key={shape}
+                    onClick={() => updateAdvanced('buttonShape', shape)}
+                    className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium capitalize transition-colors ${
+                      (advanced.buttonShape || 'rounded') === shape
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {shape}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium">Button Size</label>
+              <div className="flex gap-1.5">
+                {(['sm', 'md', 'lg'] as const).map(size => (
+                  <button
+                    key={size}
+                    onClick={() => updateAdvanced('buttonSize', size)}
+                    className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium uppercase transition-colors ${
+                      (advanced.buttonSize || 'md') === size
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium">Section Spacing</label>
+              <div className="flex gap-1.5">
+                {(['compact', 'normal', 'spacious'] as const).map(spacing => (
+                  <button
+                    key={spacing}
+                    onClick={() => updateAdvanced('sectionSpacing', spacing)}
+                    className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium capitalize transition-colors ${
+                      (advanced.sectionSpacing || 'normal') === spacing
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {spacing}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-xs font-medium">Product Card Style</label>
+              <select
+                value={advanced.productCardStyle || 'default'}
+                onChange={e => updateAdvanced('productCardStyle', e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              >
+                <option value="default">Default (row)</option>
+                <option value="grid">Grid Cards</option>
+                <option value="compact">Compact List</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium">Corner Radius</label>
+              <select
+                value={advanced.cornerRadius || 'rounded'}
+                onChange={e => updateAdvanced('cornerRadius', e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              >
+                <option value="none">Sharp (0px)</option>
+                <option value="subtle">Subtle (8px)</option>
+                <option value="rounded">Rounded (16px)</option>
+                <option value="pill">Extra Round (28px)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function BrandingStep() {
   const { state, updateDesignTokens, updateGradients, updateCardStyle, updateIconTheme, updateWebSettings, updateAppSettings } = useBuilder()
@@ -323,6 +442,8 @@ export function BrandingStep() {
               </div>
             </div>
           </div>
+          {/* Advanced Storefront Controls */}
+          <AdvancedControls />
         </TabsContent>
 
         <TabsContent value="typography" className="mt-4 space-y-4">

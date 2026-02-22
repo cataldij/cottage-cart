@@ -194,6 +194,7 @@ export default async function ShopPage({ params }: Props) {
   ])
 
   const sections = (tokens?.sections?.length > 0) ? tokens.sections : DEFAULT_SECTIONS
+  const advanced = tokens?.advanced || null
 
   return (
     <ShopStorefront
@@ -202,6 +203,7 @@ export default async function ShopPage({ params }: Props) {
       categories={categories}
       hours={hours}
       sections={sections}
+      advanced={advanced}
     />
   )
 }

@@ -1,10 +1,118 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import { useBuilder } from '@/contexts/builder-context'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Calendar, MapPin, FileText, Image } from 'lucide-react'
+import { Calendar, MapPin, FileText, Image as ImageIcon, Upload, X, Loader2 } from 'lucide-react'
+
+function ImageUpload({
+  label,
+  value,
+  onChange,
+  aspectHint,
+}: {
+  label: string
+  value: string | null
+  onChange: (url: string | null) => void
+  aspectHint: string
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    setIsProcessing(true)
+
+    // Resize to reasonable dimensions for storage
+    const maxSize = label === 'Logo' ? 256 : 1200
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')!
+    const img = new window.Image()
+
+    img.onload = () => {
+      let { width, height } = img
+      if (width > maxSize || height > maxSize) {
+        const ratio = Math.min(maxSize / width, maxSize / height)
+        width = Math.round(width * ratio)
+        height = Math.round(height * ratio)
+      }
+      canvas.width = width
+      canvas.height = height
+      ctx.drawImage(img, 0, 0, width, height)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+      onChange(dataUrl)
+      setIsProcessing(false)
+    }
+    img.onerror = () => setIsProcessing(false)
+    img.src = URL.createObjectURL(file)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0]
+    if (file) handleFile(file)
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="flex items-center gap-2">
+        <ImageIcon className="h-4 w-4" />
+        {label}
+      </Label>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) handleFile(file)
+          e.target.value = ''
+        }}
+      />
+      {value ? (
+        <div className="relative overflow-hidden rounded-lg border">
+          <img src={value} alt={label} className="h-24 w-full object-cover" />
+          <div className="absolute right-1 top-1 flex gap-1">
+            <button
+              onClick={() => inputRef.current?.click()}
+              className="rounded-full bg-black/60 p-1 text-white transition hover:bg-black/80"
+              title="Change image"
+            >
+              <Upload className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => onChange(null)}
+              className="rounded-full bg-black/60 p-1 text-white transition hover:bg-red-600"
+              title="Remove image"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+          className="flex h-24 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5"
+        >
+          {isProcessing ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <>
+              <Upload className="h-5 w-5" />
+              <span>Click or drop to upload</span>
+              <span className="text-[10px] text-slate-400">{aspectHint}</span>
+            </>
+          )}
+        </button>
+      )}
+    </div>
+  )
+}
 
 export function OverviewStep() {
   const { state, updateOverview } = useBuilder()
@@ -110,26 +218,20 @@ export function OverviewStep() {
           />
         </div>
 
-        {/* Logo & Banner Upload Placeholders */}
+        {/* Logo & Banner Upload */}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Image className="h-4 w-4" />
-              Logo
-            </Label>
-            <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-muted-foreground">
-              Drag and drop or click to upload
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Image className="h-4 w-4" />
-              Hero Image
-            </Label>
-            <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-sm text-muted-foreground">
-              Drag and drop or click to upload
-            </div>
-          </div>
+          <ImageUpload
+            label="Logo"
+            value={overview.logoUrl}
+            onChange={(url) => updateOverview({ logoUrl: url })}
+            aspectHint="Square, 256x256 recommended"
+          />
+          <ImageUpload
+            label="Hero Image"
+            value={overview.bannerUrl}
+            onChange={(url) => updateOverview({ bannerUrl: url })}
+            aspectHint="Wide, 1200x400 recommended"
+          />
         </div>
       </div>
     </div>
