@@ -8,7 +8,7 @@ import { Check, FileText, Palette, LayoutGrid, Rocket } from 'lucide-react'
 const STEPS = [
   { id: 0, name: 'Overview', description: 'Shop details', icon: FileText },
   { id: 1, name: 'Branding', description: 'Look and feel', icon: Palette },
-  { id: 2, name: 'Navigation', description: 'Customer app tabs', icon: LayoutGrid },
+  { id: 2, name: 'Layout', description: 'Sections & app tabs', icon: LayoutGrid },
   { id: 3, name: 'Publish', description: 'Launch storefront', icon: Rocket },
 ]
 

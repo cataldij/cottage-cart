@@ -16,7 +16,9 @@ interface BuilderPayload {
     tokens?: any
     cardStyle?: any
     iconTheme?: string
+    gradients?: any
   }
+  sections?: any[]
   web?: {
     navBackgroundColor?: string | null
     navTextColor?: string | null
@@ -193,8 +195,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: updateError?.message || 'Could not save shop settings' }, { status: 500 })
   }
 
+  const sections = body.sections || []
+
   const tokens = {
     ...(design.tokens || {}),
+    sections,
+    gradients: design.gradients || null,
     app: {
       ...(design.tokens?.app || {}),
       cardStyle: design.cardStyle || null,

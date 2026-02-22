@@ -35,6 +35,7 @@ interface DesktopWebsitePreviewProps {
   backgroundGradientEnd?: string
   backgroundImageUrl?: string | null
   backgroundImageOverlay?: number
+  sections?: any[]
   sessions?: Array<{ id: string; title: string; room?: string }>
   speakers?: Array<{ id: string; name: string; title?: string; avatarUrl?: string }>
   sponsors?: Array<{ id: string; name: string; logoUrl?: string; tier: string }>

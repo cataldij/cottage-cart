@@ -51,6 +51,7 @@ interface AttendeeAppHomeProps {
     imageOverlay?: number
   }
   modules: NavigationModule[]
+  sections?: any[]
   onModuleTap?: (moduleId: string) => void
   scale?: number
 }

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { ShopStorefront } from './storefront'
+import { DEFAULT_SECTIONS } from '@/lib/builder-sections'
 
 interface Props {
   params: { slug: string }
@@ -140,6 +141,17 @@ async function getHours(shopId: string) {
   return hours || []
 }
 
+async function getDesignTokens(shopId: string) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('shop_design_tokens')
+    .select('tokens')
+    .eq('shop_id', shopId)
+    .eq('is_active', true)
+    .maybeSingle()
+  return (data?.tokens as any) || null
+}
+
 export async function generateMetadata({ params }: Props) {
   if (params.slug === 'demo') {
     const { shop } = getDemoStorefrontData()
@@ -174,11 +186,14 @@ export default async function ShopPage({ params }: Props) {
   const shop = await getShop(params.slug)
   if (!shop) notFound()
 
-  const [products, categories, hours] = await Promise.all([
+  const [products, categories, hours, tokens] = await Promise.all([
     getProducts(shop.id),
     getCategories(shop.id),
     getHours(shop.id),
+    getDesignTokens(shop.id),
   ])
+
+  const sections = (tokens?.sections?.length > 0) ? tokens.sections : DEFAULT_SECTIONS
 
   return (
     <ShopStorefront
@@ -186,6 +201,7 @@ export default async function ShopPage({ params }: Props) {
       products={products}
       categories={categories}
       hours={hours}
+      sections={sections}
     />
   )
 }

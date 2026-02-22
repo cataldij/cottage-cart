@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react'
 import { DEMO_CONFERENCE, DEMO_DESIGN_TOKENS } from '@/lib/demo-data'
+import { StorefrontSection, DEFAULT_SECTIONS } from '@/lib/builder-sections'
+import type { BuilderTemplate } from '@/lib/builder-templates'
 
 // =============================================
 // TYPES
@@ -75,6 +77,7 @@ interface BuilderState {
     backgroundImageUrl: string | null
     backgroundImageOverlay: number
   }
+  sections: StorefrontSection[]
   navigation: NavigationModule[]
   publish: {
     eventCode: string
@@ -124,6 +127,10 @@ interface BuilderContextValue {
   updateIconTheme: (iconTheme: BuilderState['design']['iconTheme']) => void
   updateWebSettings: (updates: Partial<BuilderState['web']>) => void
   updateAppSettings: (updates: Partial<BuilderState['app']>) => void
+  // Sections
+  updateSections: (sections: StorefrontSection[]) => void
+  // Templates
+  applyTemplate: (template: BuilderTemplate) => void
   // Navigation
   toggleModule: (moduleId: string) => void
   reorderModules: (modules: NavigationModule[]) => void
@@ -215,6 +222,7 @@ const DEFAULT_STATE: BuilderState = {
     backgroundImageUrl: null,
     backgroundImageOverlay: 0.5,
   },
+  sections: DEFAULT_SECTIONS,
   navigation: DEFAULT_MODULES,
   publish: {
     eventCode: '',
@@ -330,6 +338,50 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  const updateSections = useCallback((sections: StorefrontSection[]) => {
+    setState(prev => ({ ...prev, sections }))
+  }, [])
+
+  const applyTemplate = useCallback((template: BuilderTemplate) => {
+    setState(prev => ({
+      ...prev,
+      sections: template.sections,
+      design: {
+        ...prev.design,
+        tokens: {
+          ...prev.design.tokens,
+          colors: {
+            ...prev.design.tokens.colors,
+            primary: template.colors.primary,
+            secondary: template.colors.secondary,
+            accent: template.colors.accent,
+            background: template.colors.background,
+            surface: template.colors.surface,
+            text: template.colors.text,
+            textMuted: template.colors.textMuted,
+            border: template.colors.border,
+          },
+          typography: {
+            ...prev.design.tokens.typography,
+            fontFamily: {
+              ...prev.design.tokens.typography.fontFamily,
+              heading: template.fonts.heading,
+              body: template.fonts.body,
+            },
+          },
+        },
+        gradients: template.gradients,
+        cardStyle: template.cardStyle as BuilderState['design']['cardStyle'],
+      },
+      web: {
+        ...prev.web,
+        heroStyle: template.heroSettings.style,
+        heroHeight: template.heroSettings.height as BuilderState['web']['heroHeight'],
+        heroOverlayOpacity: template.heroSettings.overlayOpacity,
+      },
+    }))
+  }, [])
+
   const generateEventCode = useCallback(() => {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
     setState(prev => ({
@@ -346,6 +398,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     setState(prev => ({
       ...prev,
       ...data,
+      sections: data.sections || prev.sections,
       overview: { ...prev.overview, ...(data.overview || {}) },
       design: {
         ...prev.design,
@@ -405,7 +458,10 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
           return Number.isFinite(parsed) ? parsed : fallback
         }
 
+        const serverSections = tokens?.sections as StorefrontSection[] | undefined
+
         const hydrated: Partial<BuilderState> = {
+          sections: (serverSections && serverSections.length > 0) ? serverSections : DEFAULT_SECTIONS,
           overview: {
             id: shop?.id,
             name: shop?.name || '',
@@ -420,7 +476,7 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
           },
           design: {
             tokens: baseTokens,
-            gradients: DEFAULT_STATE.design.gradients,
+            gradients: tokens?.gradients || DEFAULT_STATE.design.gradients,
             darkMode: DEFAULT_STATE.design.darkMode,
             iconTheme: (tokens?.app?.iconTheme as BuilderState['design']['iconTheme']) || 'solid',
             cardStyle: (tokens?.app?.cardStyle as BuilderState['design']['cardStyle']) || DEFAULT_STATE.design.cardStyle,
@@ -533,6 +589,8 @@ export function BuilderProvider({ children }: { children: ReactNode }) {
     updateIconTheme,
     updateWebSettings,
     updateAppSettings,
+    updateSections,
+    applyTemplate,
     toggleModule,
     reorderModules,
     generateEventCode,

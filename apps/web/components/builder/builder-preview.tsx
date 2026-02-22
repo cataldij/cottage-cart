@@ -6,7 +6,7 @@ import { AppPreview } from '@/components/simulator/app-preview'
 export function BuilderPreview() {
   const { state, savedState, previewEnabled } = useBuilder()
   const activeState = previewEnabled ? state : savedState
-  const { overview, design, navigation, web, app } = activeState
+  const { overview, design, navigation, sections, web, app } = activeState
   const { tokens, gradients } = design
   const appTokenSettings = (tokens as any)?.app || {}
 
@@ -54,6 +54,7 @@ export function BuilderPreview() {
       imageUrl: app.backgroundImageUrl || undefined,
       imageOverlay: app.backgroundImageOverlay,
     },
+    sections,
     hero: {
       style: web.heroStyle,
       height: web.heroHeight,

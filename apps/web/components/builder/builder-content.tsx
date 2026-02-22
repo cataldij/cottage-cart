@@ -1,12 +1,14 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useBuilder } from '@/contexts/builder-context'
 import { OverviewStep } from './steps/overview-step'
 import { BrandingStep } from './steps/branding-step'
-import { NavigationStep } from './steps/navigation-step'
+import { LayoutStep } from './steps/layout-step'
 import { PublishStep } from './steps/publish-step'
+import { TemplatePickerModal } from './template-picker-modal'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, ArrowRight, AlertTriangle, LogIn } from 'lucide-react'
+import { ArrowLeft, ArrowRight, AlertTriangle, LogIn, Sparkles } from 'lucide-react'
 
 export function BuilderContent() {
   const {
@@ -23,7 +25,17 @@ export function BuilderContent() {
     lastSavedAt,
     saveError,
     isAuthenticated,
+    state,
   } = useBuilder()
+
+  const [templateModalOpen, setTemplateModalOpen] = useState(false)
+
+  // Auto-show template picker for new shops (no saved state)
+  useEffect(() => {
+    if (isAuthenticated !== null && !state.overview.id && !lastSavedAt) {
+      setTemplateModalOpen(true)
+    }
+  }, [isAuthenticated, state.overview.id, lastSavedAt])
 
   return (
     <div className="flex h-full flex-col">
@@ -63,6 +75,15 @@ export function BuilderContent() {
         </div>
         <div className="flex items-center gap-2">
           <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setTemplateModalOpen(true)}
+            className="gap-1.5"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Templates
+          </Button>
+          <Button
             variant={previewEnabled ? 'default' : 'outline'}
             size="sm"
             onClick={() => setPreviewEnabled(!previewEnabled)}
@@ -74,11 +95,14 @@ export function BuilderContent() {
           </Button>
         </div>
       </div>
+      {/* Template Picker Modal */}
+      <TemplatePickerModal open={templateModalOpen} onOpenChange={setTemplateModalOpen} />
+
       {/* Step Content */}
       <div className="flex-1 overflow-y-auto rounded-2xl border bg-white/80 p-6 backdrop-blur-xl">
         {currentStep === 0 && <OverviewStep />}
         {currentStep === 1 && <BrandingStep />}
-        {currentStep === 2 && <NavigationStep />}
+        {currentStep === 2 && <LayoutStep />}
         {currentStep === 3 && <PublishStep />}
       </div>
 

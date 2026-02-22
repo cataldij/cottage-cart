@@ -165,6 +165,7 @@ interface PreviewConfig {
     imageUrl?: string | null
     imageOverlay?: number
   }
+  sections?: any[]
   fontFamily?: string
   gradientHero?: string
   modules: NavigationModule[]
@@ -267,6 +268,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
         appTileGap={config.appTileGap}
         appBackground={config.appBackground}
         modules={config.modules}
+        sections={config.sections}
         onModuleTap={handleModuleTap}
         scale={s}
       />
@@ -307,6 +309,7 @@ export function AppPreview({ config, className = '' }: AppPreviewProps) {
     backgroundGradientEnd: config.background?.gradientEnd,
     backgroundImageUrl: config.background?.imageUrl,
     backgroundImageOverlay: config.background?.imageOverlay,
+    sections: config.sections,
   }
 
   const shopUrl = `${config.eventName.toLowerCase().replace(/\s+/g, '-')}.makers.market`

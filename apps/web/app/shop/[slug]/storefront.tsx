@@ -71,11 +71,19 @@ interface Shop {
   website_url: string | null
 }
 
+interface StorefrontSection {
+  id: string
+  sectionType: string
+  config: Record<string, unknown>
+  isVisible: boolean
+}
+
 interface StorefrontProps {
   shop: Shop
   products: Product[]
   categories: Category[]
   hours: ShopHours[]
+  sections?: StorefrontSection[]
 }
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -101,7 +109,7 @@ function formatMoney(value: number) {
   return `$${value.toFixed(2)}`
 }
 
-export function ShopStorefront({ shop, products, categories, hours }: StorefrontProps) {
+export function ShopStorefront({ shop, products, categories, hours, sections }: StorefrontProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [cart, setCart] = useState<Record<string, number>>({})
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
