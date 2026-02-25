@@ -143,7 +143,7 @@ export default async function DashboardPage() {
     return <div>Loading...</div>
   }
 
-  // No shop yet - show onboarding
+  // No shop yet - redirect to onboarding wizard
   if (!data.shop) {
     return (
       <div className="mx-auto max-w-2xl space-y-8 py-12 text-center">
@@ -151,14 +151,17 @@ export default async function DashboardPage() {
           <ChefHat className="h-10 w-10" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Welcome to Maker's Market</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Welcome to Maker&apos;s Market</h1>
           <p className="mt-2 text-slate-500">
-            Create your shop to start selling your homemade goods
+            Let&apos;s get your shop set up in just a few steps
           </p>
         </div>
         <Button asChild className="rounded-full bg-amber-700 px-8 text-white hover:bg-amber-800">
-          <Link href="/builder">Create My Shop</Link>
+          <Link href="/onboarding">Start Setup Wizard</Link>
         </Button>
+        <p className="text-sm text-slate-400">
+          Or <Link href="/builder" className="text-amber-700 hover:underline">jump straight to the shop designer</Link>
+        </p>
       </div>
     )
   }
