@@ -186,9 +186,10 @@ export default function MessagesPage() {
   }
 
   const applyTemplate = (template: Template) => {
+    const validBroadcastTypes = ['announcement', 'promotion', 'new_product', 'reminder']
     setBcSubject(template.subject)
     setBcBody(template.body)
-    setBcType(template.type === 'custom' ? 'announcement' : template.type)
+    setBcType(validBroadcastTypes.includes(template.type) ? template.type : 'announcement')
     setShowBroadcast(true)
     setTab('broadcasts')
   }
