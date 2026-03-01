@@ -185,15 +185,15 @@ export default function MessagesPage() {
     setTemplates(prev => prev.filter(t => t.id !== id))
   }
 
-  const [templateApplied, setTemplateApplied] = useState(false)
-
   const applyTemplate = (template: Template) => {
     const validBroadcastTypes = ['announcement', 'promotion', 'new_product', 'reminder']
     setBcSubject(template.subject)
     setBcBody(template.body)
     setBcType(validBroadcastTypes.includes(template.type) ? template.type : 'announcement')
     setShowTemplate(false)
-    setTemplateApplied(true)
+    // Immediately switch to broadcasts tab and open the form
+    setShowBroadcast(true)
+    setTab('broadcasts')
   }
 
   const filteredCustomers = customers.filter(c => {
@@ -561,41 +561,6 @@ export default function MessagesPage() {
                   New Template
                 </Button>
               )}
-              {/* Template applied confirmation */}
-              {templateApplied && (
-                <div className="flex items-center gap-4 rounded-2xl border border-green-200 bg-green-50 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-700">
-                    <Check className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-green-800">Template applied!</p>
-                    <p className="text-sm text-green-600">Subject and message loaded into broadcast form.</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
-                      onClick={() => {
-                        setTemplateApplied(false)
-                        setShowBroadcast(true)
-                        setTab('broadcasts')
-                      }}
-                    >
-                      <Send className="mr-1 h-3 w-3" />
-                      Go to Broadcast
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-full"
-                      onClick={() => setTemplateApplied(false)}
-                    >
-                      Done
-                    </Button>
-                  </div>
-                </div>
-              )}
-
               <div className="grid gap-4 sm:grid-cols-2">
                 {templates.map(tpl => (
                   <div key={tpl.id} className="rounded-2xl border border-slate-200 bg-white p-5">
