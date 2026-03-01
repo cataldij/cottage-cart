@@ -18,6 +18,9 @@ import {
   Tag,
   TrendingUp,
   Gift,
+  CalendarClock,
+  Scale,
+  Wallet,
 } from 'lucide-react'
 
 interface NavItem {
@@ -77,6 +80,12 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
           icon: Calculator,
           highlight: true,
         },
+        {
+          name: 'Recipe Scaler',
+          href: `${basePath}/recipe-scaler`,
+          icon: Scale,
+          highlight: true,
+        },
       ],
     },
     {
@@ -96,6 +105,18 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
           name: 'Revenue',
           href: `${basePath}/revenue`,
           icon: TrendingUp,
+          highlight: true,
+        },
+        {
+          name: 'Financials',
+          href: `${basePath}/financials`,
+          icon: Wallet,
+          highlight: true,
+        },
+        {
+          name: 'Planner',
+          href: `${basePath}/planner`,
+          icon: CalendarClock,
           highlight: true,
         },
       ],
