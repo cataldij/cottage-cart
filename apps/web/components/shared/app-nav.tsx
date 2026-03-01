@@ -21,6 +21,9 @@ import {
   CalendarClock,
   Scale,
   Wallet,
+  Leaf,
+  BarChart3,
+  BellRing,
 } from 'lucide-react'
 
 interface NavItem {
@@ -134,6 +137,29 @@ export function AppNav({ basePath, isDemo = false, user }: AppNavProps) {
           name: 'Label Generator',
           href: `${basePath}/labels`,
           icon: Tag,
+        },
+      ],
+    },
+    {
+      title: 'Insights',
+      items: [
+        {
+          name: 'Benchmarks',
+          href: `${basePath}/benchmarks`,
+          icon: BarChart3,
+          highlight: true,
+        },
+        {
+          name: 'Price Alerts',
+          href: `${basePath}/alerts`,
+          icon: BellRing,
+          highlight: true,
+        },
+        {
+          name: 'Sustainability',
+          href: `${basePath}/sustainability`,
+          icon: Leaf,
+          highlight: true,
         },
       ],
     },
