@@ -1,8 +1,7 @@
 'use client'
 
-import { Suspense, useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Mail,
@@ -50,22 +49,9 @@ interface Template {
 
 type Tab = 'threads' | 'broadcasts' | 'templates'
 
-export default function MessagesPageWrapper() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-amber-600" /></div>}>
-      <MessagesPage />
-    </Suspense>
-  )
-}
-
-function MessagesPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  // Read tab from URL, default to 'threads'
-  const urlTab = searchParams.get('tab') as Tab | null
-  const tab: Tab = urlTab && ['threads', 'broadcasts', 'templates'].includes(urlTab) ? urlTab : 'threads'
-  const composeMode = searchParams.get('compose') === 'true'
+export default function MessagesPage() {
+  // All tab switching is pure React state — no URL navigation, no sessionStorage
+  const [tab, setTab] = useState<Tab>('threads')
 
   const [shopId, setShopId] = useState<string | null>(null)
   const [shopName, setShopName] = useState('')
@@ -75,21 +61,15 @@ function MessagesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
-  // On mount, check sessionStorage for template data from "Use" click
-  const storedTemplate = typeof window !== 'undefined'
-    ? sessionStorage.getItem('applyTemplate')
-    : null
-  const parsedTemplate = storedTemplate ? JSON.parse(storedTemplate) : null
-
-  // Broadcast form — initialize from sessionStorage if available
-  const [showBroadcast, setShowBroadcast] = useState(composeMode || !!parsedTemplate)
-  const [bcSubject, setBcSubject] = useState(parsedTemplate?.subject || '')
-  const [bcBody, setBcBody] = useState(parsedTemplate?.body || '')
-  const [bcType, setBcType] = useState(parsedTemplate?.type || 'announcement')
+  // Broadcast form
+  const [showBroadcast, setShowBroadcast] = useState(false)
+  const [bcSubject, setBcSubject] = useState('')
+  const [bcBody, setBcBody] = useState('')
+  const [bcType, setBcType] = useState('announcement')
   const [sending, setSending] = useState(false)
 
   // Applied template name for confirmation banner
-  const [appliedTemplateName, setAppliedTemplateName] = useState<string | null>(parsedTemplate?.name || null)
+  const [appliedTemplateName, setAppliedTemplateName] = useState<string | null>(null)
 
   // Template form
   const [showTemplate, setShowTemplate] = useState(false)
@@ -101,16 +81,9 @@ function MessagesPage() {
 
   const supabase: any = createClient()
 
-  // Clear sessionStorage after reading template data
-  useEffect(() => {
-    if (parsedTemplate) {
-      sessionStorage.removeItem('applyTemplate')
-    }
-  }, [])
-
-  // Navigate tabs via URL
+  // Switch tabs via state only — no URL navigation
   const switchTab = (newTab: Tab) => {
-    router.push(`/messages?tab=${newTab}`, { scroll: false })
+    setTab(newTab)
   }
 
   const loadData = useCallback(async () => {
@@ -176,13 +149,6 @@ function MessagesPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // If URL says compose mode, open the broadcast form
-  useEffect(() => {
-    if (composeMode && tab === 'broadcasts') {
-      setShowBroadcast(true)
-    }
-  }, [composeMode, tab])
-
   const sendBroadcast = async () => {
     if (!shopId || !bcSubject.trim() || !bcBody.trim()) return
     setSending(true)
@@ -201,7 +167,6 @@ function MessagesPage() {
     setBcBody('')
     setAppliedTemplateName(null)
     loadData()
-    router.push('/messages?tab=broadcasts', { scroll: false })
   }
 
   const saveTemplate = async () => {
@@ -231,15 +196,13 @@ function MessagesPage() {
 
   const applyTemplate = (template: Template) => {
     const validBroadcastTypes = ['announcement', 'promotion', 'new_product', 'reminder']
-    // Store template data in sessionStorage so it survives navigation
-    sessionStorage.setItem('applyTemplate', JSON.stringify({
-      subject: template.subject,
-      body: template.body,
-      type: validBroadcastTypes.includes(template.type) ? template.type : 'announcement',
-      name: template.name,
-    }))
-    // Hard navigate to broadcasts tab — full page load guarantees clean state
-    window.location.href = '/messages?tab=broadcasts&compose=true'
+    // Directly set form state + switch tab — no navigation needed
+    setBcSubject(template.subject)
+    setBcBody(template.body)
+    setBcType(validBroadcastTypes.includes(template.type) ? template.type : 'announcement')
+    setAppliedTemplateName(template.name)
+    setShowBroadcast(true)
+    setTab('broadcasts')
   }
 
   const filteredCustomers = customers.filter(c => {
@@ -277,7 +240,7 @@ function MessagesPage() {
           className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
           onClick={() => {
             setShowBroadcast(true)
-            router.push('/messages?tab=broadcasts&compose=true', { scroll: false })
+            setTab('broadcasts')
           }}
         >
           <Megaphone className="mr-1 h-4 w-4" />
@@ -414,7 +377,6 @@ function MessagesPage() {
                 <button onClick={() => {
                   setShowBroadcast(false)
                   setAppliedTemplateName(null)
-                  router.push('/messages?tab=broadcasts', { scroll: false })
                 }}>
                   <X className="h-5 w-5 text-slate-400 hover:text-slate-600" />
                 </button>
@@ -472,7 +434,6 @@ function MessagesPage() {
                   <Button variant="outline" className="rounded-full" onClick={() => {
                     setShowBroadcast(false)
                     setAppliedTemplateName(null)
-                    router.push('/messages?tab=broadcasts', { scroll: false })
                   }}>
                     Cancel
                   </Button>
@@ -491,7 +452,6 @@ function MessagesPage() {
                 className="mt-4 rounded-full bg-amber-700 text-white hover:bg-amber-800"
                 onClick={() => {
                   setShowBroadcast(true)
-                  router.push('/messages?tab=broadcasts&compose=true', { scroll: false })
                 }}
               >
                 <Plus className="mr-1 h-4 w-4" />
