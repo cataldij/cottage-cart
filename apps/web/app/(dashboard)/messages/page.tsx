@@ -75,12 +75,21 @@ function MessagesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
-  // Broadcast form
-  const [showBroadcast, setShowBroadcast] = useState(composeMode)
-  const [bcSubject, setBcSubject] = useState('')
-  const [bcBody, setBcBody] = useState('')
-  const [bcType, setBcType] = useState('announcement')
+  // On mount, check sessionStorage for template data from "Use" click
+  const storedTemplate = typeof window !== 'undefined'
+    ? sessionStorage.getItem('applyTemplate')
+    : null
+  const parsedTemplate = storedTemplate ? JSON.parse(storedTemplate) : null
+
+  // Broadcast form — initialize from sessionStorage if available
+  const [showBroadcast, setShowBroadcast] = useState(composeMode || !!parsedTemplate)
+  const [bcSubject, setBcSubject] = useState(parsedTemplate?.subject || '')
+  const [bcBody, setBcBody] = useState(parsedTemplate?.body || '')
+  const [bcType, setBcType] = useState(parsedTemplate?.type || 'announcement')
   const [sending, setSending] = useState(false)
+
+  // Applied template name for confirmation banner
+  const [appliedTemplateName, setAppliedTemplateName] = useState<string | null>(parsedTemplate?.name || null)
 
   // Template form
   const [showTemplate, setShowTemplate] = useState(false)
@@ -90,10 +99,14 @@ function MessagesPage() {
   const [tplType, setTplType] = useState('custom')
   const [savingTpl, setSavingTpl] = useState(false)
 
-  // Applied template confirmation
-  const [appliedTemplateName, setAppliedTemplateName] = useState<string | null>(null)
-
   const supabase: any = createClient()
+
+  // Clear sessionStorage after reading template data
+  useEffect(() => {
+    if (parsedTemplate) {
+      sessionStorage.removeItem('applyTemplate')
+    }
+  }, [])
 
   // Navigate tabs via URL
   const switchTab = (newTab: Tab) => {
@@ -218,15 +231,15 @@ function MessagesPage() {
 
   const applyTemplate = (template: Template) => {
     const validBroadcastTypes = ['announcement', 'promotion', 'new_product', 'reminder']
-    // Set the broadcast form data
-    setBcSubject(template.subject)
-    setBcBody(template.body)
-    setBcType(validBroadcastTypes.includes(template.type) ? template.type : 'announcement')
-    setShowTemplate(false)
-    setShowBroadcast(true)
-    setAppliedTemplateName(template.name)
-    // Navigate to broadcasts tab via URL — this is bulletproof
-    router.push('/messages?tab=broadcasts&compose=true', { scroll: false })
+    // Store template data in sessionStorage so it survives navigation
+    sessionStorage.setItem('applyTemplate', JSON.stringify({
+      subject: template.subject,
+      body: template.body,
+      type: validBroadcastTypes.includes(template.type) ? template.type : 'announcement',
+      name: template.name,
+    }))
+    // Hard navigate to broadcasts tab — full page load guarantees clean state
+    window.location.href = '/messages?tab=broadcasts&compose=true'
   }
 
   const filteredCustomers = customers.filter(c => {
