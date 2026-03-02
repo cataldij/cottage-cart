@@ -4,13 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import {
   Mail,
   MessageSquare,
   Phone,
@@ -68,13 +61,16 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
-  // Broadcast compose dialog — used for "New Broadcast" AND template "Use"
-  const [composeOpen, setComposeOpen] = useState(false)
+  // Inline compose: which template card is expanded with the compose form
+  const [composeForTemplateId, setComposeForTemplateId] = useState<string | null>(null)
   const [bcSubject, setBcSubject] = useState('')
   const [bcBody, setBcBody] = useState('')
   const [bcType, setBcType] = useState('announcement')
   const [sending, setSending] = useState(false)
-  const [appliedTemplateName, setAppliedTemplateName] = useState<string | null>(null)
+  const [sentSuccess, setSentSuccess] = useState(false)
+
+  // Standalone compose (from "New Broadcast" button, on broadcasts tab)
+  const [standaloneCompose, setStandaloneCompose] = useState(false)
 
   // Template form
   const [showTemplate, setShowTemplate] = useState(false)
@@ -150,23 +146,34 @@ export default function MessagesPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // Open compose dialog fresh (New Broadcast button)
-  const openCompose = () => {
-    setBcSubject('')
-    setBcBody('')
-    setBcType('announcement')
-    setAppliedTemplateName(null)
-    setComposeOpen(true)
-  }
-
-  // Open compose dialog pre-filled from a template (Use button)
+  // Click "Use" on a template: expand inline compose form inside that card
   const applyTemplate = (template: Template) => {
     const validTypes = ['announcement', 'promotion', 'new_product', 'reminder']
     setBcSubject(template.subject)
     setBcBody(template.body)
     setBcType(validTypes.includes(template.type) ? template.type : 'announcement')
-    setAppliedTemplateName(template.name)
-    setComposeOpen(true)
+    setSentSuccess(false)
+    setComposeForTemplateId(template.id)
+  }
+
+  // Close inline compose
+  const closeCompose = () => {
+    setComposeForTemplateId(null)
+    setStandaloneCompose(false)
+    setBcSubject('')
+    setBcBody('')
+    setBcType('announcement')
+    setSentSuccess(false)
+  }
+
+  // Open standalone compose (New Broadcast button)
+  const openStandaloneCompose = () => {
+    setBcSubject('')
+    setBcBody('')
+    setBcType('announcement')
+    setSentSuccess(false)
+    setStandaloneCompose(true)
+    setTab('broadcasts')
   }
 
   const sendBroadcast = async () => {
@@ -182,11 +189,11 @@ export default function MessagesPage() {
     })
 
     setSending(false)
-    setComposeOpen(false)
-    setBcSubject('')
-    setBcBody('')
-    setAppliedTemplateName(null)
-    loadData()
+    setSentSuccess(true)
+    setTimeout(() => {
+      closeCompose()
+      loadData()
+    }, 1500)
   }
 
   const saveTemplate = async () => {
@@ -226,6 +233,70 @@ export default function MessagesPage() {
     return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q)
   })
 
+  // Reusable inline compose form (used inside template cards AND standalone)
+  const renderComposeForm = () => (
+    <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
+      {sentSuccess ? (
+        <div className="flex items-center gap-2 rounded-xl bg-green-50 p-4 text-green-800">
+          <Check className="h-5 w-5" />
+          <p className="font-medium">Broadcast sent to {customers.length} customer{customers.length !== 1 ? 's' : ''}!</p>
+        </div>
+      ) : (
+        <>
+          <div>
+            <label className="text-sm font-medium text-slate-700">Type</label>
+            <select
+              value={bcType}
+              onChange={e => setBcType(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+            >
+              <option value="announcement">Announcement</option>
+              <option value="promotion">Promotion / Sale</option>
+              <option value="new_product">New Product</option>
+              <option value="reminder">Reminder</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-slate-700">Subject</label>
+            <input
+              type="text"
+              value={bcSubject}
+              onChange={e => setBcSubject(e.target.value)}
+              placeholder="e.g., Fresh batch dropping this Saturday!"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-slate-700">Message</label>
+            <textarea
+              value={bcBody}
+              onChange={e => setBcBody(e.target.value)}
+              placeholder="Write your message to customers..."
+              rows={4}
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
+              disabled={sending || !bcSubject.trim() || !bcBody.trim()}
+              onClick={sendBroadcast}
+            >
+              {sending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-4 w-4" />}
+              Send to {customers.length} Customer{customers.length !== 1 ? 's' : ''}
+            </Button>
+            <Button variant="outline" className="rounded-full" onClick={closeCompose}>
+              Cancel
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -254,7 +325,7 @@ export default function MessagesPage() {
         </div>
         <Button
           className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
-          onClick={openCompose}
+          onClick={openStandaloneCompose}
         >
           <Megaphone className="mr-1 h-4 w-4" />
           New Broadcast
@@ -284,83 +355,6 @@ export default function MessagesPage() {
           </button>
         ))}
       </div>
-
-      {/* ===== Compose Broadcast Dialog (Modal) ===== */}
-      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
-              {appliedTemplateName
-                ? `Send Broadcast — "${appliedTemplateName}"`
-                : 'New Broadcast'}
-            </DialogTitle>
-            <DialogDescription>
-              Send a message to all {customers.length} customer{customers.length !== 1 ? 's' : ''}
-            </DialogDescription>
-          </DialogHeader>
-
-          {appliedTemplateName && (
-            <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
-              <Check className="h-4 w-4 text-green-600" />
-              <p className="text-sm text-green-800">
-                Template &ldquo;{appliedTemplateName}&rdquo; loaded — edit and send.
-              </p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Type</label>
-              <select
-                value={bcType}
-                onChange={e => setBcType(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-              >
-                <option value="announcement">Announcement</option>
-                <option value="promotion">Promotion / Sale</option>
-                <option value="new_product">New Product</option>
-                <option value="reminder">Reminder</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">Subject</label>
-              <input
-                type="text"
-                value={bcSubject}
-                onChange={e => setBcSubject(e.target.value)}
-                placeholder="e.g., Fresh batch dropping this Saturday!"
-                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-700">Message</label>
-              <textarea
-                value={bcBody}
-                onChange={e => setBcBody(e.target.value)}
-                placeholder="Write your message to customers..."
-                rows={4}
-                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-              />
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <Button
-                className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
-                disabled={sending || !bcSubject.trim() || !bcBody.trim()}
-                onClick={sendBroadcast}
-              >
-                {sending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-4 w-4" />}
-                Send to {customers.length} Customer{customers.length !== 1 ? 's' : ''}
-              </Button>
-              <Button variant="outline" className="rounded-full" onClick={() => setComposeOpen(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* ===== Tab: Customer Threads ===== */}
       {tab === 'threads' && (
@@ -443,14 +437,30 @@ export default function MessagesPage() {
       {/* ===== Tab: Broadcasts ===== */}
       {tab === 'broadcasts' && (
         <>
-          {broadcasts.length === 0 ? (
+          {/* Standalone compose form */}
+          {standaloneCompose && (
+            <div className="rounded-3xl border border-slate-200 bg-white p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-slate-900">New Broadcast</h2>
+                <button onClick={closeCompose}>
+                  <X className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                </button>
+              </div>
+              <p className="mt-1 text-sm text-slate-500">
+                Send a message to all {customers.length} customer{customers.length !== 1 ? 's' : ''}
+              </p>
+              {renderComposeForm()}
+            </div>
+          )}
+
+          {broadcasts.length === 0 && !standaloneCompose ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
               <Megaphone className="mx-auto mb-3 h-10 w-10 text-slate-300" />
               <p className="text-base font-medium text-slate-700">No broadcasts sent yet</p>
               <p className="mt-1 text-sm text-slate-500">Send announcements, promotions, and updates to all your customers</p>
               <Button
                 className="mt-4 rounded-full bg-amber-700 text-white hover:bg-amber-800"
-                onClick={openCompose}
+                onClick={openStandaloneCompose}
               >
                 <Plus className="mr-1 h-4 w-4" />
                 Create Broadcast
@@ -601,7 +611,15 @@ export default function MessagesPage() {
               )}
               <div className="grid gap-4 sm:grid-cols-2">
                 {templates.map(tpl => (
-                  <div key={tpl.id} className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <div
+                    key={tpl.id}
+                    className={cn(
+                      'rounded-2xl border bg-white p-5 transition-all',
+                      composeForTemplateId === tpl.id
+                        ? 'border-amber-300 ring-2 ring-amber-200 sm:col-span-2'
+                        : 'border-slate-200'
+                    )}
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className={cn(
@@ -618,24 +636,31 @@ export default function MessagesPage() {
                         {tpl.body && <p className="mt-1 text-xs text-slate-400 line-clamp-2">{tpl.body}</p>}
                       </div>
                     </div>
-                    <div className="mt-4 flex gap-2">
-                      <Button
-                        size="sm"
-                        className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
-                        onClick={() => applyTemplate(tpl)}
-                      >
-                        <Send className="mr-1 h-3 w-3" />
-                        Use
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-full text-red-600 hover:bg-red-50"
-                        onClick={() => deleteTemplate(tpl.id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
+
+                    {/* Buttons: Use / Delete */}
+                    {composeForTemplateId !== tpl.id && (
+                      <div className="mt-4 flex gap-2">
+                        <Button
+                          size="sm"
+                          className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
+                          onClick={() => applyTemplate(tpl)}
+                        >
+                          <Send className="mr-1 h-3 w-3" />
+                          Use
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-full text-red-600 hover:bg-red-50"
+                          onClick={() => deleteTemplate(tpl.id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Inline compose form — appears INSIDE this card */}
+                    {composeForTemplateId === tpl.id && renderComposeForm()}
                   </div>
                 ))}
               </div>
