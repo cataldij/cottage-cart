@@ -4,6 +4,13 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import {
   Mail,
   MessageSquare,
   Phone,
@@ -16,6 +23,7 @@ import {
   X,
   Check,
   Users,
+  AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -50,7 +58,6 @@ interface Template {
 type Tab = 'threads' | 'broadcasts' | 'templates'
 
 export default function MessagesPage() {
-  // All tab switching is pure React state — no URL navigation, no sessionStorage
   const [tab, setTab] = useState<Tab>('threads')
 
   const [shopId, setShopId] = useState<string | null>(null)
@@ -61,14 +68,12 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
-  // Broadcast form
-  const [showBroadcast, setShowBroadcast] = useState(false)
+  // Broadcast compose dialog — used for "New Broadcast" AND template "Use"
+  const [composeOpen, setComposeOpen] = useState(false)
   const [bcSubject, setBcSubject] = useState('')
   const [bcBody, setBcBody] = useState('')
   const [bcType, setBcType] = useState('announcement')
   const [sending, setSending] = useState(false)
-
-  // Applied template name for confirmation banner
   const [appliedTemplateName, setAppliedTemplateName] = useState<string | null>(null)
 
   // Template form
@@ -78,13 +83,9 @@ export default function MessagesPage() {
   const [tplBody, setTplBody] = useState('')
   const [tplType, setTplType] = useState('custom')
   const [savingTpl, setSavingTpl] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const supabase: any = createClient()
-
-  // Switch tabs via state only — no URL navigation
-  const switchTab = (newTab: Tab) => {
-    setTab(newTab)
-  }
 
   const loadData = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -149,6 +150,25 @@ export default function MessagesPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
+  // Open compose dialog fresh (New Broadcast button)
+  const openCompose = () => {
+    setBcSubject('')
+    setBcBody('')
+    setBcType('announcement')
+    setAppliedTemplateName(null)
+    setComposeOpen(true)
+  }
+
+  // Open compose dialog pre-filled from a template (Use button)
+  const applyTemplate = (template: Template) => {
+    const validTypes = ['announcement', 'promotion', 'new_product', 'reminder']
+    setBcSubject(template.subject)
+    setBcBody(template.body)
+    setBcType(validTypes.includes(template.type) ? template.type : 'announcement')
+    setAppliedTemplateName(template.name)
+    setComposeOpen(true)
+  }
+
   const sendBroadcast = async () => {
     if (!shopId || !bcSubject.trim() || !bcBody.trim()) return
     setSending(true)
@@ -162,7 +182,7 @@ export default function MessagesPage() {
     })
 
     setSending(false)
-    setShowBroadcast(false)
+    setComposeOpen(false)
     setBcSubject('')
     setBcBody('')
     setAppliedTemplateName(null)
@@ -172,8 +192,9 @@ export default function MessagesPage() {
   const saveTemplate = async () => {
     if (!shopId || !tplName.trim() || !tplSubject.trim()) return
     setSavingTpl(true)
+    setSaveError(null)
 
-    await supabase.from('message_templates').insert({
+    const { error } = await supabase.from('message_templates').insert({
       shop_id: shopId,
       name: tplName,
       subject: tplSubject,
@@ -182,6 +203,12 @@ export default function MessagesPage() {
     })
 
     setSavingTpl(false)
+
+    if (error) {
+      setSaveError(`Failed to save: ${error.message}`)
+      return
+    }
+
     setShowTemplate(false)
     setTplName('')
     setTplSubject('')
@@ -192,17 +219,6 @@ export default function MessagesPage() {
   const deleteTemplate = async (id: string) => {
     await supabase.from('message_templates').delete().eq('id', id)
     setTemplates(prev => prev.filter(t => t.id !== id))
-  }
-
-  const applyTemplate = (template: Template) => {
-    const validBroadcastTypes = ['announcement', 'promotion', 'new_product', 'reminder']
-    // Directly set form state + switch tab — no navigation needed
-    setBcSubject(template.subject)
-    setBcBody(template.body)
-    setBcType(validBroadcastTypes.includes(template.type) ? template.type : 'announcement')
-    setAppliedTemplateName(template.name)
-    setShowBroadcast(true)
-    setTab('broadcasts')
   }
 
   const filteredCustomers = customers.filter(c => {
@@ -238,10 +254,7 @@ export default function MessagesPage() {
         </div>
         <Button
           className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
-          onClick={() => {
-            setShowBroadcast(true)
-            setTab('broadcasts')
-          }}
+          onClick={openCompose}
         >
           <Megaphone className="mr-1 h-4 w-4" />
           New Broadcast
@@ -263,7 +276,7 @@ export default function MessagesPage() {
                 ? 'border-b-2 border-amber-700 text-amber-700'
                 : 'text-slate-500 hover:text-slate-700'
             )}
-            onClick={() => switchTab(t.key)}
+            onClick={() => setTab(t.key)}
           >
             <t.icon className="h-4 w-4" />
             {t.label}
@@ -272,7 +285,84 @@ export default function MessagesPage() {
         ))}
       </div>
 
-      {/* Tab: Customer Threads */}
+      {/* ===== Compose Broadcast Dialog (Modal) ===== */}
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {appliedTemplateName
+                ? `Send Broadcast — "${appliedTemplateName}"`
+                : 'New Broadcast'}
+            </DialogTitle>
+            <DialogDescription>
+              Send a message to all {customers.length} customer{customers.length !== 1 ? 's' : ''}
+            </DialogDescription>
+          </DialogHeader>
+
+          {appliedTemplateName && (
+            <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <p className="text-sm text-green-800">
+                Template &ldquo;{appliedTemplateName}&rdquo; loaded — edit and send.
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-slate-700">Type</label>
+              <select
+                value={bcType}
+                onChange={e => setBcType(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+              >
+                <option value="announcement">Announcement</option>
+                <option value="promotion">Promotion / Sale</option>
+                <option value="new_product">New Product</option>
+                <option value="reminder">Reminder</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">Subject</label>
+              <input
+                type="text"
+                value={bcSubject}
+                onChange={e => setBcSubject(e.target.value)}
+                placeholder="e.g., Fresh batch dropping this Saturday!"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">Message</label>
+              <textarea
+                value={bcBody}
+                onChange={e => setBcBody(e.target.value)}
+                placeholder="Write your message to customers..."
+                rows={4}
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
+                disabled={sending || !bcSubject.trim() || !bcBody.trim()}
+                onClick={sendBroadcast}
+              >
+                {sending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-4 w-4" />}
+                Send to {customers.length} Customer{customers.length !== 1 ? 's' : ''}
+              </Button>
+              <Button variant="outline" className="rounded-full" onClick={() => setComposeOpen(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ===== Tab: Customer Threads ===== */}
       {tab === 'threads' && (
         <>
           <div className="relative max-w-sm">
@@ -350,109 +440,17 @@ export default function MessagesPage() {
         </>
       )}
 
-      {/* Tab: Broadcasts */}
+      {/* ===== Tab: Broadcasts ===== */}
       {tab === 'broadcasts' && (
         <>
-          {/* Template applied confirmation */}
-          {appliedTemplateName && (
-            <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-              <Check className="h-4 w-4 text-green-600" />
-              <p className="text-sm text-green-800">
-                Template &ldquo;{appliedTemplateName}&rdquo; loaded — edit below and send.
-              </p>
-              <button
-                className="ml-auto text-green-600 hover:text-green-800"
-                onClick={() => setAppliedTemplateName(null)}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-
-          {/* Broadcast form */}
-          {showBroadcast && (
-            <div className="rounded-3xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-900">New Broadcast</h2>
-                <button onClick={() => {
-                  setShowBroadcast(false)
-                  setAppliedTemplateName(null)
-                }}>
-                  <X className="h-5 w-5 text-slate-400 hover:text-slate-600" />
-                </button>
-              </div>
-              <p className="mt-1 text-sm text-slate-500">
-                Send a message to all {customers.length} customer{customers.length !== 1 ? 's' : ''}
-              </p>
-
-              <div className="mt-4 space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Type</label>
-                  <select
-                    value={bcType}
-                    onChange={e => setBcType(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                  >
-                    <option value="announcement">Announcement</option>
-                    <option value="promotion">Promotion / Sale</option>
-                    <option value="new_product">New Product</option>
-                    <option value="reminder">Reminder</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Subject</label>
-                  <input
-                    type="text"
-                    value={bcSubject}
-                    onChange={e => setBcSubject(e.target.value)}
-                    placeholder="e.g., Fresh batch dropping this Saturday!"
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Message</label>
-                  <textarea
-                    value={bcBody}
-                    onChange={e => setBcBody(e.target.value)}
-                    placeholder="Write your message to customers..."
-                    rows={4}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                  />
-                </div>
-
-                <div className="flex gap-3">
-                  <Button
-                    className="rounded-full bg-amber-700 text-white hover:bg-amber-800"
-                    disabled={sending || !bcSubject.trim() || !bcBody.trim()}
-                    onClick={sendBroadcast}
-                  >
-                    {sending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-4 w-4" />}
-                    Send to {customers.length} Customer{customers.length !== 1 ? 's' : ''}
-                  </Button>
-                  <Button variant="outline" className="rounded-full" onClick={() => {
-                    setShowBroadcast(false)
-                    setAppliedTemplateName(null)
-                  }}>
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Broadcast history */}
-          {broadcasts.length === 0 && !showBroadcast ? (
+          {broadcasts.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
               <Megaphone className="mx-auto mb-3 h-10 w-10 text-slate-300" />
               <p className="text-base font-medium text-slate-700">No broadcasts sent yet</p>
               <p className="mt-1 text-sm text-slate-500">Send announcements, promotions, and updates to all your customers</p>
               <Button
                 className="mt-4 rounded-full bg-amber-700 text-white hover:bg-amber-800"
-                onClick={() => {
-                  setShowBroadcast(true)
-                }}
+                onClick={openCompose}
               >
                 <Plus className="mr-1 h-4 w-4" />
                 Create Broadcast
@@ -493,18 +491,25 @@ export default function MessagesPage() {
         </>
       )}
 
-      {/* Tab: Templates */}
+      {/* ===== Tab: Templates ===== */}
       {tab === 'templates' && (
         <>
-          {/* Template form */}
+          {/* Template creation form */}
           {showTemplate && (
             <div className="rounded-3xl border border-slate-200 bg-white p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-900">New Template</h2>
-                <button onClick={() => setShowTemplate(false)}>
+                <button onClick={() => { setShowTemplate(false); setSaveError(null) }}>
                   <X className="h-5 w-5 text-slate-400 hover:text-slate-600" />
                 </button>
               </div>
+
+              {saveError && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <p className="text-sm text-red-800">{saveError}</p>
+                </div>
+              )}
 
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
@@ -561,7 +566,7 @@ export default function MessagesPage() {
                   {savingTpl ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Check className="mr-1 h-4 w-4" />}
                   Save Template
                 </Button>
-                <Button variant="outline" className="rounded-full" onClick={() => setShowTemplate(false)}>
+                <Button variant="outline" className="rounded-full" onClick={() => { setShowTemplate(false); setSaveError(null) }}>
                   Cancel
                 </Button>
               </div>
